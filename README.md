@@ -1041,7 +1041,7 @@ Builds a textual input that is styled with Bootstrap and supports input group su
 
 Attribute | Description
 ---|---
-data-inputname | The input name.
+data&#x2011;inputname | The input name.
 data-type | The type of input it is: `password`, `multiline`, `date`, or `text` (default).
 data-label | The input label.
 data-help | The help tip.  When provided, the help icon will be displayed that can render the tip in a a popup fashion.
@@ -1068,7 +1068,7 @@ Builds a dropdown control that is styled with Bootstrap (and _bootstrap-select_)
 
 Attribute | Description
 ---|---
-data-inputname | The input name.
+data&#x2011;inputname | The input name.
 data-label | The input label.
 data-help | The help tip.  When provided, the help icon will be displayed that can render the tip in a a popup fashion.
 data-css | A CSS class to apply to the container `div`.  This is same `div` that has the `rbl-display` attribute and `form-group` CSS class assigned.
@@ -1106,7 +1106,7 @@ The `input-checkbox-simple` is a simplified rendering that does _not_ support he
 
 Attribute | Description
 ---|---
-data-inputname | The input name.
+data&#x2011;inputname | The input name.
 data-label | The input label.
 data-help | The help tip.  When provided, the help icon will be displayed that can render the tip in a a popup fashion.
 data&#x2011;checked | A `Boolean` indicating whether the input should be checked by default (default is `false`).
@@ -1123,7 +1123,7 @@ Builds a noUiSlider input that is styled with Bootstrap and supports help tips, 
 
 Attribute | Description
 ---|---
-data-inputname | The input name.
+data&#x2011;inputname | The input name.
 data-label | The input label.
 data-help | The help tip.  When provided, the help icon will be displayed that can render the tip in a a popup fashion.
 data-css | A CSS class to apply to the container `div`.  This is same `div` that has the `rbl-display` attribute and `form-group` CSS class assigned.
@@ -1142,7 +1142,7 @@ Builds a radio or checkbox list of inputs that grouped together and styled with 
 
 Attribute | Description
 ---|---
-data-inputname | The input name.
+data&#x2011;inputname | The input name.
 data-label | The input label.
 data-help | The help tip.  When provided, the help icon will be displayed that can render the tip in a a popup fashion.
 data-css | A CSS class to apply to the container `div`.  This is same `div` that has the `rbl-display` attribute and `form-group` CSS class assigned.
@@ -1177,7 +1177,7 @@ Builds a file upload input that is styled with Bootstrap and supports help tips,
 
 Attribute | Description
 ---|---
-data-inputname | The input name.
+data&#x2011;inputname | The input name.
 data-label | The input label.
 data-help | The help tip.  When provided, the help icon will be displayed that can render the tip in a a popup fashion.
 data-css | A CSS class to apply to the container `div`.  This is same `div` that has the `rbl-display` attribute and `form-group` CSS class assigned.
