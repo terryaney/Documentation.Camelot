@@ -1075,7 +1075,7 @@ data-css | A CSS class to apply to the container `div`.  This is same `div` that
 data-multiselect | A `Boolean` value specifying whether this dropdown allows multi-selection (default is `false`).
 data-livesearch | A `Boolean` value specifying whether this dropdown allows live search capabilities when the dropdown is opened (default is `false`).
 data-size | The number of items to display when the dropdown is opened before rendering a scrollbar (default is `15`).
-data-lookuptable | Specifies the name of lookup table to use as a data source when `ejs-listcontrols` from the results will _not_ provide the data source.
+data&#x2011;lookuptable | Specifies the name of lookup table to use as a data source when `ejs-listcontrols` from the results will _not_ provide the data source.
 data-* | All other data attributes present will be applied to the contained `select` element for processing from the [_bootstrap-select API_](#https://developer.snapappointments.com/bootstrap-select/).
 
 <br/>
@@ -1149,7 +1149,7 @@ data-css | A CSS class to apply to the container `div`.  This is same `div` that
 data-formcss | A CSS class to use in place of the default `form-group`.
 data-horizontal | A `Boolean` value specifying whether the list items should be displayed in a horizontal layout versus vertical (default is `false`).
 data-hidelabel | A `Boolean` value specifying whether the contained `label` element should be remove to correct for UI layout issues when needed (default is `false`).
-data-lookuptable | Specifies the name of lookup table to use as a data source when `ejs-listcontrols` from the results will _not_ provide the data source.
+data&#x2011;lookuptable | Specifies the name of lookup table to use as a data source when `ejs-listcontrols` from the results will _not_ provide the data source.
 
 <br/>
 
