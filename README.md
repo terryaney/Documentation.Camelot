@@ -2480,7 +2480,7 @@ The following methods are helpful for Kaml View or CalcEngine developers to aid 
 
 **`.saveCalcEngine( location: string )`**
 
-Save the *next successful* calculation's CalcEngine to the secure folder specified KAT Team's CMS.
+Save the *next successful* calculation's CalcEngine to the secure folder specified KAT Team's CMS.  Trigger the calculation by changing an input or manually calling the [`.calculate()`](#calculate) or [`.configureUI()`](#configureUI) methods.
 
 ```javascript
 // Save the next CalcEngine to the 'terry.aney' folder
