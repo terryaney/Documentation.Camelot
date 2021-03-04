@@ -521,7 +521,7 @@ value | Whether or not to hide the element.  If `value` is `0`, the element will
 
 <br/>
 
-**Note**: This table should no longer be used.  A `rbl-display` table should be used in its place (ensure that all elements that need content from the table have a `rbl-display=` attribute applied). 
+**Note**: This table should no longer be used.  A `rbl-display` table should be used in its place (ensure that all elements that toggle visibility using this table have a `rbl-display=` attribute applied). 
 
 ## Required  _Push_ Processing
 
