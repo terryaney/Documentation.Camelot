@@ -37,7 +37,7 @@
     - [Building Common Controls](#Building-Common-Controls)
         - [Eliminating Browser ID Warnings](#Eliminating-Browser-ID-Warnings)
         - [Creating Table Row/Column Templates](#Creating-Table-Row/Column-Templates)
-        - [Example: Creating a slider](#Example:-Creating-a-slider)
+        - [Example: Creating a slider](#Example-Creating-a-slider)
     - [Standard_Templates.kaml](#Standard_Templates.kaml)
         - [input-textbox](#input-textbox)
         - [input-dropdown](#input-dropdown)
