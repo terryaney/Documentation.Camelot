@@ -2498,6 +2498,14 @@ Save the *next successful* calculation's CalcEngine to the secure folder specifi
 // Save the next CalcEngine to the 'terry.aney' folder
 $(".katapp").KatApp("saveCalcEngine", "terry.aney");
 $(".katapp").KatApp().saveCalcEngine("terry.aney");
+
+// Then call calculation or configureUI to trigger a calculation...
+$(".katapp").KatApp("calculate");
+$(".katapp").KatApp().calculate();
+
+// or... 
+$(".katapp").KatApp("configureUI");
+$(".katapp").KatApp().configureUI();
 ```
 
 <hr/>
@@ -2512,6 +2520,14 @@ For the next calculation, instruct the RBLe Service to immediately check for an 
 // Immediately check for new CalcEngine upon the next calculation
 $(".katapp").KatApp("refreshCalcEngine");
 $(".katapp").KatApp().refreshCalcEngine();
+
+// Then call calculation or configureUI to trigger a calculation...
+$(".katapp").KatApp("calculate");
+$(".katapp").KatApp().calculate();
+
+// or... 
+$(".katapp").KatApp("configureUI");
+$(".katapp").KatApp().configureUI();
 ```
 
 <hr/>
@@ -2526,6 +2542,14 @@ For the next calculation, instruct the RBLe Service to return detailed trace inf
 // Save the next CalcEngine to the 'terry.aney' folder
 $(".katapp").KatApp("traceCalcEngine");
 $(".katapp").KatApp().traceCalcEngine();
+
+// Then call calculation or configureUI to trigger a calculation...
+$(".katapp").KatApp("calculate");
+$(".katapp").KatApp().calculate();
+
+// or... 
+$(".katapp").KatApp("configureUI");
+$(".katapp").KatApp().configureUI();
 ```
 
 <hr/>
