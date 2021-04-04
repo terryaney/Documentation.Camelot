@@ -2400,7 +2400,7 @@ Attribute | Description
 rbl-action-link | Used as the `commandName` passed into `apiAction`.
 rbl-action-download | Used as the `isDownload` property of the `customOptions` parameter.
 data-param-* | Used as the `customParameters` property of the `customOptions` parameter.  (i.e. to pass plan-id parameter to server, use `data-param-plan-id="value"`)
-data-input-* | Used as the `customInputs` property of the `customOptions` parameter.  (i.e. to pass iDownloadForms=1 parameter to server, use `data-input-iDownloadForms="1"`)
+data-input-* | Used as the `customInputs` property of the `customOptions` parameter.  (i.e. to pass iDownloadForms=1 parameter to server, use `data-input-download-forms="1"`, the server will convert to 'input name' automatically)
 rbl-action-confirm-selector | If the link should prompt before calling the endpoint, this attribute provides a jQuery selector to element containing the markup to display in a modal confirm dialog.
 
 <br/>
