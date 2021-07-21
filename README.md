@@ -284,7 +284,9 @@ $("#KatApp-wealth").KatApp({
 There is a third and final way to configure CalcEngine information.  This is the most common use case as it keeps the KatApp markup and Javascript in the hosting client the simplest and is easist to implement.  Inside each Kaml View file is a required `<rbl-config>` element.  The first element in any Kaml View file should be the `<rbl-config>` element.
 
 ```html
-<rbl-config calcengine="LAW_Wealth_CE"
+<rbl-config 
+    calcengine="LAW_Wealth_CE"
+    calcengine-key="default"
     input-tab="RBLInput"
     result-tabs="RBLResult"
     templates="Standard_Templates,LAW:Law_Templates"></rbl-config>
@@ -353,6 +355,8 @@ rbl-source<br/>rbl&#x2011;source&#x2011;table | Indicates row(s) from an RBLe re
 rbl-on | Attached Javascript event handlers to DOM elements
 
 <br/>
+
+Note: `<rbl-config calcengine-key=""/>` is optional (and `default` is the default key) and would be used when a CalcEngine is a used as both a primary and a secondary (Multiple) CalcEngine are the results are shared across markup templates.  For example, if a Sample_Shared CalcEngine was used as a secondary CalcEngine with a key of `Shared`, the template would have to specify `rbl-ce="Shared"` as a source to a Selector Path.  When Sample_Shared is the single/primary CalcEngine used in a Kaml view, its key would be `default`.  When the same markup template is used, the `rbl-ce="Shared"` source would result in no matches.  To correct this, use `<rbl-config calcengine="Sample_Shared" calcengine-key="Shared"/>`.
 
 ## rbl-value Selector Paths
 There are two ways to use `rbl-value` attribute.  You can provide simply an 'id' that will look inside the `ejs-output` table.  Or you can provide a 'selector path'.  Both mechanisms can be used in conjunction with `rbl-ce` and `rbl-tab`.
@@ -431,9 +435,9 @@ Selector: Table: rbl-value, ID: election-confirm, Column: value
 ```
 
 ## rbl-display Attribute Details
-The `rbl-display` value has all the same 'selector' capabilities described in the _`rbl-value` Attribute Details_.  Once a `value` is selected from a specified table (with a table priority of `rbl-display`, `ejs-visibility`, then `ejs-output` by default), a boolean 'falsey' logic is applied against the value.  An element will be hidden if the value is `0`, `false` or an empty string.
+The `rbl-display` attribute has all the same 'selector' capabilities described in the _`rbl-value` Attribute Details_.  Once a `value` is selected from a specified table (with a table priority of `rbl-display`, `ejs-visibility`, then `ejs-output` by default), a boolean 'falsey' logic is applied against the value.  An element will be hidden if the value is `0`, `false` or an empty string.
 
-**Simple Expressions** - In addition to simply returning a visibility value from the CalcEngine, the `rbl-display` attribute can contain a simple equality expression.
+**Simple Expressions** - In addition to simply returning a visibility value from the CalcEngine, the `rbl-display` attribute can contain simple operator expressions.  Operators supported are `=`, `!=`, `>=`, `>`, `<=`, and `<`.
 
 ```html
 <!-- Show or hide based on 'value' column from 'rbl-display' table where 'id' is 'show-wealth' -->
@@ -447,6 +451,17 @@ Using the first/default tab from the 'Shared' CalcEngine (key=Shared)
 Show if 'enabled' column from 'wealth-summary' table where 'id' is 'benefit-start' = 1, otherwise hide 
 -->
 <div rbl-ce="Shared" rbl-display="wealth-summary.benefit-start.enabled=1">Wealth Information</div>
+```
+
+**Template Value Expressions**
+The `rbl-display` attribute usually works off of values from a CalcEngine result directly.  However, inside [Templates](#Templates), visibility can be controlled by looking at values on the current data being processed by the template, using the simply expressions above.  To accomplish this, a `v:` (for value) prefix is added.
+
+For example, if the data processed by a template had a `code` and `count` column, the following could be leveraged.
+
+```html
+<div rbl-display="v:{code}=YES">Show if the `code` column is `YES`.</div>
+
+<div rbl-display="v:{count}>=2">Show if the `count` column is greater than or equal to 2.</div>
 ```
 
 ## rbl-on Event Handlers
@@ -898,6 +913,27 @@ The most common use of templates with RBLe results is for repetitive result item
 </ul>
 ```
 
+## rbl-source-defaults Attribute
+
+When templates process a data source provided via `rbl-source`, if the data row doesn't have a column requested in the template (i.e. `{requested-column}`), a replace doesn't happen and the templated content returns `{requested-column}`.  If you want to provide default values for columns requested in a template, you can use the `rbl-source-defaults` attribute with values delimited by `;`.
+
+```html
+<!-- Template -->
+<rbl-template tid="li-foundingfathers">
+    <li rbl-display="v:{show}!=0">{first} {last} ({age}), {title}, {location}</li>
+</rbl-template>
+
+<!-- Markup, note that columns without =value provided automatically default to blank. -->
+<ul rbl-tid="li-foundingfathers" rbl-source="foundingfathers" rbl-source-defaults="age=Old;title=Unknown;location;show=1">
+</ul>
+
+<!-- Markup Results (same data source provided in samples above) -->
+<ul rbl-tid="li-foundingfathers" rbl-source="foundingfathers">
+    <li rbl-display="v:1!=0">James Madison (Old), 4th US President, </li>
+    <li rbl-display="v:1!=0">Alexander Hamilton (Old), Former US Treasury Secretary, </li>
+</ul>
+```
+
 ## Template Precedence
 
 Templates can be created inside Kaml View files in addition to a separate Kaml Template file.  Also, a Kaml View can specify multiple Kaml Template files that are required.  Therefore, an order of precedence is applied because templates can be overridden if the same `tid` is used.
@@ -929,7 +965,7 @@ There is additional control that can be applied when processing Kaml templates.
 Attribute | Description
 ---|---
 rbl&#x2011;preserve | Normal processing of a template starts off with all child content of the target being removed.  Setting the content to the templated content.  If you want some content to be preserved, add the `rbl-preserve` _CSS class_ to any child elements that should not be replaced.
-rbl&#x2011;preprend | When templated content is inserted into the Kaml View, by default it is inserted at the end of the element content.  If you are preserving items and you want it inserted at the beginning of the element content, set `rbl-prepend` attribute to `true`.
+rbl&#x2011;preprend | When templated content is inserted into the Kaml View, by default it is inserted at the end of the element content.  If you are preserving items and you want it inserted at the beginning of the element content, set `rbl-prepend` attribute to `true`.  By default, `true` will put items in 'reverse' order because each data source processed will be added as the first element on the template.  If you want them in the order they are processed, you can use `rbl-prepend="before-preserve"` and each data source processed will be inserted before the first `.rbl-preserve` item found.
 
 ```html
 <!-- 
