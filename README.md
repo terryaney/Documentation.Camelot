@@ -1649,15 +1649,15 @@ Nesting `[]` | Column Switch | Optional syntax to specify that a column contains
 
 #### Unique Summary Configuration
 
-Producing a unique list of values in CalcEngines can be difficult (especially when the unique _key_ is a combination of multiple columns). To alleviate this problem, RBLe can produce a unique list of values from input tables (UI inputs, Data Tables `<>` or Global Tables `<<>>`).  The configuration is controlled by the `/unique-summary:detailTable` flag and the columns specified in the summary table.
+Producing a unique list of values in CalcEngines can be difficult (especially when the unique _key_ is a combination of multiple columns). To alleviate this problem, RBLe can produce a unique list of values from input tables (UI inputs, `<data-tables>` or `<<global-tables>>`).  The configuration is controlled by the `/unique-summary:detailTable` flag and the columns specified in the summary table.
 
 1. The `/unique-summary:detailTable` flags a table as a _summary_ table and the `detailTable` name indicates the table that should be summarized.
-2. When creating a summary table, you indicate what type of table (input, data, or global) the detail table is by using the same naming convention: `<>` (data), `<<>>` (global), or no `<>` for user input tables.
+2. When creating a summary table, you indicate what type of table (input, data, or global) the detail table is by using the same naming convention: `<data>`, `<<global>>`, or no `<>` for user input tables.
 3. In the summary table, only columns that generate the _unique_ list of values desired should be specified.  Additional columns (i.e. for additional details) *can not* be used.
 
 In the example below, `benefitSummary` will contain values that generate a unique list across the `benefitType` and `optionId` columns from the `benefitDetails` table.
 
-*\<benefitDetails\> table*
+*&lt;benefitDetails&gt; table*
 id | benefitType/text | optionId/text | coverageLevel/text
 ---|---|---|---
 1 | 01 | 02 | 05
@@ -1666,7 +1666,7 @@ id | benefitType/text | optionId/text | coverageLevel/text
 4 | 02 | 01 | 03
 5 | 03 | 01 | 01
 
-*\<benefitSummary\>/unique-summary:benefitDetails table*
+*&lt;benefitSummary&gt;/unique-summary:benefitDetails table*
 benefitType/text | optionId/text
 ---|---
 01 | 02
@@ -2275,7 +2275,7 @@ viewTemplates | string | A `comma` delimitted list of Kaml Template Files to use
 ajaxLoaderSelector | string | A jQuery selector that indicates an item to show at the start of calculations and hide upon completion.  By default, `.ajaxloader` is used.
 handlers | object | An object containing functions that will be assigned via [rbl-on Event Handlers](#rbl-on-Event-Handlers).
 calcEngines | [CalcEngine](#CalcEngine-Object)[] | An array of CalcEngine objects specifying which CalcEngine(s) should drive the current Kaml View.
-manualResults | [TabDef Object](#TabDef-Object) | Provide manual results that should _always_ be merged with calculation results (or used as the sole calculation results if the KatApp does not have a CalcEngine), they can be assigned here.  These results can be generated and used during prototyping of the Kaml file before the CalcEngine is ready, or can suppliment CalcEngine results if some data that is needed in the Kaml file is/can be generated from code.  When referencing these results in [Kaml Markup selectors](#Multiple-CalcEngines-and-Result-Tabs), use `rbl-ce="ManualResults"`.
+manualResults | [TabDef](#TabDef-Object)[] | Provide manual results that should _always_ be merged with calculation results (or used as the sole calculation results if the KatApp does not have a CalcEngine), they can be assigned here.  These results can be generated and used during prototyping of the Kaml file before the CalcEngine is ready, or can suppliment CalcEngine results if some data that is needed in the Kaml file is/can be generated from code.  When referencing these results in [Kaml Markup selectors](#Multiple-CalcEngines-and-Result-Tabs), use `rbl-ce="ManualResults"`.
 manualInputs | [OptionInputs](#OptionInputs-Object) | Provide inputs that should _always_ be passed in on a calculation but aren't available in the UI, they can be assigned here.
 defaultInputs | [OptionInputs](#OptionInputs-Object) | Provide default inputs to use when the KatApp is initialized or updated via [method calls](#KatApp-Methods) .  `defaultInputs` are only applied one time.
 registerDataWithService | boolean | Whether or not data will be registered with the RBLe Service.  Default value is `true`.  If true, usually the `registeredToken` is passed in, but it can be created via an event handler triggered during the calculation lifecycle.  If false, the `data` property is usually passed in, but it can be created via an event handler triggered during the calculation lifecycle.
