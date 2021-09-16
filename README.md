@@ -1658,6 +1658,7 @@ Producing a unique list of values in CalcEngines can be difficult (especially wh
 In the example below, `benefitSummary` will contain values that generate a unique list across the `benefitType` and `optionId` columns from the `benefitDetails` table.
 
 *&lt;benefitDetails&gt; table*
+
 id | benefitType/text | optionId/text | coverageLevel/text
 ---|---|---|---
 1 | 01 | 02 | 05
@@ -1667,6 +1668,7 @@ id | benefitType/text | optionId/text | coverageLevel/text
 5 | 03 | 01 | 01
 
 *&lt;benefitSummary&gt;/unique-summary:benefitDetails table*
+
 benefitType/text | optionId/text
 ---|---
 01 | 02
