@@ -34,6 +34,7 @@
         - [errors And warnings Tables](#**errors/warnings**)
         - [ejs-markup Table](#**ejs-markup**)
 - [Templates](#Templates)
+    - [rbl-source Selector Paths](#rbl-source-Selector-Paths)
     - [Template Default Attributes](#Template-Default-Attributes)
     - [Template Precedence](#Template-Precedence)
     - [Template Attributes](#Template-Attributes)
@@ -56,6 +57,10 @@
         - [carousel](#carousel)
         - [Additional Template Components](#Additional-Template-Components)
         - [Using Template Type Attribute](#Using-Template-Type-Attribute)
+- [View and Template Expressions](#View-and-Template-Expressions)
+    - [Simple rbl-display Expression Selector](#Simple-rbl-display-Expression-Selector)
+    - [Complex rbl-source Expression Selector](#Complex-rbl-source-Expression-Selector)
+    - [rbl-display Template v: Expression](#rbl-display-Template-v:-Expression)
 - [RBLe Service](#RBLe-Service)
     - [ResultBuilder Framework](#ResultBuilder-Framework)
         - [Table Template Processing](#Table-Template-Processing)
@@ -115,7 +120,7 @@
         - [KatApp Advanced Methods](#KatApp-Advanced-Methods)
             - [apiAction](#apiAction)
             - [serverCalculation](#serverCalculation)
-            - [setDefaultInputsOnNavigate](#setDefaultInputsOnNavigate)
+            - [setNavigationInputs](#setNavigationInputs)
             - [navigate](#navigate)
             - [pushNotification](#pushNotification)
         - [KatApp Debugging Methods](#KatApp-Debugging-Methods)
@@ -152,7 +157,7 @@
             - [onUploadComplete](#onUploadComplete)
         - [Template Event Handlers](#Template-Event-Handlers)
     - [Global Methods](#Global-Methods)
-        - [static setDefaultInputsOnNavigate](#static-setDefaultInputsOnNavigate)
+        - [static setNavigationInputs](#static-setNavigationInputs)
 
 # Overview
 A KatApp is a dynamic html application delivered to a host platform such as Life@Work.  Conceptually, its like a CMS, but instead of static content, it provides for dynamic content containing potentially complex business logic and controls and data and results.
@@ -296,6 +301,7 @@ There is a third and final way to configure CalcEngine information.  This is the
     calcengine-key="default"
     input-tab="RBLInput"
     result-tabs="RBLResult"
+    input-caching="true"
     templates="Standard_Templates,LAW:Law_Templates"></rbl-config>
 ```
 
@@ -371,9 +377,11 @@ There are two ways to use `rbl-value` attribute.  You can provide simply an 'id'
 Selector&nbsp;Path | Description
 ---|---
 id | Look in `rbl-value` (legacy `ejs-output`) table for row where row id is `id` and return the value column.
-table.id | Look in `table` table for row where row id is `id` and return the value column.
-table.id.column | Look in `table` table for row where row id is `id` and return the `column` column.
+table.idValue | Look in `table` table for row where row id is `idValue` and return the value column.
+table.idValue.column | Look in `table` table for row where row id is `idValue` and return the `column` column.
 table.keyColumn.keyValue.column | Look in `table` table for row where `keyColumn` is `keyValue` and return the `column` column.
+
+See [View and Template Expressions](#View-and-Template-Expressions) for information on how to use simple and complex expressions when selecting and processing `rbl-value` attributes.
 
 ```html
 <!-- Table: rbl-value/ejs-output, ID: ret-age, Column: value -->
@@ -442,43 +450,20 @@ Selector: Table: rbl-value, ID: election-confirm, Column: value
 ```
 
 ## rbl-display Attribute Details
-The `rbl-display` attribute has all the same 'selector' capabilities described in the _`rbl-value` Attribute Details_.  Once a `value` is selected from a specified table (with a table priority of `rbl-display`, `ejs-visibility`, then `ejs-output` by default), a boolean 'falsey' logic is applied against the value.  An element will be hidden if the value is `0`, `false` or an empty string.
-
-**Simple Expressions** - In addition to simply returning a visibility value from the CalcEngine, the `rbl-display` attribute can contain simple operator expressions.  Operators supported are `=`, `!=`, `>=`, `>`, `<=`, and `<`.
+The `rbl-display` attribute has all the same 'selector' capabilities described in the [(`rbl-value` Attribute Details](#rbl-value-Selector-Paths).  Once a `value` is selected from a specified table (with a table priority of `rbl-display`, `ejs-visibility`, then `ejs-output` by default), a boolean 'falsey' logic is applied against the value.  An element will be hidden if the value is `0`, `false` or an empty string.
 
 ```html
 <!-- Show or hide based on 'value' column from 'rbl-display' table where 'id' is 'show-wealth' -->
 <div rbl-display="show-wealth">Wealth Information</div>
 
-<!-- Show if 'value' column from 'rbl-display' table where 'id' is 'show-wealth' = 1, otherwise hide -->
-<div rbl-display="wealth-level=1">Wealth Information</div>
+<!-- Show or hide based on 'value' column from 'benefit-savings' table where 'id' is 'ret-age' -->
+<span rbl-display="benefit-savings.ret-age"></span>
 
-<!-- 
-Using the first/default tab from the 'Shared' CalcEngine (key=Shared)
-Show if 'enabled' column from 'wealth-summary' table where 'id' is 'benefit-start' = 1, otherwise hide 
--->
-<div rbl-ce="Shared" rbl-display="wealth-summary.benefit-start.enabled=1">Wealth Information</div>
-
-<!-- 
-Checking existence of a table given a known key 'benefit-start' by using the built in @id value.
-Show if wealth-summary row with id=benefit-start exists.
--->
-<div rbl-display="wealth-summary.benefit-start.@id=benefit-start">benefit-start row exists</div>
+<!-- Show or hide based on 'year' column from 'benefit-savings' table where 'id' is 'ret-age' -->
+<span rbl-display="benefit-savings.ret-age.year"></span>
 ```
 
-**Template Value Expressions**
-
-The `rbl-display` attribute usually works off of values from a CalcEngine result directly.  However, inside [Templates](#Templates), visibility can be controlled by looking at values on the current data being processed by the template, using the simple expressions above.  To accomplish this, a `v:` (for value) prefix is added.
-
-For example, if the data processed by a template had a `code` and `count` column, the following could be leveraged.
-
-```html
-<div rbl-display="v:{code}=YES">Show if the `code` column is `YES`.</div>
-
-<div rbl-display="v:{count}>=2">Show if the `count` column is greater than or equal to 2.</div>
-
-<div rbl-display="v:{field}=">Show if the `field` column is blank.</div>
-```
+See [View and Template Expressions](#View-and-Template-Expressions) for information on how to use simple and complex expressions to determine visibility.
 
 ## rbl-on Event Handlers
 
@@ -613,6 +598,8 @@ Click <a rbl-navigate="DB.Home">here</a> to see your Defined Benefit Portal.
 
 **Passing Default Inputs to the Next KatApp**
 If you need to pass inputs to the KatApp that is being navigated to assign defaults, the `rbl-navigate-input-selector` attribute can be used.  Any input that matches the JQuery selector provided will be pass to the next KatApp to be used as default inputs, similar to the `defaultInputs` property of the [KatAppOptions Object](#KatAppOptions-Object).
+
+By default, inputs passed during navigation are a one-time use input.  If you want inputs persisted to `Storage` indefinitely, use the `rbl-navigate-persist-inputs="true"` attribute.
 
 ```html
 Click <a rbl-navigate="Benefits.HPF" rbl-navigate-input-selector=".iProviderTypeIds">here</a> to find a Benefit Provider.
@@ -871,13 +858,19 @@ removeClass<sup>1</sup> | A `space` delimitted list of CSS clsas names to remove
 
 Templates are a powerful tool in KatApp Views.  Templates are a small markup snippet that are combined with a data object to render content.
 
-The data object can come from static `data-*` attributes or from an RBLe Service result row.  When using RBLe Service result rows, the `rbl-source` attribute is required and the selector path is defined as follows.
+The data object can come from static `data-*` attributes, a RBLe Service result row, or the merged result of both.  To use RBLe Service result rows, the `rbl-source` attribute is required and the selector path is defined as follows.
 
-Selector&nbsp;Path | Description
+## rbl-source Selector Paths
+
+Selector | Description
 ---|---
 table | The name of the table to use as the data source.  The defined template with be applied to each row and injected into the Kaml View.
-table.id | Will only process the row from `table` where the row id  equals `id`.
+table.idValue | Will only process the row from `table` where the row id equals `idValue`.
 table.column.value | Will only process rows from `table` where the value of `column` equals `value`.
+
+If both `rbl-source` and `data-*` attributes are provided, `data-*` attributes will take precedence. All `data-*` values will be merged into currently processing row to provide additional values not present or **replace** existing values found in the current row.
+
+See [View and Template Expressions](#View-and-Template-Expressions) for information on filter `rbl-source` selectors before processing a row.
 
 ```html
 <!-- 
@@ -959,22 +952,24 @@ To provide defaults on a template, simply specify values via `default-` prefixed
 
 When templates are processed, if the data source (`data-` attributes or data row from `rbl-source` driven templates) doesn't have a column requested in the template (i.e. `{missing-column}`), a replace doesn't happen and the templated content returns the static string `{requested-column}` in the markup. Providing defaults allows the Kaml View developers to avoid this situation..
 
+**Note** When `rbl-source` is the data source, result columns from RBLe CalcEngines with blank values returned will automatically be processed as if a blank value was passed in and `{blank-column}` will be replaced. Therefore, setting `default-*=""` is unnecessary, but if an override value instead of blank is desired, `default-*` attribute values should be provided.
+
 ```html
-<!-- Template, note that columns without =value provided automatically default to blank. -->
-<rbl-template tid="li-foundingfathers" default-age="Old" default-title="Unknown" default-location="" default-show="1">
-    <li rbl-display="v:{show}!=0">{first} {last} ({age}), {title}, {location}</li>
+<!-- Template (default-location="" below is for demonstration only since rbl-source is used by caller) -->
+<rbl-template tid="li-foundingfathers" default-age="Old" default-title="Unknown" default-location="">
+    <li>{first} {last} ({age}), {title}, {location}</li>
 </rbl-template>
 
 <!-- Markup -->
 <ul rbl-tid="li-foundingfathers" rbl-source="foundingfathers"></ul>
 
-<!-- Markup, using data-* instead of defaults -->
-<ul rbl-tid="li-foundingfathers" rbl-source="foundingfathers" data-age="Old" data-title="Unknown" data-location="" data-show="1"></ul>
+<!-- Markup, using data-* applied to caller of template instead of defaults on template definition -->
+<ul rbl-tid="li-foundingfathers" rbl-source="foundingfathers" data-age="Old" data-title="Unknown" data-location=""></ul>
 
 <!-- Markup Results (same data source provided in samples above) -->
 <ul rbl-tid="li-foundingfathers" rbl-source="foundingfathers">
-    <li rbl-display="v:1!=0">James Madison (Old), 4th US President, </li>
-    <li rbl-display="v:1!=0">Alexander Hamilton (Old), Former US Treasury Secretary, </li>
+    <li>James Madison (Old), 4th US President, </li>
+    <li>Alexander Hamilton (Old), Former US Treasury Secretary, </li>
 </ul>
 ```
 
@@ -2175,7 +2170,63 @@ The 'culture' of the table can be set via the CalcEngine.  If the results have a
 
 # Advanced Configuration
 
-KatApps have advanced features that can be configured that manage input handling (via attributes), CalcEngines (via Precalc Pipelines) and hooking into the calculation lifecycle events.
+KatApps have advanced features that can be configured that provide expression capabilities, manage input handling (via attributes), CalcEngines (via Precalc Pipelines) and hooking into the calculation lifecycle events.
+
+## View and Template Expressions
+
+Simple and complex expression logic can be used in conjunction with [`rbl-value`/`rbl-display` selector paths](#rbl-value-Selector-Paths) and [`rbl-source` selector paths](#rbl-source-Selector-Paths).  Simple expression logic simply provides a single operator/value comparison in a selector path.  Complex expressions (denoted by `[]` in the selector path) are much more powerful and provide the full capabilities of Javascript programming to create expressions.
+
+### Simple rbl-display Expression Selector
+
+In addition to simply returning a falsey visibility value from the CalcEngine via a [selector path](#rbl-value-Selector-Paths), the `rbl-display` attribute can contain simple operator expressions. The operators that are supported are `=`, `!=`, `>=`, `>`, `<=`, and `<`.
+
+Expression Selector | Description
+---|---
+table.idValue.column{operator}{value} | Display the item if row in `table` table where id is `idValue` does not exist or the `column` column compared to `value` does not return falsey.
+table.keyColumn.keyValue.column{operator}{value} | Display the item if row in `table` table where `keyColumn` is `keyValue` does not exist or the `column` column compared to `value` does not return falsey.
+
+```html
+<!-- 
+Show if 'enabled' column from 'wealth-summary' table where 'id' is 'benefit-start' = 1, otherwise hide 
+-->
+<div rbl-display="wealth-summary.benefit-start.enabled=1">Wealth Information</div>
+
+<!-- 
+Show if 'address1' column from 'contact-info' table where 'id' is 'work' is not blank, otherwise hide 
+-->
+<div rbl-display="contact-info.work.address1!=">Work Address: <span rbl-value="contact-info.work.address1"></span></div>
+
+<!-- 
+Checking existence of a table given a known key 'benefit-start' by using the built in @id value.
+Show if wealth-summary row with id=benefit-start exists.
+-->
+<div rbl-display="wealth-summary.benefit-start.@id=benefit-start">benefit-start row exists</div>
+```
+
+### Complex rbl-source Expression Selector
+
+Expression&nbsp;Selector | Description
+---|---
+table[predicate] | Similar to a [`rbl-source` selector path](#rbl-source-Selector-Paths) that only specifies a `table` (to process all rows) with the addition of javascript predicate support. In the predicate, the `this` reference will be current row being processed and the row will only be processed if the javascript expression returns `true`.
+
+```html
+<!-- Call the name-item template with each row in foundingfathers table where the last  containing 'Mad'. -->
+<div rbl-tid="name-item" rbl-source="foundingfathers[this.last.indexOf('Mad')>-1]"></div>
+```
+
+### rbl-display Template v: Expression
+
+The `rbl-display` attribute usually works off of falsey values directly from a CalcEngine result.  However, inside [Templates](#Templates), controlling visibility by looking at values on the current row being processed can be accomplished by using a `v:` (for value) prefix and providing a simple operator expression.
+
+For example, if the data processed by a template had a `code` and `count` column, the following could be leveraged.
+
+```html
+<div rbl-display="v:{code}=YES">Show if the `code` column is `YES`.</div>
+
+<div rbl-display="v:{count}>=2">Show if the `count` column is greater than or equal to 2.</div>
+
+<div rbl-display="v:{field}=">Show if the `field` column is blank.</div>
+```
 
 ## RBLe Service Attributes / Classes
 
@@ -2272,6 +2323,8 @@ Property | Type | Description
 ---|---|---
 debug | [DebugOptions Object](#DebugOptions-Object) | Assign properties that control debugging capabilities.
 view | string | Assign the Kaml View to use in this KatApp in the form of `Folder:View`.
+inputCaching | boolean | Whether or not inputs should automatically persist and restore from `Storage`.
+userIdHash | string | Optional hashed User ID to use as a key in different storage situations.
 inputSelector | string | A jQuery selector that specifies which inputs inside the view are considers RBLe Calculation Service inputs.  By default, _all_ inputs are selected via a selector of `input, textarea, select`.
 viewTemplates | string | A `comma` delimitted list of Kaml Template Files to use in the form of `Folder:Template,Folder:Template,...`.
 ajaxLoaderSelector | string | A jQuery selector that indicates an item to show at the start of calculations and hide upon completion.  By default, `.ajaxloader` is used.
@@ -2859,10 +2912,10 @@ Kaml View developers can leverage calling API endpoints as well by constructing 
 Attribute | Description
 ---|---
 rbl-action-link | Used as the `commandName` passed into `apiAction`.
-rbl-action-download | (true|false) Determines if the action results in the downloading of a file.
-rbl-action-calculate | (true|false) Determines if an `application.calculate()` should be called upon successful `api-action-link` execution.
-data-param-* | Used as the `customParameters` property of the `customOptions` parameter.  (i.e. to pass plan-id parameter to server, use `data-param-plan-id="value"`)
-data-input-* | Used as the `customInputs` property of the `customOptions` parameter.  (i.e. to pass iDownloadForms=1 parameter to server, use `data-input-download-forms="1"`, the server will convert to 'input name' automatically)
+rbl-action-download | (boolean) Determines if the action results in the downloading of a file.
+rbl-action-calculate | (boolean) Determines if an `application.calculate()` should be called upon successful `api-action-link` execution.
+data-param-* | Used as the `customParameters` property of the `customOptions` parameter and is used by server side API endpints.  (i.e. to pass `PlanId=value` parameter to server, use `data-param-plan-id="value"`, the parameter name will be created automatically to match server API endpoint parameter name pattern)
+data-input-* | Used as the `customInputs` property of the `customOptions` parameter and passed to RBLe CalcEngine on server side calculation.  (i.e. to pass `iDownloadForms=1` parameter to server, use `data-input-download-forms="1"`, the 'input name' will be created automatically to match RBLe CalcEngine input name pattern)
 rbl-action-confirm-selector | If the link should prompt before calling the endpoint, this attribute provides a jQuery selector to element containing the markup to display in a modal confirm dialog.
 
 <br/>
@@ -2938,23 +2991,28 @@ $(".saveButtonAction", view).on('click', function (e) {
 });
 ```
 
-#### setDefaultInputsOnNavigate
+#### setNavigationInputs
 
-**`.setDefaultInputsOnNavigate( inputs: {} | undefined, inputSelector?: string )`**
+**`.setNavigationInputs( inputs: {} | undefined, navigationId?: string, inputSelector?: string, persist?: boolean )`**
 
-`setDefaultInputsOnNavigate` is primarily used as an internal helper, however, default inputs could be programmatically set if needed.  These inputs would be used after the next navigation in which a KatApp is rendered.
+`setNavigationInputs` is primarily used as an internal helper, however, default inputs could be programmatically set if needed.  These inputs would be used after the next navigation in which a KatApp is rendered. If persist is `false`, the inputs will be used a single time.  If navigationId is `undefined`, then the inputs are applied globally and can not be persisted.
 
 ```javascript
 // Set the iCurrentAge default (calculated from CE) to be used in next KatApp after navigation
 view.on("onCalculationOptions.RBLe", function (event, calculationOptions, application) {
     const currentAge: application.getResultValue("defaults", "iCurrentAge", "value") * 1
-    application.setDefaultInputsOnNavigate( { "iCurrentAge": currentAge } );
+    // No navigationId makes it global to all applications rendered
+    application.setNavigationInputs( { "iEnableTrace": 1 } );
+    // Set iCurrentAge for Sharkfin application only.
+    application.setNavigationInputs( { "iCurrentAge": currentAge }, "Sharkfin" );
+    // Set iCurrentAge for Sharkfin application only (only valid for next navigation to Sharkfin).
+    application.setNavigationInputs( { "iCurrentAge": currentAge }, "Sharkfin", false );
 });
 
 // Create defaults from any input with .default-from-ce class (calculated from CE and assigned via ejs-defaults) 
 // to be used in next KatApp after navigation
 view.on("onCalculationOptions.RBLe", function (event, calculationOptions, application) {
-    application.setDefaultInputsOnNavigate( undefined, ".default-from-ce" );
+    application.setNavigationInputs( undefined, undefined, false, ".default-from-ce" );
 });
 ```
 
@@ -3012,22 +3070,33 @@ The following methods are helpful for Kaml View or CalcEngine developers to aid 
 
 #### saveCalcEngine
 
-**`.saveCalcEngine( location: string )`**
+**`.saveCalcEngine( location: string | boolean, serverSideOnly?: boolean )`**
 
-Save the *next successful* calculation's CalcEngine to the secure folder specified KAT Team's CMS.  Trigger the calculation by changing an input or manually calling the [`.calculate()`](#calculate) or [`.configureUI()`](#configureUI) methods.
+Save the *next successful* calculation's CalcEngine to the secure folder specified in the KAT Team's CMS.  Trigger the calculation by changing an input or manually calling the [`.calculate()`](#calculate) or [`.configureUI()`](#configureUI) methods.
+
+Calling `saveCalcEngine` multiple times before a calculation is ran will save the CalcEngine to each location specified.  To clear out all locations specified, call `saveCalcEngine( false )`.
+
+If the UI event that triggers a calculation calls an 'API Endpoint' or if a KatApp event handler calls the [`serverCalculation`](#serverCalculation) method, and upon success calls `application.calculate()` (i.e. data was updated on the server and a calculation is needed to refresh the UI), you may only want to save the next CalcEngine for the server side calculation.  To accomplish this, pass `true` into the optional `serverSideOnly` parameter.
 
 ```javascript
 // Save the next CalcEngine to the 'terry.aney' folder
-$(".katapp").KatApp("saveCalcEngine", "terry.aney");
 $(".katapp").KatApp().saveCalcEngine("terry.aney");
 
 // Then call calculation or configureUI to trigger a calculation...
-$(".katapp").KatApp("calculate");
+$(".katapp").KatApp().calculate();
+// or... 
+$(".katapp").KatApp().configureUI();
+
+// Save the next CalcEngine to the 'terry.aney' and 'tom.aney' folders
+$(".katapp").KatApp().saveCalcEngine("terry.aney");
+$(".katapp").KatApp().saveCalcEngine("tom.aney");
+
+// Then call calculation or configureUI to trigger a calculation...
 $(".katapp").KatApp().calculate();
 
-// or... 
-$(".katapp").KatApp("configureUI");
-$(".katapp").KatApp().configureUI();
+// Save the next Server Side Calculation CalcEngine to the 'terry.aney' folder, then trigger
+// the UI event (via button/link click that triggers apiAction or serverCalculation)
+$(".katapp").KatApp().saveCalcEngine("terry.aney", true);
 ```
 
 <hr/>
@@ -3117,10 +3186,10 @@ Additionally, every event handler described can be passed in on the `KatAppOptio
 
 ```javascript
 var options = {
-    onCalculateStart: function( application: KatAppPlugIn ) {
+    onCalculateStart: function( event: Event, application: KatAppPlugIn ) {
         application.showAjaxBlocker();
     },
-    onCalculateEnd: function( application: KatAppPlugIn ) {
+    onCalculateEnd: function( event: Event, application: KatAppPlugIn ) {
         application.hideAjaxBlocker();
     }
 };
@@ -3263,7 +3332,7 @@ By default, the KatApp framework does the following:
 
 ```javascript
 {
-    onCalculateStart = function (application) {
+    onCalculateStart = function (e, application) {
         // custom code
         
         // can then call default behavior if you want via following line
@@ -3293,6 +3362,22 @@ This event is triggered during `calculate` immediately before submission to RBLe
 view.on("onCalculationOptions.RBLe", function (event, calculationOptions, application) {
     calculationOptions.Inputs.iUrl = document.URL;
     calculationOptions.Inputs.iHero = querystring.hero;
+});
+```
+
+<hr/>
+
+#### onInputsCache
+
+**`onInputsCache(event: Event, inputsCache: CalculationInputs, application: KatApp )`**
+
+This event is triggered immediately before inputs are cached to `Storage` (if `options.inputCaching=true`).  It allows Kaml Views to massage the inputs before being cached.  Use this method if you want to add or remove inputs before caching.
+
+```javascript
+// Sample appends custom input and removes a 'state' input that was set programmatically.
+view.on("onInputsCache.RBLe", function (event, inputsCache, application) {
+    inputsCache.iUrl = document.URL;
+    delete inputsCache.iPopulateResults;
 });
 ```
 
@@ -3507,14 +3592,14 @@ $.fn.KatApp.templateOn("{thisTemplate}", "onInitialized.RBLe", function (event, 
 
 For almost all code written revolving around KatApps, it will be based on a KatApp 'application' object as described throughout this document.  However, there are times when there is code _related_ to KatApp applications but occurs outside of a running KatApp.  Below is the list of methods that are available and when they are useful.
 
-#### static setDefaultInputsOnNavigate
+#### static setNavigationInputs
 
-**`.setDefaultInputsOnNavigate( inputs: {} | undefined )`**
+**`.setNavigationInputs( inputs: {}, cachingKey: string | undefined )`**
 
-The static version of `setDefaultInputsOnNavigate` is almost identical to the application [setDefaultInputsOnNavigate](#setDefaultInputsOnNavigate) method.  Default inputs can be programmatically set for the next rendering of a KatApp if needed.  The difference is that the static version does not accept an `inputsSelector` parameter since it is not running inside the context of an application.  After this method is called, these inputs would be used when the next KatApp is rendered.  The primary use for this function is to set inputs immediately before navigation to a KatApp.
+The static version of `setNavigationInputs` is almost identical to the application [setNavigationInputs](#setNavigationInputs) method.  Default inputs can be programmatically set for one time use in the next rendering of a KatApp if needed.  The difference is that the static version does not accept an `inputsSelector` parameter since it is not running inside the context of an application.  After this method is called, these inputs would be used when the next KatApp is rendered.  The primary use for this function is to set inputs immediately before navigation to a KatApp.  If `cachingKey` is undefined or not passed in, the inputs apply globally to any/all KatApps on the next navigation only.
 
 ```html
 <!-- Set the iCurrentAge default before navigating to HPF KatApp -->
-<a href="#" onclick="KatApp.setDefaultInputsOnNavigate( { iCurrentAge: 64 } );NavigateToKatApp( 'Benefits.HPF' );">Navigate to HPF</a>
+<a href="#" onclick="KatApp.setNavigationInputs( { iCurrentAge: 64 } );NavigateToKatApp( 'Benefits.HPF' );">Navigate to HPF</a>
 ```
 <hr/>
