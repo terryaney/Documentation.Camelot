@@ -123,6 +123,7 @@
             - [setNavigationInputs](#setNavigationInputs)
             - [navigate](#navigate)
             - [pushNotification](#pushNotification)
+            - [createModalDialog](#createModalDialog)
         - [KatApp Debugging Methods](#KatApp-Debugging-Methods)
             - [saveCalcEngine](#saveCalcEngine)
             - [refreshCalcEngine](#refreshCalcEngine)
@@ -156,6 +157,7 @@
             - [onUploadFailed](#onUploadFailed)
             - [onUploadComplete](#onUploadComplete)
         - [Template Event Handlers](#Template-Event-Handlers)
+    - [Helper Methods](#Helper-Methods)
     - [Global Methods](#Global-Methods)
         - [static setNavigationInputs](#static-setNavigationInputs)
 
@@ -3058,6 +3060,25 @@ view.on( "onKatAppNotification.RBLe", function( event, name, information, applic
             application.calculate();
             break;
         }
+    }
+});
+```
+
+#### createModalDialog
+
+**`.createModalDialog(confirm: string, onConfirm: ()=> void, onCancel: ()=> void | undefined)`**
+
+createModalDialog is a helper method to show a simple 'Continue' / 'Cancel' Bootstrap dialog on the screen.  If `onCancel` is not provided, the 'Cancel' button will not be displayed.
+
+```javascript
+view.on("onActionResult.RBLe", function (e, commandName, _jsonResponse, application) {
+    if (commandName == "update-payment-inst") {
+        application.createModalDialog(
+            "You bank information have been successfully updated.",
+            function () {
+                application.navigate("Pension.PaymentDetails");
+            }
+        );
     }
 });
 ```
