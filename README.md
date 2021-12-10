@@ -16,6 +16,7 @@
     - [rbl-value Attribute Details](#rbl-value-Attribute-Details)
     - [rbl-attr Attribute Details](#rbl-attr-Attribute-Details)
     - [rbl-display Attribute Details](#rbl-display-Attribute-Details)
+    - [rbl-disabled Attribute Details](#rbl-disabled-Attribute-Details)
     - [rbl-on Event Handlers](#rbl-on-Event-Handlers)
         - [Assigning Event Handlers to Contained Elements](#Assigning-Event-Handlers-to-Contained-Elements)
         - [Assigning Multiple Event Handlers](#Assigning-Multiple-Event-Handlers)
@@ -469,6 +470,26 @@ The `rbl-display` attribute has all the same 'selector' capabilities described i
 ```
 
 See [View and Template Expressions](#View-and-Template-Expressions) for information on how to use simple and complex expressions to determine visibility.
+
+## rbl-disabled Attribute Details
+The `rbl-disabled` attribute has all the same 'selector' capabilities described in [KatApp Selectors](#KatApp-Selectors).  Once a `value` is selected from a specified selector (or `rbl-disabled` as default table if only ID is provided), a boolean 'falsey' logic is applied against the value.  An element will be disabled if the value is `1` or `true`.
+
+**Note:** By default, all the template inputs provided by Standard_Templates.kaml have `rbl-disabled` attributes assigned to appropriate items.
+
+```html
+<!-- Disable or enable based on 'value' column from 'rbl-disabled' table where 'id' is 'show-wealth' -->
+<input rbl-disabled="show-wealth" value="10000">
+
+<!-- Disable or enable based on 'value' column from 'benefit-savings' table where 'id' is 'ret-age' -->
+<input rbl-disabled="benefit-savings.ret-age" value="65">
+
+<!-- Disable or enable based on 'year' column from 'benefit-savings' table where 'id' is 'ret-age' -->
+<input rbl-disabled="benefit-savings.ret-age.year" value="2020">
+```
+
+See [View and Template Expressions](#View-and-Template-Expressions) for information on how to use simple and complex expressions to determine disabled state.
+
+**Note:** When working with inputs, check/radio lists, or sliders, the jQuery `.prop("disabled", true)` method is used.  For anything else (i.e. bootstrap buttons or generic divs), the `disabled` class is added/removed as necessary.
 
 ## rbl-on Event Handlers
 
