@@ -1360,6 +1360,7 @@ data-multiselect | A `Boolean` value specifying whether this dropdown allows mul
 data-livesearch | A `Boolean` value specifying whether this dropdown allows live search capabilities when the dropdown is opened (default is `false`).
 data-size | The number of items to display when the dropdown is opened before rendering a scrollbar (default is `15`).
 data&#x2011;lookuptable | Specifies the name of lookup table to use as a data source when `rbl-listcontrols` from the results will _not_ provide the data source.
+data&#x2011;use&#x2011;selectpicker | A `Boolean` value specifying whether this dropdown should leverage `bootstrap-select` (or use a standard `<select>` when `false`) (default is `true`).
 data-* | All other data attributes present will be applied to the contained `select` element for processing from the [_bootstrap-select API_](#https://developer.snapappointments.com/bootstrap-select/).
 
 <br/>
