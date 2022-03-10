@@ -3857,9 +3857,20 @@ This event is triggered after a modal application has been successfully confirme
 
 ```javascript
 // This code would be inside the KAML that is *the host* application
-view.on("onModalAppConfirmed.RBLe", function (event, applicationId, application, modalLink, message) {
+view.on("onModalAppConfirmed.RBLe", function (event, applicationId, application, modalApplication, modalLink, message) {
 	if (applicationId == "Channel.Home") {
 		application.createModalDialog( message );
+
+        // Grab all inputs from modal application
+        var inputs = modalApplication.calculationInputs;
+        
+        // Move input values from modal to host (i.e. IRP values)
+        application.setInputs({
+            "iRetAge": inputs["iRetirementAge"],
+            "iSalaryIncrease": inputs["iAnnualFuturePayIncreaseRate"],
+            "iReplaceRatio": Math.round(Number(inputs["iReplaceRatio"]) * 100 / 5) * 5
+        });
+
         application.calculate();
 	}
 });
