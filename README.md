@@ -162,6 +162,7 @@
         - [KatApp Modal Application Lifecycle Events](#KatApp-Modal-Application-Lifecycle-Events)
             - [onModalAppConfirm](#onModalAppConfirm)
             - [onModalAppCancel](#onModalAppCancel)
+            - [onModalAppInitialized](#onModalAppInitialized)
             - [onModalAppConfirmed](#onModalAppConfirmed)
             - [onModalAppCancelled](#onModalAppCancelled)
         - [Template Event Handlers](#Template-Event-Handlers)
@@ -3789,11 +3790,11 @@ application.updateOptions(
 
 #### onModalAppConfirm
 
-**`onModalAppConfirm(hostApplication: KatApp, modalLink: JQuery<HTMLElement>, dismiss: ( message?: string )=> void)`**
+**`onModalAppConfirm(hostApplication: KatApp, modalLink: JQuery<HTMLElement>, dismiss: ( message?: string )=> void, enable: ()=> void)`**
 
 This event is triggered when the 'continue' button is clicked in the modal.  The `hostApplication` is the main application and `modalLink` is the link that was clicked to trigger the creation of the application.  Either can be referred to if additional information is needed by the hosted application to determine logic.
 
-After the modal application has performed any desired logic, the modal can be dismissed by calling `dismiss();`. `message` can be returned to allow for the hosting application to display or act upon it.
+After the modal application has performed any desired logic, the modal can be dismissed by calling `dismiss();`. `message` can be returned to allow for the hosting application to display or act upon it.  If you do not want to dismiss the modal, but need to indicate to host application to enable the continue and cancel buttons, call `enable();`.
 
 Note that the `this` reference will be the modal dialogs 'continue' button.
 
@@ -3801,7 +3802,7 @@ Note that the `this` reference will be the modal dialogs 'continue' button.
 // This code would be inside the KAML that is being hosted *as* the modal application.
 application.updateOptions(
     {
-        onModalAppConfirm: function (hostApplication, modalLink, dismiss) {
+        onModalAppConfirm: function (hostApplication, modalLink, dismiss, enable) {
             application.apiAction(
                 "dependents/update",
                 application.options,
@@ -3816,6 +3817,7 @@ application.updateOptions(
                     else {
                         // KatApp Provider code has already displayed errors, additional inspection
                         // and use of failureResponse could be done.
+                        return enable();
                     }
                 }
             );
@@ -3828,11 +3830,11 @@ application.updateOptions(
 
 #### onModalAppCancel
 
-**`onModalAppCancel(hostApplication: KatApp, modalLink: JQuery<HTMLElement>, dismiss: ( message?: string )=> void)`**
+**`onModalAppCancel(hostApplication: KatApp, modalLink: JQuery<HTMLElement>, dismiss: ( message?: string )=> void, enable: ()=> void)`**
 
 This event is triggered when the 'cancel' button is clicked in the modal.  The `hostApplication` is the main application and `modalLink` is the link that was clicked to trigger the creation of the application.  Either can be referred to if additional information is needed by the hosted application to determine logic.
 
-After the modal application has performed any desired logic, the modal can be dismissed by calling `dismiss();`. `message` can be returned to allow for the hosting application to display or act upon it.
+After the modal application has performed any desired logic, the modal can be dismissed by calling `dismiss();`. `message` can be returned to allow for the hosting application to display or act upon it.  If you do not want to dismiss the modal, but need to indicate to host application to enable the continue and cancel buttons, call `enable();`.
 
 Note that the `this` reference will be the modal dialogs 'continue' button.
 
