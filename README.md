@@ -3849,29 +3849,36 @@ application.updateOptions(
 
 <hr/>
 
+#### onModalAppShown
+
+**`onModalAppShown(event: Event, applicationId: string, hostApplication: KatApp, modalApplication: KatApp, modalLink: JQuery<HTMLElement>)`**
+
+This event is triggered after a modal application has been shown.
+
+```javascript
+// This code would be inside the KAML that is *the host* application
+view.on("onModalAppShown.RBLe", function (event, applicationId, hostApplication, modalApplication, modalLink, message) {
+	if (applicationId == "Channel.Home") {
+		hostApplication.createModalDialog( message );
+        hostApplication.calculate();
+	}
+});
+```
+
+<hr/>
+
 #### onModalAppConfirmed
 
-**`onModalAppConfirmed(event: Event, applicationId: string, application: KatApp, modalLink: JQuery<HTMLElement>, message: string | undefined)`**
+**`onModalAppConfirmed(event: Event, applicationId: string, hostApplication: KatApp, modalApplication: KatApp, modalLink: JQuery<HTMLElement>, message: string | undefined)`**
 
 This event is triggered after a modal application has been successfully confirmed and dismissed.  If the modal application returned a `message`, it can be displayed in some form (alert, modal).  Other actions can be performed as well (i.e. calculations, navigations, etc.) by the hosting application as needed.
 
 ```javascript
 // This code would be inside the KAML that is *the host* application
-view.on("onModalAppConfirmed.RBLe", function (event, applicationId, application, modalApplication, modalLink, message) {
+view.on("onModalAppConfirmed.RBLe", function (event, applicationId, hostApplication, modalApplication, modalLink, message) {
 	if (applicationId == "Channel.Home") {
-		application.createModalDialog( message );
-
-        // Grab all inputs from modal application
-        var inputs = modalApplication.calculationInputs;
-        
-        // Move input values from modal to host (i.e. IRP values)
-        application.setInputs({
-            "iRetAge": inputs["iRetirementAge"],
-            "iSalaryIncrease": inputs["iAnnualFuturePayIncreaseRate"],
-            "iReplaceRatio": Math.round(Number(inputs["iReplaceRatio"]) * 100 / 5) * 5
-        });
-
-        application.calculate();
+		hostApplication.createModalDialog( message );
+        hostApplication.calculate();
 	}
 });
 ```
@@ -3880,15 +3887,15 @@ view.on("onModalAppConfirmed.RBLe", function (event, applicationId, application,
 
 #### onModalAppCancelled
 
-**`onModalAppCancelled(event: Event, applicationId: string, application: KatApp, modalLink: JQuery<HTMLElement>, message: string | undefined)`**
+**`onModalAppCancelled(event: Event, applicationId: string, hostApplication: KatApp, modalApplication: KatApp, modalLink: JQuery<HTMLElement>, message: string | undefined)`**
 
 This event is triggered after a modal application has been cancelled and dismissed.  If the modal application returned a `message`, it can be displayed in some form (alert, modal).  Other actions can be performed as well (i.e. calculations, navigations, etc.) by the hosting application as needed.
 
 ```javascript
 // This code would be inside the KAML that is *the host* application
-view.on("onModalAppCancelled.RBLe", function (event, applicationId, application) {
+view.on("onModalAppCancelled.RBLe", function (event, applicationId, hostApplication) {
 	if (applicationId == "Channel.Home") {
-		application.createModalDialog( "Sorry you didn't want to do this." );
+		hostApplication.createModalDialog( "Sorry you didn't want to do this." );
 	}
 });
 ```
