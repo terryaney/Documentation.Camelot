@@ -3817,7 +3817,7 @@ application.updateOptions(
                     else {
                         // KatApp Provider code has already displayed errors, additional inspection
                         // and use of failureResponse could be done.
-                        return enable();
+                        enable();
                     }
                 }
             );
