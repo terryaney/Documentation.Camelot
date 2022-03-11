@@ -3849,20 +3849,20 @@ application.updateOptions(
 
 <hr/>
 
-#### onModalAppShown
+#### onModalAppInitialized
 
-**`onModalAppShown(event: Event, applicationId: string, hostApplication: KatApp, modalApplication: KatApp, modalLink: JQuery<HTMLElement>)`**
+**`onModalAppInitialized(event: Event, applicationId: string, hostApplication: KatApp, modalApplication: KatApp, modalLink: JQuery<HTMLElement>)`**
 
-This event is triggered after a modal application has been shown.
+This event is triggered after a modal application has been initialized.  Allows for host application to assign events to the modal application if needed.
 
 ```javascript
 // This code would be inside the KAML that is *the host* application
-view.on("onModalAppShown.RBLe", function (event, applicationId, hostApplication, modalApplication, modalLink, message) {
-	if (applicationId == "Channel.Home") {
-		hostApplication.createModalDialog( message );
-        hostApplication.calculate();
-	}
-});
+view
+    .on("onModalAppInitialized.RBLe", function (event, applicationId, hostApplication, modalApplication, modalLink) {
+        modalApplication.element.on("onResultsProcessing.RBLe", function (event, calculationResults, calculationOptions, application) {
+            // pre process child results...
+        })
+    })
 ```
 
 <hr/>
