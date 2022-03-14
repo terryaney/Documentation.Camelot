@@ -3013,16 +3013,16 @@ This can be helpful if the javascript inside the Kaml view contains the logic on
         .on("onResultsProcessing.RBLe", function (event, calculationResults, calculationOptions, application) {
             // push 'current page' into rbl-values for 'parent page' views/templates to use to render a link
             // to navigate to a 'target page'
-			calculationResults.pushResultRow(
-				"rbl-value",
-				{ "@id": "currentPage", "value": calculationOptions.currentPage.replace("lnkNexgenHost.", "") }
-			);
+            calculationResults.pushResultRow(
+                "rbl-value",
+                { "@id": "currentPage", "value": calculationOptions.currentPage.replace("lnkNexgenHost.", "") }
+            );
             // if iReferrer input present (will be set via data-input-referrer 'parent page'), add to rbl-value
             // so 'target' page can use it to create a navigate back link
-			calculationResults.pushResultRow(
-				"rbl-value",
-				{ "@id": "referrerPage", "value": inputs.iReferrer || "" }
-			);
+            calculationResults.pushResultRow(
+                "rbl-value",
+                { "@id": "referrerPage", "value": inputs.iReferrer || "" }
+            );
         });
 ```
 
