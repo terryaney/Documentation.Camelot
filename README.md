@@ -13,6 +13,10 @@
 - [Kaml View Specifications](#Kaml-View-Specifications)
     - [RBLe Attributes used in Kaml View](#RBLe-Attributes-used-in-Kaml-View)
     - [KatApp Selectors](#KatApp-Selectors)
+    - [View Scoping](#View-Scoping)
+        - [Scoping CSS](#Scoping-CSS)
+        - [Scoping IDs](#Scoping-IDs)
+        - [Scoping jQuery](#Scoping-jQuery)
     - [rbl-value Attribute Details](#rbl-value-Attribute-Details)
     - [rbl-attr Attribute Details](#rbl-attr-Attribute-Details)
     - [rbl-display Attribute Details](#rbl-display-Attribute-Details)
@@ -23,7 +27,7 @@
         - [Removing Event Handlers](#Removing-Event-Handlers)
     - [rbl-navigate Attribute Details](#rbl-navigate-Attribute-Details)
     - [rbl-modal Attribute Details](#rbl-modal-Attribute-Details)
-    - [View Scoping](#View-Scoping)
+    - [rbl-app Attribute Details](#rbl-app-Attribute-Details)
     - [_Push_ Table Processing](#_Push_-Table-Processing)
         - [rbl-defaults Table](#**rbl-defaults**)
         - [rbl-listcontrol Table](#**rbl-listcontrol**)
@@ -109,6 +113,9 @@
             - [rebuild](#rebuild)
             - [updateOptions](#updateOptions)
             - [ensure](#ensure)
+        - [KatApp Scoping Methods](#KatApp-Scoping-Methods)
+            - [select](#select)
+            - [closest](#closest)
         - [KatApp Calculation Methods](#KatApp-Calculation-Methods)
             - [calculate](#calculate)
             - [configureUI](#configureUI)
@@ -131,7 +138,6 @@
             - [saveCalcEngine](#saveCalcEngine)
             - [refreshCalcEngine](#refreshCalcEngine)
             - [traceCalcEngine](#traceCalcEngine)
-            - [redraw](#redraw)
     - [KatApp Events](#KatApp-Events)
         - [KatApp Lifecycle Events](#KatApp-Lifecycle-Events)
             - [onInitializing](#onInitializing)
@@ -391,6 +397,91 @@ idValue | Look in `rbl-value` table for row where row id is `idValue` and return
 table.idValue | Look in `table` table for row where row id is `idValue` and return the value column.
 table.idValue.column | Look in `table` table for row where row id is `idValue` and return the `column` column.
 table.keyColumn.keyValue.column | Look in `table` table for row where `keyColumn` is `keyValue` and return the `column` column.
+
+## View Scoping
+
+It is very important to keep Kaml View encapsulated as an isolated environment, or sandbox if you will. **The KatApp framework ensures that all input and calculation result processing are isolated to the KatApp/Kaml View.**  In the same manner, there are ways to ensure proper scoping your markup and javascript so that Kaml Views do not interfere with containing web sites.
+
+### Scoping CSS
+
+In Kaml Views, if you include a `<style>` section to define some CSS for the view, make sure you prefix every class selector with `.thisClass`.
+
+Additional CSS scoping has to be considered when creating Template Kaml Files.  The `.katapp-css` class will always be applied to KatApp application elements.  So that is the way to provide some scoping inside template files (or Kaml Views too, although `.thisClass` is preferred).
+
+So the CSS priority would be:
+
+1. `.katapp-css`
+2. `.thisClass`
+
+```html
+<style>
+    /* Without scoping would affect all h2 elements on rendered page even if not part of this Kaml View */
+    h2 {
+        font-size: 24px;
+    }
+
+    /* Do use .katapp-css */
+    .katapp-css h2 {
+        color: Green;
+        font-size: 30px;
+    }
+
+    /* Do use .thisClass */
+    .thisClass h2 {
+        color: Red;
+    }
+
+    /* The end result would be color: Red, size 30px */
+</style>
+
+<h2>Hello</h2>
+```
+
+### Scoping IDs
+
+When creating HTML elements inside the Kaml View that needs the `id` attribute provided, ID scoping must be used.  A name cannot be guaranteed to be unique with out.  To guarantee a unique ID for elements, you need to append or prepend the unique KatApp ID.  This is done with the `{id}` token. 
+
+```html
+<!-- nav-list can not be guaranteed unique, the containing application (or other hosted KatApps may use the same id) -->
+<div id="nav-list">
+    <!-- ... -->
+</div>
+
+
+<div id="nav-list_{id}">
+    <!-- ... -->
+</div>
+```
+
+### Scoping jQuery
+
+When `<script>` tags are included in Kaml View files, the correct way to obtain the KatApp element is by using this `{thisView}` token.  `{thisView}` is substituted with a jQuery selector like `[rbl-application-id='{id}']` where `{id}` is the unique KatApp ID.
+
+```html
+<script>
+(function () {
+    
+    // Obtain a reference of the KatApp element.
+    var view = $("{thisView}");
+    var application = view.KatApp();
+})();
+</script>
+```
+
+Then, inside any `<script>` elements in a Kaml View, any time selection is needed, you need to scope it to the KatApp element.  To do this, use the `application.select()` and `application.closest()` methods instead of the jQuery counterparts of `$()` or `$().closest()`.  This is also required to ensure proper selected for [nested KatApps](#rbl-app-Attribute-Details) as well.
+
+```html
+<script>
+view.on("onInitialized.RBLe", function (event, application) {
+    application.select("[data-reset-confirmed='true']").on("click", function (e) {
+        e.preventDefault();
+        application.select(".iDirection").val(-1);
+    })
+});
+</script>
+```
+
+See [KatApp Scoping Methods](#KatApp-Scoping-Methods) for more details or [KatApp Events](#KatApp-Events) for more usage examples where scoping is required.
 
 ## rbl-value Attribute Details
 There are two ways to use `rbl-value` attribute.  You can provide simply an 'id' that will look inside the `rbl-value` table or you can provide a KatApp Selector.  Both mechanisms can be used in conjunction with `rbl-ce` and `rbl-tab`.
@@ -658,95 +749,29 @@ Click <a rbl-modal="Channel.Home">here</a> to see your dashboard.
 Attribute | Description
 ---|---
 rbl-action-calculate | (boolean) Determines if an `application.calculate()` should be called upon modal application confirmation (default is `false`).
+data-label-title | Change the title of the modal dialog (default is no title).
 data-label-continue | Change the text of the continue button (default is Continue).
 data-label-cancel | Change the text of the cancel button (default is Cancel).
 data-show-cancel | (boolean) Whether or not to show the cancel button (default is `true`).
 data-input-* | Passed as the `manualInputs` to the modal application.  (i.e. to pass `iDependentId=1`, use `data-input-dependent-id="1"`.  The 'input name' will be created automatically to match RBLe CalcEngine input name pattern)
 
-## View Scoping
+See [KatApp Modal Application Lifecycle Events](#KatApp-Modal-Application-Lifecycle-Events) to see how to handle confirmation or cancellation of modal KatApps and how to handle unexpected exceptions.
 
-It is very important to keep Kaml View encapsulated as an isolated environment, or sandbox if you will. **The KatApp framework ensures that all input and calculation result processing are isolated to the KatApp/Kaml View.**  In the same manner, there are ways to ensure proper scoping your markup and javascript so that Kaml Views do not interfere with containing web sites.
-
-**Scoping CSS**
-
-In Kaml Views, if you include a `<style>` section to define some CSS for the view, make sure you prefix every class selector with `.thisClass`.
-
-Additional CSS scoping has to be considered when creating Template Kaml Files.  The `.katapp-css` class will always be applied to KatApp application elements.  So that is the way to provide some scoping inside template files (or Kaml Views too, although `.thisClass` is preferred).
-
-So the CSS priority would be:
-
-1. `.katapp-css`
-2. `.thisClass`
+## rbl-app Attribute Details
+The `rbl-app` attribute can be used to nest an independent KatApp application inline within a parent KatApp.
 
 ```html
-<style>
-    /* Without scoping would affect all h2 elements on rendered page even if not part of this Kaml View */
-    h2 {
-        font-size: 24px;
-    }
-
-    /* Do use .katapp-css */
-    .katapp-css h2 {
-        color: Green;
-        font-size: 30px;
-    }
-
-    /* Do use .thisClass */
-    .thisClass h2 {
-        color: Red;
-    }
-
-    /* The end result would be color: Red, size 30px */
-</style>
-
-<h2>Hello</h2>
+<p>Below is our nested KatApp</p>
+<div rbl-app="Channel.Home"></div>
 ```
 
-**Scoping IDs**
+Attribute | Description
+---|---
+data-input-* | Passed as the `manualInputs` to the nested application.  (i.e. to pass `iDependentId=1`, use `data-input-dependent-id="1"`.  The 'input name' will be created automatically to match RBLe CalcEngine input name pattern)
 
-When creating HTML elements inside the Kaml View that needs the `id` attribute provided, ID scoping must be used.  A name cannot be guaranteed to be unique with out.  To guarantee a unique ID for elements, you need to append or prepend the unique KatApp ID.  This is done with the `{id}` token. 
+**Note**: It is important to use `application.select()` to ensure that parent KatApps do not cross into the boundary of a nested KatApp.  See [View Scoping - Scoping jQuery](#Scoping-jQuery) for more information.
 
-```html
-<!-- nav-list can not be guaranteed unique, the containing application (or other hosted KatApps may use the same id) -->
-<div id="nav-list">
-    <!-- ... -->
-</div>
-
-
-<div id="nav-list_{id}">
-    <!-- ... -->
-</div>
-```
-
-**jQuery Scoping**
-
-When `<script>` tags are included in Kaml View files, the correct way to obtain the KatApp element is by using this `{thisView}` token.  `{thisView}` is substituted with a jQuery selector like `[rbl-application-id='{id}']` where `{id}` is the unique KatApp ID.
-
-```html
-<script>
-(function () {
-    
-    // Obtain a reference of the KatApp element.
-    var view = $("{thisView}");
-
-})();
-</script>
-```
-
-Additionally, inside any `<script>` elements in a Kaml View, any time you do a selector, you need to scope it with the KatApp element/view.
-
-```html
-<script>
-view.on("onInitialized.RBLe", function (event, application) {
-    $("[data-reset-confirmed='true']", view).on("click", function (e) {
-        e.preventDefault();
-        $(".iDirection", view).val(-1);
-    })
-});
-</script>
-```
-
-See [KatApp Events](#KatApp-Events) for more usage examples where scoping is required.
+**Caveat**: If a parent of a `rbl-app` has a `rbl-nocalc` class applied, currently this does carry into the inline application and will be applied to all inputs in both applications.  To fix this would require extra processing.  Instead of jQuery selector, I would first have to return all inputs then loop them checking if the containing application is the appropriate application that is doing the selecting.
 
 ## _Push_ Table Processing
 
@@ -1729,7 +1754,7 @@ view.on("onCalculationOptions.RBLe", function (event, submitOptions, application
     // Loop all inputs that start with iCoverageA- and process them.
     // data-inputname is in form of iCoverageA-id
     // For each input, create a row with id/covered properties
-    var inputControlData = $("div[data-inputname^=iCoverageA-]", view);
+    var inputControlData = application.select("div[data-inputname^=iCoverageA-]");
     inputControlData.each(function (index, element) {
         var id = $(element).data("inputname").split("-")[1];
         var v = $(element).hasClass("active") ? 1 : 0;
@@ -2486,13 +2511,12 @@ The following properties are available on the `DebugOptions` object, some of whi
 Property | Type | Description
 ---|---|---
 traceVerbosity | TraceVerbosity | Set the minimum allowed trace level to be displayed.  Values are : `None`, `Quiet`, `Minimal`, `Normal`, `Detailed`, or `Diagnostic`.
-debugResourcesDomain | string | Set the base domain/url to use if `allowLocalServer` is `true` when attempting to find local resource files.  Default value is `http://localhost:8887/DataLocker/`.
+debugResourcesDomain | string | Set the base domain/url to use if provided when attempting to find local resource files.  By default, the `localserver=` querystring will set this value.
 saveConfigureUiCalculationLocation | string | Signals to the RBLe Service that the ConfigureUI calculation should save a debug CalcEngine to this location.  By default, the `saveConfigureUI` querystring will set this.
 refreshCalcEngine | boolean | If `true`, it signals to the RBLe Service to check for new CalcEngines from the CalcEngine CMS immediately instead of waiting for cache to expire.  By default, the `expireCE=1` querystring will set this to true.
 useTestCalcEngine | boolean | Whether or not the RBLe Service should use the test version of a CalcEngine (if it is present).  By default, the `test=1` querystring will set this to true.
 useTestView | boolean | Whether or not the Kaml View CMS should use the test version of a Kaml View (if it is present).  By default, the `testView=1` querystring will set this to true.  If `relativePathTemplates` is configured in the [KatAppOptions Object](#KatAppOptions-Object), this setting is ignored.
 useTestPlugin | boolean | Whether or not the Kaml View CMS should use the test version of the KatAppProvider.js file (if it is present).  By default, the `testPlugin=1` querystring will set this to true.
-allowLocalServer | boolean | Whether or not resource files (provider, views, and templates) should attempt to be loaded from the `debugResourcesDomain`.  By default, the `allowLocal=1` querystring sets this to true.
 showInspector | boolean | Whether or not the Kaml View will highlight elements that have `rbl-value`, `rbl-source`, and `rbl-display` attributes to aid in debugging.  By default, the `showInspector=1` querystring sets this to true.
 
 <br/>
@@ -2804,6 +2828,42 @@ $(".katapp-irp").KatApp("ensure", options);
 $(".katapp-irp").KatApp().ensure(options);`
 ```
 
+### KatApp Scoping Methods
+
+The following methods allow developers to correctly scope DOM selector methods when programming against the KatApp model.
+
+<hr/>
+
+#### select
+
+**`.select(selector: string, context?: JQuery | HTMLElement): JQuery`**
+
+This is a replacement function for jQuery's default `$()` selector method.  It is needed scope the selection within the current KatApp (does not reach outside the KatApp markup) and also prevents selection from selecting **inside** a nested KatApp.
+
+```javascript
+// Get all inputs of my application (but none from nested KatApps or outside of my KatApp in container site)
+application.select(":input");
+
+// Get all inputs of my application within the address container
+var address = application.select(".address")
+application.select(":input", address);
+```
+
+<hr/>
+
+#### closest
+
+**`.closest(element: JQuery | HTMLElement, selector: string): JQuery`**
+
+This is a replacement function for jQuery's default `$()` selector method.  It is needed scope the selection within the current KatApp (does not reach outside the KatApp markup - either to hosting site or a parent KatApp).
+
+```javascript
+var name = application.select(".iName");
+var nameLabel application.closest(name, "label");
+```
+
+<hr/>
+
 ### KatApp Calculation Methods
 
 The following methods allow developers to trigger calculations, get and set inputs, and get result information.
@@ -3073,7 +3133,7 @@ customInputs | JSON | Optional.  Any input values that need to be passed back to
 
 ```javascript
 // hook up a click handler that generates a server side DocGen package for download
-$(".downloadForms", view).on('click', function (e) {
+application.select(".downloadForms").on('click', function (e) {
     application.apiAction(
         "PensionEstimates.DocGen.Forms", 
         { 
@@ -3104,18 +3164,18 @@ Each `endpoint`/`rbl-action-link` can, and most likely will, have its own set of
 
 ```html
 <!-- Same as sample above in Javascript, create a link generates a server side DocGen package for download -->
-<a rbl-action-link="PensionEstimates.DocGen.Forms" rbl-action-download="true" data-input-iDownloadForms="1" href="#">Download Forms</a>
+<a rbl-action-link="rble/docgen" rbl-action-download="true" data-input-iDownloadForms="1" href="#">Download Forms</a>
 
 <!-- Sample download of a static file -->
-<a rbl-action-link="DownloadFile" rbl-action-download="true" data-param-filename="PlanDocument.pdf" class="download-file" href="#">Download SPD</a>
+<a rbl-action-link="document-center/download" rbl-action-download="true" data-param-domain="SecureFile" data-param-filename="PlanDocument.pdf" class="download-file" href="#">Download SPD</a>
 
 <!-- Sample enrollment kaml deleting a 'required document' that was uploaded -->
-<a rbl-action-link="RetireOnline.DeleteDocument" rbl-action-confirm-selector="[data-required-document-prompt=\'delete\']" data-param-doc-id="PlanDocument" data-param-plan-id="{plan-id}" class="delete-file" href="#">Delete</a>
+<a rbl-action-link="document-center/delete" rbl-action-confirm-selector="[data-required-document-prompt=\'delete\']" data-param-domain="RequiredDocument" data-param-documentid="{document-id}" class="delete-file" href="#">Delete</a>
 
 <!-- 
 Using input-fileupload template to support file uploads using the `data-command` attribute.  Current inputs from the 'entire KatApp' are passed as well, so endpoint code can use that as well to determine which type of document they are uploading.
 -->
-<div rbl-tid="input-fileupload" class="col-md-9" data-hidelabel="false" data-label="File Name" data-inputname="iUpload" data-command="RetireOnline.UploadRequiredDocument"></div>
+<div rbl-tid="input-fileupload" class="col-md-9" data-hidelabel="false" data-label="File Name" data-inputname="iUpload" data-rbl-action="retireonline/documents/upload"></div>
 ```
 
 Note: There are API Endpoint lifecycle events that are triggered during the processing of an action.  See [KatApp Action Lifecycle Events](#KatApp-Action-Lifecycle-Events) for more information.
@@ -3155,14 +3215,14 @@ To return input information from an endpoint to pass through to all subsequent c
 
 ```javascript
 // Set up a click handler that calls a serverCalculation to save the calculated results to storage
-$(".saveButtonAction", view).on('click', function (e) {
-    application.serverCalculation({ iSaveInputs: 1, iCalculationName: $(".iCalculationName", view).val() }, $(this));
+application.select(".saveButtonAction").on('click', function (e) {
+    application.serverCalculation({ iSaveInputs: 1, iCalculationName: application.select(".iCalculationName").val() }, $(this));
 });
 
 // The same functionality could be accomplished using the apiAction method call as well.
-$(".saveButtonAction", view).on('click', function (e) {
+application.select(".saveButtonAction").on('click', function (e) {
     application.apiAction(
-        "ServerCalculation", 
+        "rble/calculation", 
         {
             customInputs: customInputs
         },
@@ -3208,7 +3268,7 @@ Similar to a `rbl-navigate` link using `data-input-*` attributes to pass inputs,
 
 ```javascript
 // Set up a click handler that calls a serverCalculation to save the calculated results to storage
-$(".showProvider", view).on('click', function (e) {
+application.select(".showProvider").on('click', function (e) {
     application.navigate( "Benefits.HPF", { iProviderTypeIds: "ABC,XYZ" });
 });
 ```
@@ -3224,8 +3284,8 @@ If multiple KatApps are on one page, KatApps can broadcast notifications to othe
 ```javascript
 // In the KatApp that wants to send the message...
 // Hook up an event to save a calculation then notify other KatApps that are displaying information about saved calculations
-$(".saveButtonAction", view).on('click', function (e) {
-    application.serverCalculation({ iSaveInputs: 1, iCalculationName: $(".iCalculationName", view).val() }, $(this));
+application.select(".saveButtonAction").on('click', function (e) {
+    application.serverCalculation({ iSaveInputs: 1, iCalculationName: application.select(".iCalculationName").val() }, $(this));
     application.pushNotification("SavePensionEstimate");
 });
 
@@ -3250,7 +3310,7 @@ createModalDialog is a helper method to show a simple 'Continue' / 'Cancel' Boot
 
 ```javascript
 view.on("onActionResult.RBLe", function (e, endpoint, _jsonResponse, application) {
-    if (endpoint == "update-payment-inst") {
+    if (endpoint == "ba7/update-withholding") {
         application.createModalDialog(
             "You bank information have been successfully updated.",
             function () {
@@ -3343,17 +3403,6 @@ $(".katapp").KatApp().configureUI();
 ```
 
 <hr/>
-
-#### redraw
-
-**`.redraw()`**
-
-Redraw/re-render the Kaml View _without_ triggering a calculation.  This can be used while a Kaml View developer is modifying the view and wants to see their progress without waiting for the time required to re-run the actual calculation.  This speeds up the development cycle of the UX developers.
-
-```javascript
-$(".katapp").KatApp("redraw");
-$(".katapp").KatApp().redraw();
-```
 
 ## KatApp Events
 
@@ -3462,6 +3511,7 @@ Triggered after a KatApp finishes building the application instance, rendering t
 (function() {
     // Use this line to grab a reference to the current view the Kaml View is being rendered to
     var view = $("thisClass");
+    var application = view.KatApp();
 
     // Hook up one or more event handlers *using* the .RBLe namespace
     view.on( "onInitialized.RBLe", function( event, application ) {
@@ -3485,14 +3535,11 @@ Triggered after a KatApp finishes building the application instance, rendering t
         });
     });
 
-    // SAMPLE: Same as the handler registered inside onInitialized for iAdditionalDates.  Since it didn't need
-    // a reference to the application object, it could be done outside any KatApp handlers.
-    // NOTE: The use of 'view' instead of 'application.element' for scoping.
-    $('.iAdditionalDates', view).click(function (e) {
+    application.select('.iAdditionalDates').click(function (e) {
         if (e.target.tagName.toUpperCase() !== "INPUT") {
             return;
         }
-        $(".both-scenarios-v").fadeToggle();
+        application.select(".both-scenarios-v").fadeToggle();
     });
 })();
 ```
@@ -3640,7 +3687,7 @@ This event is triggered during `calculate` _after a successful calculation_ from
 
 ```javascript
 view.on( "onResultsProcessing.RBLe", function( event, calculationResults, calculationOptions, application ) {
-    $(".conversionTable", view).empty(); // In case not returned from the CalcEngine, remove the table
+    application.select(".conversionTable").empty(); // In case not returned from the CalcEngine, remove the table
 })
 ```
 
@@ -3704,9 +3751,9 @@ During `calculate`, if the results returned contain `jwt-data` table, updates ar
 A common use for these handlers during calculation could be to display a status notification that data was updated.
 
 ```javascript
-view.on("onActionResult.RBLe", function (event, endpoint) {
-	if (endpoint == "calculations/jwtupdate") {
-		$(".saveSuccess", view).show(500).delay(7000).hide(500);
+view.on("onActionResult.RBLe", function (event, endpoint, _result, application) {
+	if (endpoint == "rble/jwtupdate") {
+		application.select(".saveSuccess").show(500).delay(7000).hide(500);
 	}
 });
 ```
@@ -3716,9 +3763,9 @@ When `jwt-data` data updates fail, the `onActionFailed` event would be triggered
 Note: Even if data updating fails, 'normal calculation processing' will still be deemed successful.
 
 ```javascript
-view.on("onActionFailed.RBLe", function (event, endpoint) {
-	if (endpoint == "calculations/jwtupdate") {
-		$(".saveError", view).show(500).delay(3000).hide(500);
+view.on("onActionFailed.RBLe", function (event, endpoint, _result, application) {
+	if (endpoint == "rble/jwtupdate") {
+		application.select(".saveError").show(500).delay(3000).hide(500);
 	}
 });
 ```
@@ -3819,7 +3866,10 @@ This event is triggered after the file upload has finished processing and will t
 
 KatApp Modal Application Lifecycle Events are events that occur during processing of a modal application launched via [rbl-modal](#rbl-modal-Attribute-Details) links.  
 
-Almost always, the `onModalAppConfirm` and `onModalAppCancel` events are going to call an endpoint via an [apiAction](#apiAction) method call.  Therefore, the traditional `view.on("", function() { })` syntax is not allowed.  This is because, `apiAction` uses an asyncronous flow and the event handler needs to wait until the endpoint/`apiAction` result is returned before dismissing.  For that reason, these lifecycle events are hooked up in the KAML via the [updateOptions](#updateOptions) method call.
+Almost always, the 'confirm' and 'cancel' events are going to call an endpoint via an [apiAction](#apiAction) method call then close the modal.  These lifecycle events are hooked up either the traditional `view.on("", function() { })` syntax or in the KAML via the [updateOptions](#updateOptions) method call. Based on how the host and child applications are architected determines which events you will use.
+
+1. If the host application will execute the code when confirm/cancel selected, use `onModalAppConfirmed` and/or `onModalAppCancelled`,
+1. If the child application will execute the code when confirm/cancel selected, use `onModalAppConfirm` and/or `onModalAppCancel`
 
 ```javascript
 // This code would be inside the KAML that is being hosted *as* the modal application.
@@ -3835,7 +3885,17 @@ application.updateOptions(
 );
 ```
 
-**Note:** The `onModalAppConfirmed` and `onModalAppCancelled` events can be hooked up with standard `view.on("", function() {})` syntax or via KatApp options.
+At any stage during the lifecycle of the modal application, if the modal application needs to indicate to the host, that an unexpected exception has occured and that the Bootstrap modal should be disabled, simple raise a `onUnexpectedError.RBLe` event on the `view` element.
+
+```javascript
+$(document).ready(function () {
+    try {
+        var foo = 1 / 0; // Sample code, but any code that could throw an exception
+    } catch (e) {
+        view.trigger("onUnexpectedError.RBLe", e)
+    }
+});
+```
 
 <hr/>
 
@@ -3887,7 +3947,7 @@ This event is triggered when the 'cancel' button is clicked in the modal.  The `
 
 After the modal application has performed any desired logic, the modal can be dismissed by calling `dismiss();`. `message` can be returned to allow for the hosting application to display or act upon it.  If you do not want to dismiss the modal, but need to indicate to host application to enable the continue and cancel buttons, call `enable();`.
 
-Note that the `this` reference will be the modal dialogs 'continue' button.
+Note that the `this` reference will be the modal dialogs 'cancel' button.
 
 ```javascript
 // This code would be inside the KAML that is being hosted *as* the modal application.
