@@ -27,6 +27,8 @@
         - [Removing Event Handlers](#Removing-Event-Handlers)
     - [rbl-navigate Attribute Details](#rbl-navigate-Attribute-Details)
     - [rbl-modal Attribute Details](#rbl-modal-Attribute-Details)
+        - [Controlling the Modal KatApp Options](#Controlling-the-Modal-KatApp-Options)
+        - [Controlling the Modal UI Options](#Controlling-the-Modal-UI-Options)
     - [rbl-app Attribute Details](#rbl-app-Attribute-Details)
     - [_Push_ Table Processing](#_Push_-Table-Processing)
         - [rbl-defaults Table](#**rbl-defaults**)
@@ -169,6 +171,7 @@
         - [KatApp Modal Application Lifecycle Events](#KatApp-Modal-Application-Lifecycle-Events)
             - [onModalAppConfirm](#onModalAppConfirm)
             - [onModalAppCancel](#onModalAppCancel)
+            - [onModalAppInitialize](#onModalAppInitialize)            
             - [onModalAppInitialized](#onModalAppInitialized)
             - [onModalAppConfirmed](#onModalAppConfirmed)
             - [onModalAppCancelled](#onModalAppCancelled)
@@ -740,22 +743,84 @@ Click <a rbl-navigate="Benefits.HPF" data-input-provider-type-ids="ABC,XYZ">here
 ```
 
 ## rbl-modal Attribute Details
-The `rbl-modal` attribute can be used to launch an independent KatApp application inside of a modal popup.
+The `rbl-modal` attribute can be used to launch an independent KatApp application inside of a modal popup.  
 
 ```html
 Click <a rbl-modal="Channel.Home">here</a> to see your dashboard.
 ```
 
-Attribute | Description
----|---
-rbl-action-calculate | (boolean) Determines if an `application.calculate()` should be called upon modal application confirmation (default is `false`).
-data-label-title | Change the title of the modal dialog (default is no title).
-data-label-continue | Change the text of the continue button (default is Continue).
-data-label-cancel | Change the text of the cancel button (default is Cancel).
-data-show-cancel | (boolean) Whether or not to show the cancel button (default is `true`).
-data-input-* | Passed as the `manualInputs` to the modal application.  (i.e. to pass `iDependentId=1`, use `data-input-dependent-id="1"`.  The 'input name' will be created automatically to match RBLe CalcEngine input name pattern)
+The application 'ID' specified in this attribute will always be verified via an endpoint in the hosting application: `api/rble/verify-katapp?applicationId=`.  This endpoint should return a payload of:
+
+```javascript
+{
+    path: "relative path to kaml view",
+    manualInputs: { // optional, but can provide default inputs as needed
+        iInputA: "value",
+        iInputB: "value"
+    }
+}
+```
 
 See [KatApp Modal Application Lifecycle Events](#KatApp-Modal-Application-Lifecycle-Events) to see how to handle confirmation or cancellation of modal KatApps and how to handle unexpected exceptions.
+
+### Controlling the Modal KatApp Options
+
+By default, the containing KatApp options are the starting point (see [KatAppOptions Object](#KatAppOptions-Object) for more information) with only the following properties overwritten: `view`, `currentPage`, `inputSelector`, `calcEngines`, `manualInputs`.
+
+A manual input of `iModalApplication=1` is always injected, however more inputs can be specified in markup via the `data-input-*` attribute described below.
+
+Option Attribute | Description
+---|---
+rbl-action-calculate | (boolean) Determines if an `application.calculate()` should be called upon modal application confirmation (default is `false`).
+rbl-input-selector | Set the default input selector on the modal application (default is `input, textarea, select`).
+data-input-* | Passed as the `manualInputs` to the modal application.  (i.e. to pass `iDependentId=1`, use `data-input-dependent-id="1"`.  The 'input name' will be created automatically to match RBLe CalcEngine input name pattern)
+
+If you need to control more options, you can use the [updateOptions](#updateOptions) method inside the Kaml script.
+
+```javascript
+	(function () {
+		var view = $("{thisView}");
+		var application = view.KatApp();
+
+		application.updateOptions(
+			{
+                // Settings you wish to update
+			}
+		);
+    })();
+```
+
+### Controlling the Modal UI Options
+
+By default, the following markup will be injected into the DOM to host the KatApp:
+
+```html
+<div class="modal fade katappModalAppDialog" tabindex="-1" role="dialog" bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{Modal Title}</h5>
+                <button type="button" class="btn-close" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="katapp-modal">{Application hosted here}</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default cancelButton" aria-hidden="true">{Cancel Label}</button>
+                <button type="button" class="btn btn-primary continueButton">{Continue Label}</button>
+            </div>
+        </div>
+    </div>
+</div>
+```
+
+UI Attribute | Description
+---|---
+rbl-label-title | Change the title of the modal dialog (default is no title and header is hidden).  If you want to have no title *and* header is shown simply with an `X` button to close the dialog, use `rbl-label-title=''`.
+rbl-label-continue | Change the text of the continue button (default is Continue).
+rbl-label-cancel | Change the text of the cancel button (default is Cancel).
+rbl-show-cancel | (boolean) Whether or not to show the cancel button (default is `true`).
+rbl-modal-size | Change the size of the modal via [Bootstrap sizes](#https://getbootstrap.com/docs/5.1/components/modal/#optional-sizes): `sm`, `md` (same `None` in Bootstrap documentation), `lg`, `xl` (default is `xl`).
 
 ## rbl-app Attribute Details
 The `rbl-app` attribute can be used to nest an independent KatApp application inline within a parent KatApp.
@@ -765,13 +830,27 @@ The `rbl-app` attribute can be used to nest an independent KatApp application in
 <div rbl-app="Channel.Home"></div>
 ```
 
-Attribute | Description
----|---
-data-input-* | Passed as the `manualInputs` to the nested application.  (i.e. to pass `iDependentId=1`, use `data-input-dependent-id="1"`.  The 'input name' will be created automatically to match RBLe CalcEngine input name pattern)
+The application 'ID' specified in this attribute will always be verified via an endpoint in the hosting application: `api/rble/verify-katapp?applicationId=`.  This endpoint should return a payload of:
+
+```javascript
+{
+    path: "relative path to kaml view",
+    manualInputs: { // optional, but can provide default inputs as needed
+        iInputA: "value",
+        iInputB: "value"
+    }
+}
+```
 
 **Note**: It is important to use `application.select()` to ensure that parent KatApps do not cross into the boundary of a nested KatApp.  See [View Scoping - Scoping jQuery](#Scoping-jQuery) for more information.
 
 **Caveat**: If a parent of a `rbl-app` has a `rbl-nocalc` class applied, currently this does carry into the inline application and will be applied to all inputs in both applications.  To fix this would require extra processing.  Instead of jQuery selector, I would first have to return all inputs then loop them checking if the containing application is the appropriate application that is doing the selecting.
+
+### Controlling the Nested KatApp Options
+
+Attribute | Description
+---|---
+data-input-* | Passed as the `manualInputs` to the nested application.  (i.e. to pass `iDependentId=1`, use `data-input-dependent-id="1"`.  The 'input name' will be created automatically to match RBLe CalcEngine input name pattern)
 
 ## _Push_ Table Processing
 
@@ -3304,9 +3383,9 @@ view.on( "onKatAppNotification.RBLe", function( event, name, information, applic
 
 #### createModalDialog
 
-**`.createModalDialog(confirm: string, onConfirm: ()=> void, onCancel: ()=> void | undefined)`**
+**`.createModalDialog(confirm: string | ModalDialogOptions, onConfirm: ()=> void, onCancel: ()=> void | undefined)`**
 
-createModalDialog is a helper method to show a simple 'Continue' / 'Cancel' Bootstrap dialog on the screen.  If `onCancel` is not provided, the 'Cancel' button will not be displayed.
+createModalDialog is a helper method to show a simple 'Continue' / 'Cancel' Bootstrap dialog on the screen.  If `onCancel` is not provided, the 'Cancel' button will not be displayed. If provided, the dialog will support pressing the `esc` key in addition to clicking the button.
 
 ```javascript
 view.on("onActionResult.RBLe", function (e, endpoint, _jsonResponse, application) {
@@ -3320,6 +3399,43 @@ view.on("onActionResult.RBLe", function (e, endpoint, _jsonResponse, application
     }
 });
 ```
+
+#### Controlling the Modal UI Options
+
+By default, the following markup will be injected into the DOM when a modal dialog is created:
+
+```html
+<div class="modal fade katappModalAppDialog" tabindex="-1" role="dialog" bs-keyboard="false" bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header d-none hidden">
+                <h5 class="modal-title"></h5>
+                <button type="button" class="btn-close" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">{Confirmation}</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default cancelButton" aria-hidden="true">Cancel</button>
+                <button type="button" class="btn btn-primary continueButton">Continue</button>
+            </div>
+        </div>
+    </div>
+</div>
+```
+
+A `ModalDialogOptions` object can be passed in to control the UI appearance of the dialog.  The `ModalDialogOptions` object can be constructed as follows:
+
+```javascript
+{
+    Confirmation: "Are you sure?", // Required
+    Labels: { // Optional
+        Continue: "OK", // Optional, change the continue button text
+        Cancel: "Abort", // Optional, change the cancel button text
+        Title: "Please Confirm" // Optional, if provided, the modal-header will be displayed with title and an 'X' to close the dialog.
+    }
+}
+```
+
+
 
 ### KatApp Debugging Methods
 
@@ -3947,7 +4063,7 @@ This event is triggered when the 'cancel' button is clicked in the modal.  The `
 
 After the modal application has performed any desired logic, the modal can be dismissed by calling `dismiss();`. `message` can be returned to allow for the hosting application to display or act upon it.  If you do not want to dismiss the modal, but need to indicate to host application to enable the continue and cancel buttons, call `enable();`.
 
-Note that the `this` reference will be the modal dialogs 'cancel' button.
+Note that the `this` reference will be the button clicked to dismiss the dialog, or the dialog element itself if the `esc` key  was pressed.
 
 ```javascript
 // This code would be inside the KAML that is being hosted *as* the modal application.
@@ -3962,6 +4078,27 @@ application.updateOptions(
 
 <hr/>
 
+#### onModalAppInitialize
+
+**`onModalAppInitialize(event: Event, applicationId: string, hostApplication: KatApp, modalView: JQuery<HTMLElement>, modalLink: JQuery<HTMLElement>)`**
+
+This event is triggered immediately before a modal application is initialized.  Allows for host application to assign events to the modal application if needed.
+
+```javascript
+// This code would be inside the KAML that is *the host* application
+view
+    .on("onModalAppInitialize.RBLe", function (event, applicationId, hostApplication, modalView, modalLink) {
+        modalView.on("onCalculationOptions.RBLe", function (event, calculationResults, calculationOptions, application) {
+            // add additonal options...
+        })
+        .on("onResultsProcessing.RBLe", function (event, calculationResults, calculationOptions, application) {
+            // pre process child results...
+        })
+    });
+```
+
+<hr/>
+
 #### onModalAppInitialized
 
 **`onModalAppInitialized(event: Event, applicationId: string, hostApplication: KatApp, modalApplication: KatApp, modalLink: JQuery<HTMLElement>)`**
@@ -3972,8 +4109,8 @@ This event is triggered after a modal application has been initialized.  Allows 
 // This code would be inside the KAML that is *the host* application
 view
     .on("onModalAppInitialized.RBLe", function (event, applicationId, hostApplication, modalApplication, modalLink) {
-        modalApplication.element.on("onResultsProcessing.RBLe", function (event, calculationResults, calculationOptions, application) {
-            // pre process child results...
+        modalApplication.select(".mybutton").on("click", function (event) {
+            // perform custom actions...
         })
     })
 ```
