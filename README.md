@@ -869,16 +869,16 @@ data&#x2011;input&#x2011;* | Passed as the `manualInputs` to the nested applicat
 When a `rbl-app` is launched, it uses the same options of its parent application except for `view`, `currentPage`, `inputSelector`, calcEngines`, and `manualInputs`. If you need to control more options, you can use the [updateOptions](#updateOptions) method inside the Kaml script.
 
 ```javascript
-	(function () {
-		var view = $("{thisView}");
-		var application = view.KatApp();
+(function () {
+    var view = $("{thisView}");
+    var application = view.KatApp();
 
-		application.updateOptions(
-			{
-                // Settings you wish to update
-			}
-		);
-    })();
+    application.updateOptions(
+        {
+            // Settings you wish to update
+        }
+    );
+})();
 ```
 
 ## _Push_ Table Processing
@@ -4062,11 +4062,11 @@ modalApp.element
 
 During the creation of the modal KatApp, the following life cycle occurs.
 
-ModalApp.[onInitializing](#onInitializing) - use this event for [advanced modal functionality](#advanced-katapp-modal-sample).
-HostApp.[onModalAppInitialized](#onModalAppInitialized)
-ModalApp.[Rest of KatApp Life Cycle Events](#KatApp-Lifecycle-Events)
-ModalApp.[onConfirmed](#onConfirmed)/[onCancelled](#onCancelled) - when [standard modal functionality](#Standard-KatApp-Modal-Sample) is used and cancel or continue is clicked.
-HostApp.[onModalAppConfirmed](#onModalAppConfirmed)/[onModalAppCancelled](#onModalAppCancelled) - triggered when modal should be dismissed.
+1. ModalApp.[onInitializing](#onInitializing) - use this event for [advanced modal functionality](#advanced-katapp-modal-sample).
+1. HostApp.[onModalAppInitialized](#onModalAppInitialized)
+1. ModalApp.[Rest of KatApp Life Cycle Events](#KatApp-Lifecycle-Events)
+1. ModalApp.[onConfirmed](#onConfirmed)/[onCancelled](#onCancelled) - when [standard modal functionality](#Standard-KatApp-Modal-Sample) is used and cancel or continue is clicked.
+1. HostApp.[onModalAppConfirmed](#onModalAppConfirmed)/[onModalAppCancelled](#onModalAppCancelled) - triggered when modal should be dismissed.
 
 #### onConfirmed
 
@@ -4157,7 +4157,11 @@ Below is the markup and script needed when using `rbl-modal` functionality and u
 **Host Application Markup**
 
 ```html
-Click <a rbl-modal="Verify.Mobile" rbl-label-title="Verify Mobile Telephone" rbl-action-calculate="true" rbl-input-selector=".main input" data-input-action="verify">here</a> to verify your mobile phone.
+Click <a rbl-modal="Verify.Mobile" 
+        rbl-label-title="Verify Mobile Telephone" 
+        rbl-action-calculate="true" 
+        rbl-input-selector=".main input" 
+        data-input-action="verify">here</a> to verify your mobile phone.
 ```
 
 1. rbl-label-title - sets title
@@ -4255,7 +4259,9 @@ The additional functionality that occurs is:
 **Host Application Markup**
 
 ```html
-<a rbl-action-calculate="true" rbl-label-title="Device Verification" rbl-modal="Common.TextValidate">Enable SMS messages</a>
+<a rbl-action-calculate="true" 
+    rbl-label-title="Device Verification" 
+    rbl-modal="Common.TextValidate">Enable SMS messages</a>
 ```
 
 1. rbl-label-title - sets title
@@ -4292,6 +4298,8 @@ view
     // Create custom buttons for our dialog
     .on("onInitializing.RBLe", function () {
         if (modalAppOptions != undefined) { // We knew we are in modal application
+            
+            // Remove default cancel/continue
             application.select(".modal-footer").children().remove();
 
             // Add all custom buttons needed for all screens and a method (using step* classes) to
