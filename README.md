@@ -4207,7 +4207,7 @@ application.updateOptions(
                 }
             );
         },
-        onModalAppCancel: function (hostApplication, modalLink, dismiss, cancel) {
+        onCancelled: function (hostApplication, modalLink, dismiss, cancel) {
             if ( !canDismiss ) {
                 cancel();
             }
