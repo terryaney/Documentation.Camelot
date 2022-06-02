@@ -829,7 +829,11 @@ rbl&#x2011;show&#x2011;cancel | (boolean) Whether or not to show the cancel butt
 rbl&#x2011;modal&#x2011;size | Change the size of the modal via [Bootstrap sizes](#https://getbootstrap.com/docs/5.1/components/modal/#optional-sizes): `sm`, `md` (same `None` in Bootstrap documentation), `lg`, `xl` (default is `xl`).
 
 ```html
-Click <a rbl-modal="Channel.Home" rbl-label-title="Your Dashboard" rbl-label-continue="Close" rbl-show-cancel="false" rbl-modal-size="md">here</a> to see your dashboard.
+Click <a rbl-modal="Channel.Home" 
+        rbl-label-title="Your Dashboard" 
+        rbl-label-continue="Close" 
+        rbl-show-cancel="false" 
+        rbl-modal-size="md">here</a> to see your dashboard.
 ```
 
 ## rbl-app Attribute Details
