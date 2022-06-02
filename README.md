@@ -4062,10 +4062,11 @@ modalApp.element
 
 During the creation of the modal KatApp, the following life cycle occurs.
 
-1. ModalApp.[onInitializing](#onInitializing) - use this event for [advanced modal functionality](#advanced-katapp-modal-sample).
+1. ModalApp.[onInitializing](#onInitializing) - See [advanced modal functionality](#advanced-katapp-modal-sample).
 1. HostApp.[onModalAppInitialized](#onModalAppInitialized)
 1. ModalApp.[Rest of KatApp Life Cycle Events](#KatApp-Lifecycle-Events)
 1. ModalApp.[onConfirmed](#onConfirmed)/[onCancelled](#onCancelled) - when [standard modal functionality](#Standard-KatApp-Modal-Sample) is used and cancel or continue is clicked.
+1. HostApp.[onModalAppConfirm](#onModalAppConfirm)/[onModalAppCancel](#onModalAppCancel) - See [advanced modal functionality](#advanced-katapp-modal-sample).
 1. HostApp.[onModalAppConfirmed](#onModalAppConfirmed)/[onModalAppCancelled](#onModalAppCancelled) - triggered when modal should be dismissed.
 
 #### onConfirmed
