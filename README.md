@@ -170,8 +170,8 @@
             - [onUploadFailed](#onUploadFailed)
             - [onUploadComplete](#onUploadComplete)
         - [KatApp Modal Application Lifecycle Events](#KatApp-Modal-Application-Lifecycle-Events)
-            - [onConfirmed](#onConfirmed)
-            - [onCancelled](#onCancelled)
+            - [onConfirm](#onConfirm)
+            - [onCancel](#onCancel)
             - [onModalAppInitialized](#onModalAppInitialized)
             - [onModalAppConfirmed](#onModalAppConfirmed)
             - [onModalAppCancelled](#onModalAppCancelled)
@@ -4069,31 +4069,33 @@ During the creation of the modal KatApp, the following life cycle occurs.
 1. HostApp.[onModalAppConfirm](#onModalAppConfirm)/[onModalAppCancel](#onModalAppCancel) - See [advanced modal functionality](#advanced-katapp-modal-sample).
 1. HostApp.[onModalAppConfirmed](#onModalAppConfirmed)/[onModalAppCancelled](#onModalAppCancelled) - triggered when modal should be dismissed.
 
-#### onConfirmed
+<hr/>
 
-**`onConfirmed(hostApplication: KatApp, modalLink: JQuery<HTMLElement>, dismiss: (message?: string)=> void, cancel: ()=> void)=> boolean | string | undefined`**
+#### onConfirm
+
+**`onConfirm(hostApplication: KatApp, modalLink: JQuery<HTMLElement>, dismiss: (message?: string)=> void, cancel: ()=> void)=> boolean | string | undefined`**
 
 This event is triggered when the 'continue' button is clicked in the modal.  The `hostApplication` is the main application and `modalLink` is the link that was clicked to trigger the creation of the application.  Either can be referred to if additional information is needed by the hosted application to determine logic.
 
-To prevent the modal dialog from closing, call `cancel()` delegate from the event handler.
+**Within the event handler, `dismiss()` or `cancel()` must be called.** To prevent the modal dialog from closing, call `cancel()` delegate from the event handler. To dismiss the dialog, call the `dismiss()` delegate optionally passing a `string` message value to allow for the hosting application to display or act upon it the message inside a [onModalAppConfirmed](#onModalAppConfirmed) event handler.
 
-Dismiss the dialog by calling the `dismiss()` delegate optionally passing a `string` message value to allow for the hosting application to display or act upon it the message inside a [onModalAppConfirmed](#onModalAppConfirmed) event handler.
+By default, any `string` message passed in the `dimiss` delegate is not processed by the framework.
 
-By default, any `string` message passed in the `dimiss` delegate is not processed by the framework.  
+**You must use `application.updateOptions( { onConfirm: function() { } } );` syntax versus `view.on("onConfirm.RBLe", function() { } );` syntax when assigning a handler.**  This allows the KatApp framework to automatically dismiss the dialog if no handler is provided.  If the jQuery `on()` syntax is used, the framework is unable to determine whether or not an event has been assigned and would not be able to automatically dismiss when no special functionality is needed (more so in the `onCancel` handler).
 
 <hr/>
 
-#### onCancelled
+#### onCancel
 
-**`onCancelled(hostApplication: KatApp, modalLink: JQuery<HTMLElement>, dismiss: (message?: string)=> void, cancel: ()=> void)=> boolean | string | undefined`**
+**`onCancel(hostApplication: KatApp, modalLink: JQuery<HTMLElement>, dismiss: (message?: string)=> void, cancel: ()=> void)=> boolean | string | undefined`**
 
 This event is triggered when the 'cancel' button is clicked in the modal.  The `hostApplication` is the main application and `modalLink` is the link that was clicked to trigger the creation of the application.  Either can be referred to if additional information is needed by the hosted application to determine logic.
 
-To prevent the modal dialog from closing, call `cancel()` delegate from the event handler.
-
-Dismiss the dialog by calling the `dismiss()` delegate optionally passing a `string` message value to allow for the hosting application to display or act upon it the message inside a [onModalAppCancelled](#onModalAppCancelled) event handler.
+**Within the event handler, `dismiss()` or `cancel()` must be called.** To prevent the modal dialog from closing, call `cancel()` delegate from the event handler. To dismiss the dialog, call the `dismiss()` delegate optionally passing a `string` message value to allow for the hosting application to display or act upon it the message inside a [onModalAppCancelled](#onModalAppCancelled) event handler.
 
 By default, any `string` message passed in the `dimiss` delegate is not processed by the framework.  
+
+**You must use `application.updateOptions( { onCancel: function() { } } );` syntax versus `view.on("onCancel.RBLe", function() { } );` syntax when assigning a handler.**  This allows the KatApp framework to automatically dismiss the dialog if no handler is provided.  If the jQuery `on()` syntax is used, the framework is unable to determine whether or not an event has been assigned and would not be able to automatically dismiss when no special functionality is needed.
 
 <hr/>
 
@@ -4113,9 +4115,9 @@ This event is triggered after a modal application has been successfully confirme
 
 By default, if `rbl-action-calculate="true"` is set, the host application will execute an `application.calculate()` after dismissing the dialog.
 
-**During the event handler, `dismiss()` must be called to dismiss the dialog.**
+**Within the event handler, `dismiss()` must be called to dismiss the dialog.**
 
-**If a KatApp Kaml file handles this event, ensure that you first remove the default handler via `.off('onModalAppConfirmed.RBLe')`.**
+**If a KatApp Kaml file needs to handles this event, ensure that you first remove the default handler via `.off('onModalAppConfirmed.RBLe')`.**
 
 <hr/>
 
@@ -4127,7 +4129,7 @@ This event is triggered after a modal application has been cancelled and dismiss
 
 **During the event handler, `dismiss()` must be called to dismiss the dialog.**
 
-**If a KatApp Kaml file handles this event, ensure that you first remove the default handler via `.off('onModalAppConfirmed.RBLe')`.**
+**If a KatApp Kaml file needs to handles this event, ensure that you first remove the default handler via `.off('onModalAppConfirmed.RBLe')`.**
 
 <hr/>
 
@@ -4135,7 +4137,7 @@ This event is triggered after a modal application has been cancelled and dismiss
 
 **`onModalAppConfirm(event: Event, message?: string)`**
 
-This event can be triggered by the modal application to indicate to the host application that the dialog should be dismissed as 'confirmed'.  KatApp Kaml files will never handle this event, only the KatApp framework should handle this event.
+This event can be triggered by the modal application to indicate to the host application that the dialog should be dismissed as 'confirmed'.  **KatApp Kaml files will never handle this event, only the KatApp framework should handle this event.**
 
 See [Advanced KatApp Modal Sample](#Advanced-KatApp-Modal-Sample) for an example.
 
@@ -4145,7 +4147,7 @@ See [Advanced KatApp Modal Sample](#Advanced-KatApp-Modal-Sample) for an example
 
 **`onModalAppCancel(event: Event, message?: string)`**
 
-This event can be triggered by the modal application to indicate to the host application that the dialog should be dismissed as 'cancelled'.  KatApp Kaml files will never handle this event, only the KatApp framework should handle this event.
+This event can be triggered by the modal application to indicate to the host application that the dialog should be dismissed as 'cancelled'.  **KatApp Kaml files will never handle this event, only the KatApp framework should handle this event.**
 
 See [Advanced KatApp Modal Sample](#Advanced-KatApp-Modal-Sample) for an example.
 
@@ -4181,7 +4183,7 @@ var canDismiss = true; // Sample variable that might be set to false during life
 
 application.updateOptions(
     {
-        onConfirmed: function (hostApplication, modalLink, dismiss, cancel) {
+        onConfirm: function (hostApplication, modalLink, dismiss, cancel) {
             if ( !canDismiss ) {
                 cancel();
                 return;
@@ -4202,30 +4204,20 @@ application.updateOptions(
                     else {
                         // KatApp Provider code has already displayed errors, additional inspection
                         // and use of failureResponse could be done.
-                        cancel();
+                        if ( errorResponse.Validations == undefined || ( errorResponse.Validations.length == 1 && errorResponse.Validations[ 0 ].ID == "System" ) ) {
+                            // Unexpected, tell application to 'disable' modal dialog and 
+                            application.triggerEvent("onUnexpectedError", e);
+                        }
+                        else {
+                            // Acceptable errors, just cancel dismiss action and leave summary up...
+                            cancel();
+                        }
                     }
                 }
             );
-        },
-        onCancelled: function (hostApplication, modalLink, dismiss, cancel) {
-            if ( !canDismiss ) {
-                cancel();
-            }
-            else {
-                dismiss();
-            }
         }
     }
 );
-
-$(document).ready(function () {
-    try {
-        var foo = 1 / 0; // Sample code, but any code that could throw an exception
-    } catch (e) {
-        application.triggerEvent("onUnexpectedError", e); // tell application to 'disable' modal dialog and display error summary
-    }
-});
-
 ```
 
 **Host Application Script**
@@ -4336,17 +4328,17 @@ view
                 }
                 break;
         }
+    })
+    .on("onActionFailed.RBLe", function (e, endPoint) {
+        switch (endPoint) {
+            case "common/mobile-verification":
+                if ( errorResponse.Validations == undefined || ( errorResponse.Validations.length == 1 && errorResponse.Validations[ 0 ].ID == "System" ) ) {
+                    // Unexpected, tell application to 'disable' modal dialog and 
+                    application.triggerEvent("onUnexpectedError", e);
+                }
+                break;
+        }
     });
-
-
-$(document).ready(function () {
-    try {
-        var foo = 1 / 0; // Sample code, but any code that could throw an exception
-    } catch (e) {
-        application.triggerEvent("onUnexpectedError", e); // tell application to 'disable' modal dialog and display error summary
-    }
-});
-
 ```
 
 ### Template Event Handlers
