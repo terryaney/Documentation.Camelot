@@ -777,7 +777,8 @@ Option&nbsp;Attribute | Description
 ---|---
 rbl&#x2011;action&#x2011;calculate | (boolean) Determines if an `application.calculate()` should be called upon modal application confirmation (default is `false`).
 rbl&#x2011;input&#x2011;selector | Set the default input selector on the modal application (default is `input, textarea, select`).
-data&#x2011;input&#x2011;* | Passed as the `manualInputs` to the modal application.  (i.e. to pass `iDependentId=1`, use `data-input-dependent-id="1"`.  The 'input name' will be created automatically to match RBLe CalcEngine input name pattern)
+rbl&#x2011;action&#x2011;continue | If the default modal continue button should execute an 'action link' when clicked, provide the endpoint here (default is blank).
+ data&#x2011;input&#x2011;* | Passed as the `manualInputs` to the modal application.  (i.e. to pass `iDependentId=1`, use `data-input-dependent-id="1"`.  The 'input name' will be created automatically to match RBLe CalcEngine input name pattern)
 
 When a `rbl-modal` is launched, it uses the same options of its parent application except for `view`, `currentPage`, `inputSelector`, calcEngines`, and `manualInputs`. If you need to control more options, you can use the [updateOptions](#updateOptions) method inside the Kaml script.
 
@@ -3455,11 +3456,11 @@ A `ModalDialogOptions` object can be passed in to control the UI appearance of t
 
 ```javascript
 {
-    Confirmation: "Are you sure?", // Required
-    Labels: { // Optional
-        Continue: "OK", // Optional, change the continue button text
-        Cancel: "Abort", // Optional, change the cancel button text
-        Title: "Please Confirm" // Optional, if provided, the modal-header will be displayed with title and an 'X' to close the dialog.
+    confirmation: "Are you sure?", // Required
+    labels: { // Optional
+        continue: "OK", // Optional, change the continue button text
+        cancel: "Abort", // Optional, change the cancel button text
+        title: "Please Confirm" // Optional, if provided, the modal-header will be displayed with title and an 'X' to close the dialog.
     }
 }
 ```
@@ -3963,7 +3964,7 @@ KatApp Action Lifecycle Events are events that occur during the processing of a 
 
 **`onActionStart(event: Event, endpoint: string, submitData: JSON, application: KatAppPlugInInterface, currentOptions: KatAppOptions, actionLink: JQuery<HTMLElement>)`**
 
-This event is triggered immediately before submitting the `submitData` to the API endpoint.  This handler could be used to modify the `submitData` before submission if required.
+This event is triggered immediately before submitting the `submitData` to the API endpoint.  This handler could be used to modify the `submitData` before submission if required.  If the handler returns `false` or calls `e.preventDefault()`, then the endpoint submission is immediately cancelled.
 
 <hr/>
 
@@ -4039,7 +4040,7 @@ Almost always, the 'confirm' event is going to call an endpoint via an [apiActio
 Based on how the host and child applications are architected determines which events you will use.
 
 1. If the host application will execute the code when confirm or cancel is selected, use `onModalAppConfirmed` and/or `onModalAppCancelled`,
-1. If the child application will execute the code when confirm or cancel is selected, use `onConfirmed` and/or `onCancelled`
+1. If the child application will execute the code when confirm or cancel is selected, use `onConfirm` and/or `onCancel`
 
 At any stage during the lifecycle of the modal application, if the modal application needs to indicate to the host, that an unexpected exception has occured and that the Bootstrap modal should be disabled, use `application.triggerEvent( "onUnexpectedError", ex );` within the modal application.  By default, the KatApp framework automatically triggers this event if a RBLe calculation fails during the ConfigureUI calculation.  It then catches this event and displays a validation summary and disables the UI.
 
@@ -4065,7 +4066,7 @@ During the creation of the modal KatApp, the following life cycle occurs.
 1. ModalApp.[onInitializing](#onInitializing) - See [advanced modal functionality](#advanced-katapp-modal-sample).
 1. HostApp.[onModalAppInitialized](#onModalAppInitialized)
 1. ModalApp.[Rest of KatApp Life Cycle Events](#KatApp-Lifecycle-Events)
-1. ModalApp.[onConfirmed](#onConfirmed)/[onCancelled](#onCancelled) - when [standard modal functionality](#Standard-KatApp-Modal-Sample) is used and cancel or continue is clicked.
+1. ModalApp.[onConfirm](#onConfirm)/[onCancel](#onCancel) - when [standard modal functionality](#Standard-KatApp-Modal-Sample) is used and cancel or continue is clicked.
 1. HostApp.[onModalAppConfirm](#onModalAppConfirm)/[onModalAppCancel](#onModalAppCancel) - See [advanced modal functionality](#advanced-katapp-modal-sample).
 1. HostApp.[onModalAppConfirmed](#onModalAppConfirmed)/[onModalAppCancelled](#onModalAppCancelled) - triggered when modal should be dismissed.
 
@@ -4083,6 +4084,7 @@ By default, any `string` message passed in the `dimiss` delegate is not processe
 
 **You must use `application.updateOptions( { onConfirm: function() { } } );` syntax versus `view.on("onConfirm.RBLe", function() { } );` syntax when assigning a handler.**  This allows the KatApp framework to automatically dismiss the dialog if no handler is provided.  If the jQuery `on()` syntax is used, the framework is unable to determine whether or not an event has been assigned and would not be able to automatically dismiss when no special functionality is needed (more so in the `onCancel` handler).
 
+The `this` reference inside of this handler will be the button clicked.
 <hr/>
 
 #### onCancel
@@ -4096,6 +4098,8 @@ This event is triggered when the 'cancel' button is clicked in the modal.  The `
 By default, any `string` message passed in the `dimiss` delegate is not processed by the framework.  
 
 **You must use `application.updateOptions( { onCancel: function() { } } );` syntax versus `view.on("onCancel.RBLe", function() { } );` syntax when assigning a handler.**  This allows the KatApp framework to automatically dismiss the dialog if no handler is provided.  If the jQuery `on()` syntax is used, the framework is unable to determine whether or not an event has been assigned and would not be able to automatically dismiss when no special functionality is needed.
+
+The `this` reference inside of this handler will be the button clicked, or the modal itself if `esc` was pressed.
 
 <hr/>
 
@@ -4164,12 +4168,14 @@ Click <a rbl-modal="Verify.Mobile"
         rbl-label-title="Verify Mobile Telephone" 
         rbl-action-calculate="true" 
         rbl-input-selector=".main input" 
+        rbl-action-continue="common/mobile-verification"
         data-input-action="verify">here</a> to verify your mobile phone.
 ```
 
 1. rbl-label-title - sets title
 1. rbl-action-calculate - host application will calculate if modal is confirmed
 1. rbl-input-selector - only inputs within the element with class 'main' will be processed
+1. rbl-action-continue - the endpoint api to call when continue is clicked.
 1. data-input-action - create an input named iAction='verify' to pass into the modal application's CalcEngine
 
 See [rbl-modal Attribute Details](#rbl-modal-Attribute-Details) for more information on attributes available on `rbl-modal` elements.
@@ -4180,49 +4186,33 @@ var view = $("{thisView}");
 var application = view.KatApp();
 
 var canDismiss = true; // Sample variable that might be set to false during life time of modal app
-
-application.updateOptions(
-    {
-        onConfirm: function (hostApplication, modalLink, dismiss, cancel) {
-            if ( !canDismiss ) {
-                cancel();
-                return;
-            }
-
-            // Logic to perform to verify mobile phone
-            application.apiAction(
-                "common/mobile-verification",
-                application.options,
-                { 
-                    customInputs: { iAction: "validate" } 
-                },
-                this,
-                function (successResponse, failureResponse) {
-                    if ( successResponse != undefined ) {
-                        dismiss( "Success: Mobile Phone number verified for text messages. Access Communications to update your message settings." );
-                    }
-                    else {
-                        // KatApp Provider code has already displayed errors, additional inspection
-                        // and use of failureResponse could be done.
-                        if ( errorResponse.Validations == undefined || ( errorResponse.Validations.length == 1 && errorResponse.Validations[ 0 ].ID == "System" ) ) {
-                            // Unexpected, tell application to 'disable' modal dialog and 
-                            application.triggerEvent("onUnexpectedError", e);
-                        }
-                        else {
-                            // Acceptable errors, just cancel dismiss action and leave summary up...
-                            cancel();
-                        }
-                    }
-                }
-            );
+view
+    // Optional, only needed if you want to cancel submission for some reason
+    .on("onActionStart.RBLe", function (e, endPoint, resultData, application, _currentOptions, actionLink) {
+        if ( !canDismiss ) {
+            actionLink.prop("disabled", false);
+            return false;
         }
-    }
-);
+    })
+    .on("onActionResult.RBLe", function (e, endPoint, resultData, application, _currentOptions, actionLink) {
+        var message = "Success: Mobile Phone number verified for text messages. Access Communications to update your message settings.";
+        hostApplication.triggerEvent("onModalAppConfirm", message);
+        // Optional dialog if you want to show a confirm
+        hostApplication.createModalDialog(
+            {
+                confirmation: message,
+                labels: {
+                    continue: "OK", // Optional, change the continue button text
+                    title: "Verification Successful"
+                }
+            }
+        );
+    });
 ```
 
 **Host Application Script**
 
-This script is only needed if you need to process a message returned from `onConfirmed` event (remember to always remove default `onModalAppConfirmed.RBLe` and/or `onModalAppCancelled.RBLe` event handlers if you are going to replace them.)
+This script is only needed if you need to process a message returned from `onConfirm` event (remember to always remove default `onModalAppConfirmed.RBLe` and/or `onModalAppCancelled.RBLe` event handlers if you are going to replace them.)
 
 ```javascript
 var view = $("{thisView}");
