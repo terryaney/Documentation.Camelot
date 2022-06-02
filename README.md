@@ -773,25 +773,25 @@ By default, the containing KatApp options are the starting point (see [KatAppOpt
 
 A manual input of `iModalApplication=1` is always injected, however more inputs can be specified in markup via the `data-input-*` attribute described below.
 
-Option Attribute | Description
+Option&nbsp;Attribute | Description
 ---|---
-rbl-action-calculate | (boolean) Determines if an `application.calculate()` should be called upon modal application confirmation (default is `false`).
-rbl-input-selector | Set the default input selector on the modal application (default is `input, textarea, select`).
-data-input-* | Passed as the `manualInputs` to the modal application.  (i.e. to pass `iDependentId=1`, use `data-input-dependent-id="1"`.  The 'input name' will be created automatically to match RBLe CalcEngine input name pattern)
+rbl&#x2011;action&#x2011;calculate | (boolean) Determines if an `application.calculate()` should be called upon modal application confirmation (default is `false`).
+rbl&#x2011;input&#x2011;selector | Set the default input selector on the modal application (default is `input, textarea, select`).
+data&#x2011;input&#x2011;* | Passed as the `manualInputs` to the modal application.  (i.e. to pass `iDependentId=1`, use `data-input-dependent-id="1"`.  The 'input name' will be created automatically to match RBLe CalcEngine input name pattern)
 
 When a `rbl-modal` is launched, it uses the same options of its parent application except for `view`, `currentPage`, `inputSelector`, calcEngines`, and `manualInputs`. If you need to control more options, you can use the [updateOptions](#updateOptions) method inside the Kaml script.
 
 ```javascript
-	(function () {
-		var view = $("{thisView}");
-		var application = view.KatApp();
+(function () {
+    var view = $("{thisView}");
+    var application = view.KatApp();
 
-		application.updateOptions(
-			{
-                // Settings you wish to update
-			}
-		);
-    })();
+    application.updateOptions(
+        {
+            // Settings you wish to update
+        }
+    );
+})();
 ```
 
 ### Controlling the Modal UI Options
@@ -820,13 +820,13 @@ By default, the following markup will be injected into the DOM to host the KatAp
 </div>
 ```
 
-UI Attribute | Description
+UI&nbsp;Attribute | Description
 ---|---
-rbl-label-title | Change the title of the modal dialog (default is no title and header is hidden).  If you want to have no title *and* header is shown simply with an `X` button to close the dialog, use `rbl-label-title=''`.
-rbl-label-continue | Change the text of the continue button (default is Continue).
-rbl-label-cancel | Change the text of the cancel button (default is Cancel).
-rbl-show-cancel | (boolean) Whether or not to show the cancel button (default is `true`).
-rbl-modal-size | Change the size of the modal via [Bootstrap sizes](#https://getbootstrap.com/docs/5.1/components/modal/#optional-sizes): `sm`, `md` (same `None` in Bootstrap documentation), `lg`, `xl` (default is `xl`).
+rbl&#x2011;label&#x2011;title | Change the title of the modal dialog (default is no title and header is hidden).  If you want to have no title *and* header is shown simply with an `X` button to close the dialog, use `rbl-label-title=''`.
+rbl&#x2011;label&#x2011;continue | Change the text of the continue button (default is Continue).
+rbl&#x2011;label&#x2011;cancel | Change the text of the cancel button (default is Cancel).
+rbl&#x2011;show&#x2011;cancel | (boolean) Whether or not to show the cancel button (default is `true`).
+rbl&#x2011;modal&#x2011;size | Change the size of the modal via [Bootstrap sizes](#https://getbootstrap.com/docs/5.1/components/modal/#optional-sizes): `sm`, `md` (same `None` in Bootstrap documentation), `lg`, `xl` (default is `xl`).
 
 ```html
 Click <a rbl-modal="Channel.Home" rbl-label-title="Your Dashboard" rbl-label-continue="Close" rbl-show-cancel="false" rbl-modal-size="md">here</a> to see your dashboard.
@@ -860,7 +860,7 @@ The application 'ID' specified in this attribute will always be verified via an 
 
 Attribute | Description
 ---|---
-data-input-* | Passed as the `manualInputs` to the nested application.  (i.e. to pass `iDependentId=1`, use `data-input-dependent-id="1"`.  The 'input name' will be created automatically to match RBLe CalcEngine input name pattern)
+data&#x2011;input&#x2011;* | Passed as the `manualInputs` to the nested application.  (i.e. to pass `iDependentId=1`, use `data-input-dependent-id="1"`.  The 'input name' will be created automatically to match RBLe CalcEngine input name pattern)
 
 When a `rbl-app` is launched, it uses the same options of its parent application except for `view`, `currentPage`, `inputSelector`, calcEngines`, and `manualInputs`. If you need to control more options, you can use the [updateOptions](#updateOptions) method inside the Kaml script.
 
