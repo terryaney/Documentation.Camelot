@@ -972,11 +972,20 @@ table | The name of the data source table that provides the list items for the c
 #### **rbl-listcontrol data source** 
 Typically, `rbl-listcontrol` and its data tables are only returned during a configuration calculation to initialize the user interface.  However, if the list control items are dynamic based on employee data or other inputs, the typical pattern is to return all list items possible for all situations during the configuration calculation, and then use the `visible` column to show and hide which items to show.  During subsequent calculations, when items are simply changing visibility, for performance enhancements, the only rows returned in the data source table should be the rows that have dynamic visiblity.
 
+** `rbl-listcontrol` Table **
+
+Column | Description
+---|---
+id | The input id that has a source data table.
+table | The table name in RBLe results that should populate the input specified by `id`.
+rebuild | If `rebuild` is `1` all current list items will be cleared and the control will be rebuilt from `table` specified, otherwise existing items that match the `key` column will update their properties described in the data source table.
+
+** Data Source Table specified via the `table` column **
+
 Column | Description
 ---|---
 key | The data value for current list item (i.e. MN for Minnesota). 
 text<br/>&nbsp; | The display text for the current list item.<br/>For **dropdown** controls, if text is `/data-divider` a bootstrap enabled select input is able to simple render a divider bar.
-rebuild | If `rebuild` is `1` all current list items will be cleared and the control will be rebuilt from provided items.
 visible | If `visible` is `0`, the list item is hidden<sup>1</sup>, otherwise it is shown.
 disabled | If `disabled` is `1`, the list item is disabled<sup>1</sup>, otherwise it is enabled.
 help | For _radio button and checkbox lists_, if `help` is provided, a help icon and popup text will be generated.
@@ -3453,7 +3462,7 @@ application.select(".saveButtonAction").on('click', function (e) {
 });
 
 // In other KatApps that want to handle the message...
-view.on( "onKatAppNotification.RBLe", function( event, name, information, application ) {
+view.on( "onKatAppNotification.RBLe", function( event, name, information, application, fromApplication ) {
     switch( name ) {
         case "SavePensionEstimate":
         {
@@ -3787,7 +3796,7 @@ Triggered from the `updateOptions` method after a KatApp finishes updating optio
 
 #### onKatAppNotification
 
-**`onKatAppNotification(event: Event, notificationName: string, notificationInformation: JSON | undefined, application: KatApp )`**
+**`onKatAppNotification(event: Event, notificationName: string, notificationInformation: JSON | undefined, application: KatApp, fromApplication: KatApp )`**
 
 Triggered from the `pushNotification` method from the calling KatApp.  All other KatApps that are rendered on the page are sent the notification for custom processing.
 
@@ -3798,7 +3807,7 @@ $(".saveButtonAction", application.element).on('click', function (e) {
 });
 
 // Notified KatApp...
-view.on("onKatAppNotification.RBLe", function (event, name, information, application) {
+view.on("onKatAppNotification.RBLe", function (event, name, information, application, fromApplication) {
     switch (name) {
         case "SavePensionEstimate":
             {
@@ -3826,7 +3835,7 @@ $(".katapp").KatApp({
 });
 
 // Or via javascript on() handler inside View script
-view.on("onKatAppNotification.RBLe", function (id, application) {
+view.on("onKatAppNotification.RBLe", function (e, id) {
     $(".nexgenNavigation").val(id);
     $(".lnkNexgenHost")[0].click();
 });
