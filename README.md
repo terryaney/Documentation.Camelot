@@ -33,14 +33,14 @@
     - [rbl-app Attribute Details](#rbl-app-Attribute-Details)
         - [Controlling the Nested KatApp Options](#Controlling-the-Nested-KatApp-Options)
     - [_Push_ Table Processing](#_Push_-Table-Processing)
-        - [rbl-defaults Table](#**rbl-defaults**)
-        - [rbl-listcontrol Table](#**rbl-listcontrol**)
-            - [rbl-listcontrol data source Tables](#**rbl-listcontrol-data-source**)
-        - [rbl-sliders Table](#**rbl-sliders**)
-        - [rbl-disabled Table](#**rbl-disabled**)
-        - [rbl-skip Table](#**rbl-skip**)
-        - [errors And warnings Tables](#**errors/warnings**)
-        - [rbl-markup Table](#**rbl-markup**)
+        - [rbl-defaults Table](#rbl-defaults)
+        - [rbl-listcontrol Table](#rbl-listcontrol)
+            - [rbl-listcontrol data source Tables](#rbl-listcontrol-data-source)
+        - [rbl-sliders Table](#rbl-sliders)
+        - [rbl-disabled Table](#rbl-disabled)
+        - [rbl-skip Table](#rbl-skip)
+        - [errors And warnings Tables](#errors-warnings)
+        - [rbl-markup Table](#rbl-markup)
 - [Templates](#Templates)
     - [rbl-source Selectors](#rbl-source-Selectors)
     - [Template Default Attributes](#Template-Default-Attributes)
@@ -940,7 +940,7 @@ When a `rbl-app` is launched, it uses the same options of its parent application
 
 Even though it is preferrable to have _pull_ over _push_ for content and visibility, there are still some tables that either require push processing or are much better suited for a _push_ pattern.  In these cases, the source tables in the CalcEngines are usually very focused; only turned on during the initial configuration calculation and/or have a very limited number of rows.  By paying attention to the processing scope of these tables (only returning information when needed and minimizing the rows), you can ensure that Kaml Views remain performant.
 
-### **rbl-defaults**
+### rbl-defaults
 Set input values for any input on Kaml View.
 
 Column | Description
@@ -959,28 +959,19 @@ Text | `value` is simply applied.
 
 <br/>
 
-### **rbl-listcontrol** 
+### rbl-listcontrol
 Find and populate 'list' controls (dropdown, radio button list, or checkbox list) that have a CSS class matching the `id` column.
 
 Column | Description
 ---|---
 id | The name of the input in your Kaml View (i.e. iMaritalStatus). 
 table | The name of the data source table that provides the list items for the control specified by id. 
+rebuild | If `rebuild` is `1` all current list items will be cleared and the control will be rebuilt from `table` specified, otherwise existing items that match the `key` column will update their properties described in the data source table.
 
 <br/>
 
-#### **rbl-listcontrol data source** 
+#### rbl-listcontrol data source
 Typically, `rbl-listcontrol` and its data tables are only returned during a configuration calculation to initialize the user interface.  However, if the list control items are dynamic based on employee data or other inputs, the typical pattern is to return all list items possible for all situations during the configuration calculation, and then use the `visible` column to show and hide which items to show.  During subsequent calculations, when items are simply changing visibility, for performance enhancements, the only rows returned in the data source table should be the rows that have dynamic visiblity.
-
-** `rbl-listcontrol` Table **
-
-Column | Description
----|---
-id | The input id that has a source data table.
-table | The table name in RBLe results that should populate the input specified by `id`.
-rebuild | If `rebuild` is `1` all current list items will be cleared and the control will be rebuilt from `table` specified, otherwise existing items that match the `key` column will update their properties described in the data source table.
-
-** Data Source Table specified via the `table` column **
 
 Column | Description
 ---|---
@@ -998,7 +989,7 @@ subtext<sup>2</sup> | Add subtext to an option.
 
 <br/>
 
-### **rbl-sliders** 
+### rbl-sliders
 Find and configure slider inputs that have a CSS class matching the `id` column.
 
 Column | Description
@@ -1024,7 +1015,7 @@ pips&#x2011;density | Pre-scale the number of pips.  The `pips-density` value co
 
 <br/>
 
-### **rbl-disabled**
+### rbl-disabled
 Find and enable or disable inputs that have a CSS class matching the `id` column.
 
 Column | Description
@@ -1034,7 +1025,8 @@ value | Whether or not to enable or disable the input.  If `value` is `1`, the i
 
 <br/>
 
-### **rbl-skip**
+### rbl-skip
+
 Find and prevent inputs in Kaml View from triggering a calculation upon change.  This table is legacy support that is equivalent to `rbl-nocalc` (see [RBLe Service Attributes / Classes](#RBLe-Service-Attributes-/-Classes)) and can only be used to _prevent an input from triggering a calculation_.  You can not use it to turn calculations back on for an input.  This table allows for the business logic of knowing which inputs trigger a calculation and which do not to be left inside the CalcEngine.  Using this table has the same effect as applying attributes manually in the Kaml View.
 
 Column | Description
@@ -1044,7 +1036,7 @@ value | Whether or not to disable the input.  `1` will diable, otherwise enable.
 
 <br/>
 
-### **errors/warnings**
+### errors/warnings
 Errors and warnings are returned from CalcEngine when invalid inputs are sent to the CalcEngine.
 
 Column | Description
@@ -1054,7 +1046,7 @@ text | The error message to display in the validation summary.  If `id` is provi
 
 <br/>
 
-### **rbl-markup**
+### rbl-markup
 This table is an evolution of the `rbl-value` table in the fact that is allows you to inject content into a Kaml View.  It also has ability to manage CSS class state for elements.
 
 Column | Description
