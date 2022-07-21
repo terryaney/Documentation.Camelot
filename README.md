@@ -164,6 +164,7 @@
             - [onRegistration](#onRegistration)
             - [onCalculationOptions](#onCalculationOptions)
             - [onResultsProcessing](#onResultsProcessing)
+            - [onTemplateRowProcessed](#onTemplateRowProcessed)
             - [onConfigureUICalculation](#onConfigureUICalculation)
             - [onCalculation](#onCalculation)
             - [onCalculationErrors](#onCalculationErrors)
@@ -2571,11 +2572,10 @@ By decorating elements with specific CSS class names<sup>1</sup>, RBLe Service f
 
 Class | Purpose
 ---|---
-rbl&#x2011;nocalc<br/>skipRBLe<sup>2</sup> | By default, changing any `<input>` value in the view will sumbit a calc to the RBLe service.  Use this class to supress submitting a calc.  Note this input will still be included in calcuations, but that changing it does not initate a calc.
-rbl&#x2011;exclude<br/>notRBLe<sup>2</sup> | By default, all inputs in the view are sent to RBLe calculation.  Use this class to exclude an input from the calc.  This will also prevent this input from initating a calc on change.
-rbl&#x2011;preserve | Use this class in child elements beneath `[rbl-source]` so that when the element is cleared on each calculation, an element with class 'rbl-preserve' will not be deleted.
+rbl&#x2011;nocalc<br/>skipRBLe<sup>2</sup> | By default, changing any `<input>` value in the view will sumbit a calc to the RBLe service.  Use `rbl-nocalc` class to supress submitting a calc.  Note this input will still be included in calcuations, but that changing it does not initate a calc.
+rbl&#x2011;exclude<br/>notRBLe<sup>2</sup> | By default, all inputs in the view are sent to RBLe calculation.  Use `rbl-exclude` class to exclude an input from the calc.  This will also prevent this input from initating a calc on change.
+rbl&#x2011;preserve | Use `rbl-preserve` class in child elements beneath `[rbl-source]` so that when the element is cleared on each calculation, an element with class 'rbl-preserve' will not be deleted.
  
-\
 <sup>1</sup> Future versions of KatApp's may move these classes to attributes.  
 <sup>2</sup> Legacy class name.  Prefer using the current class name when possible.  
 
@@ -4097,6 +4097,34 @@ This event is triggered during `calculate` _after a successful calculation_ from
 ```javascript
 view.on( "onResultsProcessing.RBLe", function( event, calculationResults, calculationOptions, application ) {
     application.select(".conversionTable").empty(); // In case not returned from the CalcEngine, remove the table
+})
+```
+
+<hr/>
+
+
+#### onTemplateRowProcessed
+
+**`onTemplateRowProcessed(event: Event, content: JQuery<HTMLElement>, sourceRow: {}, application: KatAppPlugInInterface ): boolean | undefined`**
+
+This event is triggered during `calculate` _while processing_ [rbl-source](#rbl-source-Selectors) attributed items.  Use this handler when custom javascript is needed to finalize processing of a rendered template row.  This could be custom visiblity or adding/removing DOM elements before the template result is injected into the markup.
+
+The `content` parameter will have the template markup content to be injected into the KatApp.  The `sourceRow` is the result row being processed specified by the `rbl-source` attribute.  In addition to the properties returned from the CalcEngine, there will be `@template`, `@table`, `@calcEngine`, and `@tab` properties available that can help distinguish which template or result rows are being processed.
+
+If the event returns `false`, the content will *not* be injected into the KatApp.
+
+```javascript
+view.on( "onTemplateRowProcessed.RBLe", function( event, content, sourceRow, application ) {
+    // If some condition specified that anchors should be removed, could remove all
+    // anchors from the content before it is injected.
+    if ( !application.state.showLinks ) {
+        $("a", content).remove();
+    }
+
+    // If some condition wanted to prevent rendering this template, return false.
+    if ( application.state.disableUserRows && sourceRow[ "@table" ] == "user" ) {
+        return false;
+    }
 })
 ```
 
