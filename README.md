@@ -4765,5 +4765,3 @@ The static version of `setNavigationInputs` is almost identical to the applicati
 <a href="#" onclick="KatApp.setNavigationInputs( { iCurrentAge: 64 } );NavigateToKatApp( 'Benefits.HPF' );">Navigate to HPF</a>
 ```
 <hr/>
-
-1
