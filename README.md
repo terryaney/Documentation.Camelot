@@ -1876,7 +1876,7 @@ Must have at least one segment. | Can supply *only* an expression *without* any 
 
 Expression&nbsp;Selector | Description
 ---|---
-[expression] | Run the `expression` on each row from the 'default' table until the expression returns value not equal to `undefined`.
+[expression] | Run the `expression` on the currently processing `rbl-source` 'template row'.  **This is only supported inside templates rendering via `rbl-source`.**
 table[expression] | Run the `expression` on each row from the `table` table until the expression returns value not equal to `undefined`.
 table.idValue[expression] | Run the `expression` on the row from `table` where `@id=idValue`.
 table.keyColumn.keyValue[expression] | Run the `expression` on the row from `table` where `keyColumn=keyValue`.
@@ -1890,10 +1890,21 @@ The javascript expression has a signature of: `expression( row: JSON, index: int
     If the CalcEngine results has rbl-value row with id='pageHeader' and value='TOTAL REWARDS`, then
     all samples below should output: Hi TOTAL BENEFITS.
 -->
-<div rbl-value="[row['@id'] == 'pageHeader' ? 'Hi ' + row.value.replace('REWARDS', 'BENEFITS') : undefined]"></div>
 <div rbl-value="rbl-value[row['@id'] == 'pageHeader' ? 'Hi ' + row.value.replace('REWARDS', 'BENEFITS') : undefined]"></div>
 <div rbl-value="rbl-value.pageHeader[row.value.indexOf('TOTAL')>-1 ? 'Hi ' + row.value.replace('REWARDS', 'BENEFITS') : undefined]"></div>
 <div rbl-value="rbl-value.@id.pageHeader[row.value.indexOf('TOTAL')>-1 ? 'Hi ' + row.value.replace('REWARDS', 'BENEFITS') : undefined]"></div>
+
+<div class="row" rbl-ce="BRD" rbl-source="contentTemplates.selector.home-main">
+    <div rbl-tid="inline">
+        <div>{templateName}, {@id}</div>
+        <!-- Process on currently processing template row -->
+        <div rbl-if="[row['@id']> 2]">[row['@id']> 2] WORKS</div>
+        <!-- Even though inside a contentTemplates row, run this expression against row with id=3, this one shouldn't work -->
+        <div rbl-ce="BRD" rbl-if="contentTemplates.3[row['@id']==2]">contentTemplates.3[row['@id']==2] WORKS</div>
+        <!-- Even though inside a contentTemplates row, run this expression against row with id=3, this one should work -->
+        <div rbl-ce="BRD" rbl-if="contentTemplates.3[row['@id']==3]">contentTemplates.3[row['@id']==3] WORKS</div>
+    </div>
+</div>
 ```
 
 # RBLe Service
