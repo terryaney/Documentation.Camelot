@@ -194,8 +194,10 @@
             - [onModalAppCancelled](#onModalAppCancelled)
             - [onModalAppConfirm](#onModalAppConfirm)
             - [onModalAppCancel](#onModalAppCancel)
+            - [onModalAppShow](#onModalAppShow)
             - [Standard KatApp Modal Sample](#Standard-KatApp-Modal-Sample)
             - [Advanced KatApp Modal Sample](#Advanced-KatApp-Modal-Sample)
+            - [KatApp Modal Sample Without Configure UI Calculation](#KatApp-Modal-Sample-Without-Configure-UI-Calculation)
         - [Template Event Handlers](#Template-Event-Handlers)
     - [Global Methods](#Global-Methods)
         - [static setNavigationInputs](#static-setNavigationInputs)
@@ -885,8 +887,10 @@ By default, the following markup will be injected into the DOM to host the KatAp
                     {View Contents Hosted Here}
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default cancelButton" aria-hidden="true">{Cancel Label}</button>
-                    <button type="button" class="btn btn-primary continueButton">{Continue Label}</button>
+                    <div class="modal-footer-buttons">
+                        <button type="button" class="btn btn-default cancelButton" aria-hidden="true">{Cancel Label}</button>
+                        <button type="button" class="btn btn-primary continueButton">{Continue Label}</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -4556,6 +4560,18 @@ See [Advanced KatApp Modal Sample](#Advanced-KatApp-Modal-Sample) for an example
 
 <hr/>
 
+#### onModalAppShow
+
+**`onModalAppShow(event: Event)`**
+
+This event can be triggered by the modal application to indicate to the host application that the dialog should be shown.  This is only necessary if there is **no** Configure UI Calculation called for the hosted app.  When needed, you'd traditionally trigger this event in the `onInitialized`.
+
+**KatApp Kaml files will never handle this event, only the KatApp framework should handle this event.**
+
+See [KatApp Modal Sample Without Configure UI Calculation](#KatApp-Modal-Sample-Without-Configure-UI-Calculation) for an example.
+
+<hr/>
+
 #### Standard KatApp Modal Sample
 
 Below is the markup and script needed when using `rbl-modal` functionality and using the standard functionality of the KatApp modal framework.
@@ -4679,7 +4695,7 @@ application.updateOptions(
 view
     // Create custom buttons for our dialog
     .on("onInitializing.RBLe", function () {
-        if (modalAppOptions != undefined) { // We knew we are in modal application
+        if (modalAppOptions != undefined) { // We know we are in modal application
             
             // Remove default cancel/continue
             application.select(".modal-footer").children().remove();
@@ -4730,6 +4746,47 @@ view
     });
 ```
 
+#### KatApp Modal Sample Without Configure UI Calculation
+
+Below is the markup and script needed when using `rbl-modal` functionality where the hosted application does not run a Configure UI Calculation.
+
+**Host Application Markup**
+
+```html
+<a rbl-action-calculate="true" 
+    rbl-label-title="Device Verification" 
+    rbl-modal="Common.TextValidate">Enable SMS messages</a>
+```
+
+1. rbl-label-title - sets title
+1. rbl-action-calculate - host application will calculate if modal is confirmed
+
+See [rbl-modal Attribute Details](#rbl-modal-Attribute-Details) for more information on attributes available on `rbl-modal` elements.
+
+**Modal Application Script**
+```javascript
+var view = $("{thisView}");
+var application = view.KatApp();
+var modalAppOptions = application.options.modalAppOptions;
+var hostApplication = modalAppOptions != undefined
+    ? modalAppOptions.hostApplication // If defined, you know you are contained inside a modal dialog
+    : undefined;
+
+application.updateOptions(
+    {
+        runConfigureUICalculation: false
+    }
+);
+
+view
+    // Create custom buttons for our dialog
+    .on("onInitialized.RBLe", function () {
+        if (modalAppOptions != undefined) { // We know we are in modal application
+            hostApplication.triggerEvent("onModalAppShow");
+        }
+    });
+```
+
 ### Template Event Handlers
 
 [Templates](#Templates) are a powerful tool in Kat Apps.  However, when you create a new template Kaml file, if you need event handlers to run, registering those handlers is different than normal.  Because the template is loaded one time regardless of how many KatApps are configured to use it.  To function properly, an event handler for each _KatApp_ that uses a template would need to be registered.  To accomplish this, you use the global `$.fn.KatApp.templateOn` method call because within the template script, there would be no concept of a _Kaml View_ since the template could be used by any application/view.
@@ -4765,4 +4822,3 @@ The static version of `setNavigationInputs` is almost identical to the applicati
 <a href="#" onclick="KatApp.setNavigationInputs( { iCurrentAge: 64 } );NavigateToKatApp( 'Benefits.HPF' );">Navigate to HPF</a>
 ```
 <hr/>
-1
