@@ -3115,7 +3115,7 @@ view
 
 The second method available to change the CalcEngine is using the `application.calculate()` method with custom options.  When calling `calculate()` with custom options, you must provide a `calcEngines` array property specifying the [CalcEngine(s)](#CalcEngine-Object) you want to run.  
 
-1. The `processCalculationResults` parameter (default is `true`) can be used to indicate whether results should go through the normal calculation life cycle and have results processed.
+1. The `processCalculationResults` parameter (default is `true`) can be used to indicate whether results should go through the normal calculation life cycle and have results processed. Note, even when value is `false`, the `onCalculateStart` and `onCalculateEnd` events will still occur.  All other events and processing are skipped.
 1. If `processCalculationResults` is `true`, then the `key` property provided on each CalcEngine must match the `key` property provided in the original [rbl-config element](#Using-Kaml-View's-<rbl-config>-for-Configuration) configuration to ensure proper result processing.  If no key was originally configured, use `default` as the value.
 1. If `processCalculationResults` is `false`, then the `key` property does not need to match and a `calculationDone` delegate should be provided to process results when they are complete.
 
