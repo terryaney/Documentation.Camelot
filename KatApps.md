@@ -3071,7 +3071,7 @@ The following methods allow developers to trigger calculations, get and set inpu
 
 #### calculate
 
-**`.calculate( calculationOptions?: KatAppOptions, calculationDone?: ( results: TabDef[] | undefined )=> void )`**
+**`.calculate( calculationOptions?: KatAppOptions, calculationDone?: ( results: TabDef[] | undefined )=> void, processCalculationResults?: boolean ): void`**
 
 Manually invoke a calculation with the optional [KatAppOptions](#KatAppOptions-Object) `calculationOptions` parameter merged with the existing KatApp options for a one time use.
 
@@ -3110,9 +3110,9 @@ view
 
 Scenario 2: Using `application.calculate()` method with custom options.  When calling `calculate()` with custom options, you must provide a `calcEngines` array property specifying the [CalcEngine(s)](#CalcEngine-Object) you want to run.  
 
-1. The `processResults` (default is `true`) property case be used to indicate whether results should go through the normal calculation life cycle and have results processed.
-1. If `processResults` is `true`, then the `key` property provided must match the `key` property provided in the [rbl-config element](#Using-Kaml-View's-<rbl-config>-for-Configuration) to ensure proper result processing.  If no key was originally configured, use `default` as the value.
-1. If `processResults` is `false`, then the `key` property does not need to match and a `calculationDone` delegate should be provided to process results when they are complete.
+1. The `processCalculationResults` parameter (default is `true`) can be used to indicate whether results should go through the normal calculation life cycle and have results processed.
+1. If `processCalculationResults` is `true`, then the `key` property provided on each CalcEngine must match the `key` property provided in the original [rbl-config element](#Using-Kaml-View's-<rbl-config>-for-Configuration) configuration to ensure proper result processing.  If no key was originally configured, use `default` as the value.
+1. If `processCalculationResults` is `false`, then the `key` property does not need to match and a `calculationDone` delegate should be provided to process results when they are complete.
 
 ```html
 <p><a rbl-on="click:runDiffCalcEngine" data-process-results="true">Run Diff CalcEngine</a></p>
@@ -3131,12 +3131,12 @@ application.updateOptions(
                                 key: "Pension",
                                 name: "Conduent_Nexgen_Profile_SE"
                             }
-                        ],
-                        processResults: $(this).data("process-results") != undefined
+                        ]
                     },
                     function (results) {
                         // Ability to process results if you want
-                    }
+                    },
+                    $(this).data("process-results") != undefined
                 );
             }
         }
