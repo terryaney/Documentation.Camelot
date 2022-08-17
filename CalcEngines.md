@@ -11,6 +11,7 @@
                 - [Default Profile Mapping](#Default-Profile-Mapping)
                 - [Default Array Processing](#Default-Array-Processing)
                 - [Query String Processing](#Query-String-Processing)
+                - [Index Formatting](#Index-Formatting)
                 - [Nested Array Processing](#Nested-Array-Processing)
                 - [Simple Array Processing](#Simple-Array-Processing)
                 - [Namespacing Fields](#Namespacing-Fields)
@@ -995,7 +996,7 @@ In the JSON response, the `response` property is renamed to `profile` before pro
         "beneficiaries": [
             {
                 "beneficiaryDetails": {
-                    "ssn": "911669594",
+                    "ssn": "11669594",
                     "name": {
                         "nameLast": "TEST",
                         "nameFirst": "BENEFICIARY",
@@ -1085,6 +1086,7 @@ In the JSON response, the `response` property is renamed to `profile` before pro
 
 1. [Default Profile Mapping](#Default-Profile-Mapping)
 1. [Default Array Processing](#Default-Array-Processing)
+1. [Index Formatting](#Index-Formatting)
 1. [Nested Array Processing](#Nested-Array-Processing)
 1. [Simple Array Processing](#Simple-Array-Processing)
 1. [Namespacing Fields](#Namespacing-Fields)
@@ -1186,6 +1188,29 @@ Given the API endpoint of `/businessapi-service-tbo/common/history/v1/{legalIden
 
 However, since the `apiParams` name is generic, it would be overwritten if multiple APIs use query strings, so the Nexgen site, then changes the history type from `apiParams` to `apiParams{Key}` where `Key` is the `apiDataSource.id` property.
 
+##### Index Formatting
+
+When a field containing a number is used for the index via `indexField` it may be beneficial to format the value before generating the xDS history index.  This is because, by default history rows are sorted ascending on the index, however the index is treated as a `string`, so `11` would come before `2`.  If order of the history rows needs to be retained, a format can be applied to zero pad the index sufficiently so that when sorted as a string it still sorts correctly.  To do this, simply use a `:format` after the field name.
+
+Note: Formatting is also supported while [Concatenating Index Fields](#Concatenating-Index-Fields).  To accomplish this, simply place the `:format` after any desired field segments.
+
+dataSource|apiTable|xdsTable|indexField|manualFields
+---|---|---|---|---
+sampleAPI|beneficiaries|beneficiary|ssn:000000000
+
+```xml
+<xDataDef>
+    <!-- Profile mapping is on by default, but removing for brevity -->
+    <HistoryData>
+        <HistoryItem hisType="beneficiaries" hisIndex="011669594">
+            <index>011669594</index> <!-- Zero padded to nine digits -->
+            <nameLast>TEST</nameLast> <!-- Flattened from beneficiaryDetails.name -->
+            <nameFirst>BENEFICIARY</nameFirst> <!-- Flattened from beneficiaryDetails.name -->
+        </HistoryItem>
+    </HistoryData>
+</xDataDef>
+```
+
 ##### Nested Array Processing
 
 As mentioned above, array properties (`[]`) are *only* processed if an `apiDataSourceMappings` is provided with a `apiTable` matching the array property name, regardless of hierarchy depth.  Some resopnses nest arrays within arrays.  Even if an `apiDataSourceMappings` row is provided for the parent, the child array will be ignored if no mapping information is present.
@@ -1196,28 +1221,28 @@ When the nested arrays *are* processed, all the mapping rules process in the exa
 
 dataSource|apiTable|xdsTable|indexField|manualFields
 ---|---|---|---|---
-sampleAPI|beneficiaries|beneficiary|ssn
+sampleAPI|beneficiaries|beneficiary|ssn:000000000
 sampleAPI|addresses|beneficiaryAddress|addressType
 
 ```xml
 <xDataDef>
     <!-- Profile mapping is on by default, but removing for brevity -->
     <HistoryData>
-        <HistoryItem hisType="beneficiaries" hisIndex="911669594">
-            <index>911669594</index>
+        <HistoryItem hisType="beneficiaries" hisIndex="011669594">
+            <index>011669594</index>
             <nameLast>TEST</nameLast> <!-- Flattened from beneficiaryDetails.name -->
             <nameFirst>BENEFICIARY</nameFirst> <!-- Flattened from beneficiaryDetails.name -->
         </HistoryItem>
-        <HistoryItem hisType="beneficiaryAddress" hisIndex="911669594-HOME">
-            <index>911669594-HOME</index>
+        <HistoryItem hisType="beneficiaryAddress" hisIndex="011669594-HOME">
+            <index>011669594-HOME</index>
             <addressType>HOME</addressType>
             <address1>123 Normal Way</address1>
             <city>New York</city>
             <postalCode>12121</postalCode>
             <state>NY</state>
         </HistoryItem>
-        <HistoryItem hisType="beneficiaryAddress" hisIndex="911669594-MAILING">
-            <index>911669594-MAILING</index>
+        <HistoryItem hisType="beneficiaryAddress" hisIndex="011669594-MAILING">
+            <index>011669594-MAILING</index>
             <addressType>MAILING</addressType>
             <address1>999 Conduent Towers</address1>
             <city>Manhattan</city>
@@ -1254,7 +1279,9 @@ However, some response have arrays that only contain simple types:
 
 When simply arrays need to be mapped back to xDS, the field index needs to be `[array]` indicating that it is just a list of simple values.  
 
-When a simple array is processed, for each value in the array, a history row will be created with an `index` and `value` element where the `index` is simply a incremental ID (similar to the `{id}` [Incremental Index](#Incremental-Index)).  `[array:format]` is supported as well if the `index` should have a format applied during processing.
+When a simple array is processed, for each value in the array, a history row will be created with an `index` and `value` element where the `index` is simply a incremental ID (similar to the `{id}` [Incremental Index](#Incremental-Index)).  
+
+[Index Formatting](#Index-Formatting) is supported as well via `[array:format]` is supported as well if the `index` should have a format applied during processing.
 
 dataSource|apiTable|xdsTable|indexField|manualFields
 ---|---|---|---|---
@@ -1345,9 +1372,7 @@ sampleAPI|electedCoverages.pending|coverages|*Pending
 
 There are times when suitable fields to create a unique index are not available, or accessing rows by an index is not necessary (i.e. dumping transactional history).  In these scenarios, an `indexField={id}` can be used.
 
-When using `{id}`, by default there is no format applied to the number.  Since the `{id}` is usually used as an index, it will be sorted by Nexgen's site framework by default and treated as a string, so `11` would come before `2`.  If order needs to be retained, a format can be applied to zero pad the index sufficiently so that when sorted as a string it still sorts correctly.  To do this, simply use a `:format` as part of the property (i.e. `{id:000}`).
-
-**Note:** When using `{id}` while [Concatenating Index Fields](#Concatenating-Index-Fields), it *must* be the last field specified.
+When using `{id}`, by default there is no format applied to the number, however [Index Formatting](#Index-Formatting) is encouraged to ensure proper sorting.  To support _Index Formatting_, `{id:format}` is supported.
 
 dataSource|apiTable|xdsTable|indexField|manualFields
 ---|---|---|---|---
