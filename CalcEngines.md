@@ -562,7 +562,7 @@ The original response has:
 
 ###### WebDataView Updated Response
 
-The final response Xml to be cached:
+The updated response will have:
 
 1. Create a `webDataView` array property to hold API response.
 1. Inject a meta data row inside `webDataView`:
@@ -992,7 +992,7 @@ The original response has:
 
 ###### Eligibility Group Updated Response
 
-The final response Xml to be cached:
+The updated response:
 
 1. Create a `eligGroups` array property to hold API response.
 1. Inject a row for each 'property' contained array row (regardless of level) with `key` and `value` property.
