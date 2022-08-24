@@ -7,6 +7,11 @@
             - [Massaging to xDS Format](#Massaging-to-xDS-Format)
             - [API DataSource CalcEngine Tables](#API-DataSource-CalcEngine-Tables)
             - [Custom API Reponse Processing](#Custom-API-Reponse-Processing)
+                - [QnA Processing](#QnA-Processing)
+                - [WebDataView Processing](#WebDataView-Processing)
+                - [Transaction History Details Processing](#Transaction-History-Details-Processing)
+                - [Dynamic Calc Details Processing](#Dynamic-Calc-Details-Processing)
+                - [Eligibility Group Processing](#Eligibility-Group-Processing)
             - [Supported Mapping Features](#Supported-Mapping-Features)
                 - [Default Profile Mapping](#Default-Profile-Mapping)
                 - [Default Array Processing](#Default-Array-Processing)
@@ -942,6 +947,76 @@ The updated response:
 ###### Dynamic Calc Details Final xDS Mapping
 
 After the response is processed using the designated mappings and the results are returned to the site, the Nexgen API controller will look inside each `tableInfo` row that has a Savanna header or footer ID specified.  It will request the content for each of them and place them inside new properties/elements in the Xml:  `headerId` content is injected into `headerContent` and `footerId` into `footerContent`.
+
+##### Eligibility Group Processing
+
+If the API endpoint ran contains `/elig-groups`, it is recognized as a Eligibility Group response.
+
+###### Eligibility Group Original Response
+
+The original response has: 
+
+1. Array properties at the root.
+1. Each array property contains rows of objects identified by `planID`.
+
+```json
+{
+  "response": {
+    "commonPopulations": [
+      {
+        "planID": "98",
+        "populations": {
+          "isTextElig": false,
+          "isDocUpld": true,
+          "isFaqs": true
+        }
+      }
+    ],
+    "hwPopulations": [
+      {
+        "planID": "21",
+        "populations": {
+          "isCoveragePayment": false,
+          "isHwChannel": true,
+          "isCobraCw": false
+        }
+      }
+    ]
+  },
+  "status": {
+    "code": "0",
+    "message": "SUCCESS"
+  }
+}
+```
+
+###### Eligibility Group Updated Response
+
+The final response Xml to be cached:
+
+1. Create a `eligGroups` array property to hold API response.
+1. Inject a row for each 'property' contained array row (regardless of level) with `key` and `value` property.
+1. `key` is `arrayName-planID-propertyName`.
+
+```json
+{
+  "response": {
+    "eligGroups": [
+      { "key": "commonPopulations-98-isTextElig", "value": false },
+      { "key": "commonPopulations-98-isDocUpld", "value": true },
+      { "key": "commonPopulations-98-isFaqs", "value": true },
+      { "key": "hwPopulations-21-isCoveragePayment", "value": false },
+      { "key": "hwPopulations-21-isHwChannel", "value": true },
+      { "key": "hwPopulations-21-isCobraCw", "value": false }
+    ]
+  },
+  "status": {
+    "code": "0",
+    "message": "SUCCESS"
+  }
+}
+```
+
 
 #### Supported Mapping Features
 
