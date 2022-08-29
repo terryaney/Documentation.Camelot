@@ -52,6 +52,7 @@
         - [Command Processing CalcEngine Tables](#Command-Processing-CalcEngine-Tables)
             - [command Layout](#command-Layout)
             - [command-inputs Layout](#command-inputs-Layout)
+            - [Accessing Previous Command Result Values](#Accessing-Previous-Command-Result-Values)
             - [command-inputs value Processing](#command-inputs-value-Processing)
                 - [command-inputs value Payload Creation](#command-inputs-value-Payload-Creation)
                 - [command-inputs QnA Payload Creation](#command-inputs-QnA-Payload-Creation)
@@ -181,7 +182,8 @@ Column | Description
 {today} | This token is always replaced with the date value of today in the format of yyyy-mm-dd.
 {Profile.field} | Select any field from the `Profile` data.  For example, to select a field called `sharkfinDbAge`, use a token of `{Profile.sharkfinDbAge}`.
 {table.index.field} | Select a field from a specific history row.  For example, `{dbCalculationID.PROJECT.calcID}` would select the `calcID` field from the `dbCalculationID` table where the index is `PROJECT`.
-{QS.param} | Select any value that will be provided via a querystring parameter.  Useful when the KatApp/javascript or [command processing calculation](#Command-Processing) is going to know the value and it is not stored in the xDS Profile.  For example, an apiDataSource `dbCalculationsDetailsDynamic` with an endpoint of `/businessapi-service-db/db/calc/v1/{legalIdentifier}/{QS.calcID}/calc-details-dynamic` would expect to be invoked via `dbCalculationsDetailsDynamic?calcID=11111` using [CacheRefreshKeys](#Refreshing-API-Data-On-Demand) or during [command processing calculations](#Command-Processing).  Note that, when this feature is used, the API result will always be treated as a [temporary query](#Temp-Query-Processing).
+{QS.param} | Select any value that will be provided via a querystring parameter.  Useful when the KatApp/javascript or [command processing calculation](#Command-Processing) is going to know the value and it is not stored in the xDS Profile.  For example, an apiDataSource `dbCalculationsDetailsDynamic` with an endpoint of `/businessapi-service-db/db/calc/v1/{legalIdentifier}/{QS.calcID}/calc-details-dynamic` would expect to be invoked via `dbCalculationsDetailsDynamic?calcID=11111` using [CacheRefreshKeys](#Refreshing-API-Data-On-Demand) or during [command processing calculations](#Command-Processing).  Note that, when this feature is used, the API result will always be treated as a [temporary query](#Temp-Query-Processing) if the `{QS.param}` is specified as a 'query string'.  It will be a 'normal' query if the `{QS.param}` is part of the endpoint 'route'.
+{{resultCommandId.jsonSelector}} | Select a field from a previous command result which was run within the current 'command processing' context.  This feature is usually used in conjunction with the `{QS.param}` feature.  See [Accessing Previous Command Result Values](#Accessing-Previous-Command-Result-Values) for more information.
 
 ##### apiDataSourceMappings Layout
 
@@ -2012,7 +2014,7 @@ Column | Description
 ---|---
 id | The name of the command which is then referenced in the `command-inputs` table (additionally it is sometimes used during [custom processing of API responses](#QnA-Processing) as well).
 verb | The Http Verb to use when sending the reqeust (`GET`, `POST`, `DELETE`, `PUT`). The verb can also contain *segments* (`.` delimitted values) that provide more details on how to process the `endpoint`.<br/><br/>To reference an endpoint defined in the BRD CalcEngines (the preferred mechanism), the `verb` should end with a `.KEY` segment (i.e. `GET.KEY`) indicating that the endpoint will be an value matching the `id` column in the [apiDataSource table](#apiDataSource-Layout).<br/><br/>By default, `GET` commands are the only commands that will process the response and mappings to generate instructions to merge results into xDS Model.  If other verb type responses (`POST` or `PUT`) should be process mappings, you can add the `.MAP` segment after the verb but before the `.KEY` segment (i.e. `POST.MAP.KEY`).  This will allow the response to be processed by mappings (usually the just default xDS [Profile mapping](#Default-Profile-Flattening)).<br/><br/>By default, [temp query processing](#Temp-Query-Processing) has its `mergeMode` set to `Replace`.  There are times when it is desired to have a temp query merge into existing rows without removing all existing rows beforehand (i.e. if you run two different temp queries that map to the same history table and you want both results available at the end of the process).  To accomplish this, you can use the `.MERGE` segment after the verb but before the `.KEY` segment (i.e. `GET.MERGE.KEY`).
-endpoint | Can either be the actual API endpoint to submit to (i.e. `/businessapi-service-tbo/common/v1/{legalIdentifier}/invoke-sp/QaInitialize`), or if the *preferred* `.KEY` segment is used, can be the `id` from the `apiDataSource` table.<br/><br/>When using a *key* to indicate a apiDataSource endpoint, you can still append query string values after the *key* and they will be appended/merged to the endpoint specified in the `apiDataSource` table (i.e. `dbEstimatesHistoryDelete?savedID=11`).<br/><br/>Remember, whenever a query string is provided (with `.KEY` or full endpoint), even if the resulting endpoint url matches what was specified in BRD, the results will still be considered *temp query processing*.
+endpoint | Can either be the actual API endpoint to submit to (i.e. `/businessapi-service-tbo/common/v1/{legalIdentifier}/invoke-sp/QaInitialize`), or if the *preferred* `.KEY` segment is used, can be the `id` from the `apiDataSource` table.<br/><br/>When using a *key* to indicate a apiDataSource endpoint, you can still append query string values after the *key* and they will be appended/merged to the endpoint, or used as substitution for [{QS.param} tokens](#apiDataSource-Selector-Support), specified in the `apiDataSource` table (i.e. `dbEstimatesHistoryDelete?savedID=11`).<br/><br/>Remember, whenever a query string is provided (with `.KEY` or full endpoint), even if the resulting endpoint url matches what was specified in BRD, the results will still be considered *temp query processing* (unless substituting into the endpoint route).
 order | (Optional) Only used by the CalcEngine via the `command/sort-field:order` table name and flag to aid in ordering the API calls in the proper manner to successfully complete a transaction when a command is used in more than one scenario. This column is *not* used by the Nexgen site.
 
 #### command-inputs Layout
@@ -2023,6 +2025,53 @@ command | The `id` of the `command` used to relate inputs to a command.
 key | The name of the input when creating payload/post data.
 value | The value of the input when createing payload/post data.
 parse | (Optional) A `1` or `0` indicating whether or not the site should attempt to parse the value into an `int`, `double` or `boolean`.  The default is `0` meaning the value will be treated as a `string` and enclosed in quotes.
+
+#### Accessing Previous Command Result Values
+
+As mentioned above, when an `iValidate=1` calculation is ran, the CalcEngine returns a list of commands/apis to run.  This can be any combination of `GET`, `POST`, `PUT`, etc.  This one CalcEngine result containing the list of commands will be ran sequentially, but are considered to all execute within 'one command processing context'.
+
+There are situations when one command contains information that needs to be used by a subsequent command.  This can be accomplisehd by using a `{{resultCommandId.jsonSelector}}` token.  `resultCommandId` refers to the `id` column from the `command` table and `jsonSelector` is a period delimitted property token string that drills into an API response.
+
+Given the following sample response that came from a command with `id=sampleApi`:
+
+```json
+{
+    "response": {
+        "division": "01",
+        "employment": {
+            "yearStart": 2020,
+        },
+        "addresses": [
+            {
+                "addressType": "HOME",
+                "address1": "123 Normal Way",
+                "city": "New York",
+                "postalCode": "12121",
+                "state": "NY"
+            },
+            {
+                "addressType": "MAILING",
+                "address1": "999 Conduent Towers",
+                "city": "Manhattan",
+                "postalCode": "34343",
+                "state": "NY"
+            }
+        ]
+    }
+}
+```
+
+You could use the following selectors<sup>1,2</sup>:
+
+Selector | Value
+---|---
+`{{sampleApi.division}}` | `"01"`
+`{{sampleApi.emloyment.yearStart}}` | `2020`
+`{{sampleApi.addresses[0].city}}`<sup>3</sup> | `"New York"`
+
+1. The `response` root property is always omitted.
+1. If any [Custom API Reponse Processing](#Custom-API-Reponse-Processing) was performed, the selectors should be based on the custom results versus the original API results.
+1. You can drill into array properties with a `[index]` syntax where `index` is an integer specifying a zero-based index row.  Future versions may allow for querying a specific array (e.g. `{{sampleApi.addresses[state=NY].city}}`).
 
 #### command-inputs value Processing
 
