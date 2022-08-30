@@ -2073,6 +2073,13 @@ Selector | Value
 1. If any [Custom API Reponse Processing](#Custom-API-Reponse-Processing) was performed, the selectors should be based on the custom results versus the original API results.
 1. You can drill into array properties with a `[index]` syntax where `index` is an integer specifying a zero-based index row.  Future versions may allow for querying a specific array (e.g. `{{sampleApi.addresses[state=NY].city}}`).
 
+`{{resultCommandId.jsonSelector}}` are often uses in conjunction with a [{QS.param}](#apiDataSource-Selector-Support) embedded in a endpoint.
+
+`apiDataSource` endpoint: `/businessapi-service-db/db/calc/v1/{legalIdentifier}/{QS.calcID}/calc-details-dynamic`
+`command` endpoint: `dbCalcDetails?calcID={{dbEstimatesRequest1.calcIndicative[0].calcID}}`
+
+In this scenario, first the `{QS.param}` tokens will be processed and `{QS.calcID}` will be replaced with `{{dbEstimatesRequest1.calcIndicative[0].calcID}}`.  Then the `{{resultCommandId.jsonSelector}}` tokens will be processed and `{{dbEstimatesRequest1.calcIndicative[0].calcID}}` will be replaced with the value from the previous `dbEstimatesRequest1` results.
+
 #### command-inputs value Processing
 
 The following scenarios for input values are supported.
