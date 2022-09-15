@@ -2080,6 +2080,8 @@ Selector | Value
 
 In this scenario, first the `{QS.param}` tokens will be processed and `{QS.calcID}` will be replaced with `{{dbEstimatesRequest1.calcIndicative[0].calcID}}`.  Then the `{{resultCommandId.jsonSelector}}` tokens will be processed and `{{dbEstimatesRequest1.calcIndicative[0].calcID}}` will be replaced with the value from the previous `dbEstimatesRequest1` results.
 
+The above scenario was describing how a `{{resultCommandId.jsonSelector}}` token could be used in the route and/or query string of an endpoint, however the same mechanism can be used for `command-inputs` as well when performing a `POST` action.  If the `value` of a command input is in `{{resultCommandId.jsonSelector}}` format, it'll attempt to grab a value from a previous result.
+
 #### command-inputs value Processing
 
 The following scenarios for input values are supported.
