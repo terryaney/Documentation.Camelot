@@ -814,126 +814,6 @@ results: {
 
 Note: Given that `v-html` used with `rbl.value` renders the 'undefined' in the markup, it is preferrable to use the [`v-ka-value`](#v-ka-value) directive to avoid this issue.
 
-## v-for
-
-> [Vue](#https://vuejs.org/api/built-in-directives.html#v-for): Render the element or template block multiple times based on the source data.
-
-> [petite-vue](#https://github.com/vuejs/petite-vue#not-supported) Not Supported: `v-for` deep destructure
-
-There are two allowed syntaxes for `v-for`. 
-
-1. `v-for="item in array"` where `item` is just a 'variable name' representing each item in the iterable source.  In this case, the `array` value, usually `rbl.source()`, represents the iterable source.
-1. `v-for="(item, index) in array"` functions the same as above, except with this signature, an 'index' variable has been introduced (it can be named anything) that is a `0..N` integer representing the current position of `item` in the `array`. This is helpful when you need to conditionally change markup based on the first or last item in the iterable source.
-
-Kaml Views will most often use `v-for` in conjunction with [`rbl.source()`](#iapplicationdatarblsource).
-
-For all samples in this section, assume calculation results of the following:
-
-```javascript
-results: {
-    resultTable: [
-        { "key": "Apple", "type": "Fruit", "text": "An apple a day keeps the doctor away." },
-        { "key": "Orange", "type": "Fruit", "text": "'Orange' you glad you didn't eat an apple?" },
-        { "key": "Baked Beans", "type": "Vegetables", "text": "Beans, beans, the magical fruit..." }
-    ]
-}
-```
-### v-for With rbl.source
-
-The most common and basic syntax used will be:
-
-```html
-<div v-for="item in rbl.source('resultTable')">
-  {{item.key}}: {{ item.text }}
-</div>
-
-<!-- Renders... -->
-<div>Apple: An apple a day keeps the doctor away.</div>
-<div>Orange: 'Orange' you glad you didn't eat an apple.</div>
-<div>Baked Beans: Beans, beans, the magical fruit...</div>
-
-<div v-for="item in rbl.source('resultTable', r => r.type == 'Fruit')">
-  {{item.key}}: {{ item.text }}
-</div>
-
-<!-- Renders... -->
-<div>Apple: An apple a day keeps the doctor away.</div>
-<div>Orange: 'Orange' you glad you didn't eat an apple.</div>
-```
-
-### v-for With template Element
-
-As documented in the [HTML Content Template Elements](#html-content-template-elements) section, a `<template>` element is a 'mechanism for holding HTML that is not to be rendered'.  Therefore, in addition to being reusable pieces of markup, `<template>` elements have an important role to be considered when rendering markup in Kaml Views.  
-
-Normally, on which ever element the `v-for` directive appears, that will be the element that *repeats* for each row that is present in the data source. Consider the following example.
-
-```html
-<div class="row">
-    <div v-for="item in rbl.source('resultTable')">
-        <div class="col-6">{{item.key}}</div>
-        <div class="col-6">{{item.text}}</div>
-    </div>
-</div>
-
-<!-- Produces... -->
-<div class="row">
-    <div> <!-- Repeated element -->
-        <div class="col-6">Apple</div>
-        <div class="col-6">An apple a day keeps the doctor away.</div>
-    </div>
-    <div> <!-- Repeated element -->
-        <div class="col-6">Orange</div>
-        <div class="col-6">'Orange' you glad you didn't eat an apple.</div>
-    </div>
-    <div> <!-- Repeated element -->
-        <div class="col-6">Baked Beans</div>
-        <div class="col-6">Beans, beans, the magical fruit...</div>
-    </div>
-</div>
-```
-
-This is *not* the proper hierarchial structure that Bootstrap css expects.  It expects `col-*` elements to be placed as an *immediate* descending of an element with the `row` class applied.
-
-We can use the `<template>` element to solve this problem.  When a `v-for` is placed on a `<template>` element, **only** the content inside the template is repeated and not the actual `<template>` element (since template elements are never rendered in HTML).
-
-```html
-<div class="row">
-    <template v-for="item in rbl.source('resultTable')">
-        <div class="col-6">{{item.key}}</div>
-        <div class="col-6">{{item.text}}</div>
-    </template>
-</div>
-
-<!-- Produces... -->
-<div class="row">
-    <!-- Repeated content -->
-    <div class="col-6">Apple</div>
-    <div class="col-6">An apple a day keeps the doctor away.</div>
-    <!-- Repeated content -->
-    <div class="col-6">Orange</div>
-    <div class="col-6">'Orange' you glad you didn't eat an apple.</div>
-    <!-- Repeated content -->
-    <div class="col-6">Baked Beans</div>
-    <div class="col-6">Beans, beans, the magical fruit...</div>
-</div>
-```
-
-### v-for With v-bind Attributes
-
-When an element has `v-for` directive applied, [v-bind](#v-bind) attributes can also be used and has access to the current item of the iterator/array.
-
-```html
-<div v-for="item in rbl.source('resultTable')" :class="item.type">
-  {{item.key}}: {{item.text}}
-</div>
-
-<!-- Renders... -->
-<div class="Fruit">Apple: An apple a day keeps the doctor away.</div>
-<div class="Fruit">Orange: 'Orange' you glad you didn't eat an apple.</div>
-<div class="Vegetable">Baked Beans: Beans, beans, the magical fruit...</div>
-```
-
-
 ## v-bind
 
 > [Vue](#https://vuejs.org/api/built-in-directives.html#v-bind): Dynamically bind one or more attributes, or a component prop to an expression.
@@ -1123,6 +1003,125 @@ model: {
 <div :style="model.myStyle"></div>
 <!-- Renders -->
 <div style="display: flex; color: red; fontSize: 40px; fontWeight: bold;"></div>
+```
+
+## v-for
+
+> [Vue](#https://vuejs.org/api/built-in-directives.html#v-for): Render the element or template block multiple times based on the source data.
+
+> [petite-vue](#https://github.com/vuejs/petite-vue#not-supported) Not Supported: `v-for` deep destructure
+
+There are two allowed syntaxes for `v-for`. 
+
+1. `v-for="item in array"` where `item` is just a 'variable name' representing each item in the iterable source.  In this case, the `array` value, usually `rbl.source()`, represents the iterable source.
+1. `v-for="(item, index) in array"` functions the same as above, except with this signature, an 'index' variable has been introduced (it can be named anything) that is a `0..N` integer representing the current position of `item` in the `array`. This is helpful when you need to conditionally change markup based on the first or last item in the iterable source.
+
+Kaml Views will most often use `v-for` in conjunction with [`rbl.source()`](#iapplicationdatarblsource).
+
+For all samples in this section, assume calculation results of the following:
+
+```javascript
+results: {
+    resultTable: [
+        { "key": "Apple", "type": "Fruit", "text": "An apple a day keeps the doctor away." },
+        { "key": "Orange", "type": "Fruit", "text": "'Orange' you glad you didn't eat an apple?" },
+        { "key": "Baked Beans", "type": "Vegetables", "text": "Beans, beans, the magical fruit..." }
+    ]
+}
+```
+### v-for With rbl.source
+
+The most common and basic syntax used will be:
+
+```html
+<div v-for="item in rbl.source('resultTable')">
+  {{item.key}}: {{ item.text }}
+</div>
+
+<!-- Renders... -->
+<div>Apple: An apple a day keeps the doctor away.</div>
+<div>Orange: 'Orange' you glad you didn't eat an apple.</div>
+<div>Baked Beans: Beans, beans, the magical fruit...</div>
+
+<div v-for="item in rbl.source('resultTable', r => r.type == 'Fruit')">
+  {{item.key}}: {{ item.text }}
+</div>
+
+<!-- Renders... -->
+<div>Apple: An apple a day keeps the doctor away.</div>
+<div>Orange: 'Orange' you glad you didn't eat an apple.</div>
+```
+
+### v-for With template Element
+
+As documented in the [HTML Content Template Elements](#html-content-template-elements) section, a `<template>` element is a 'mechanism for holding HTML that is not to be rendered'.  Therefore, in addition to being reusable pieces of markup, `<template>` elements have an important role to be considered when rendering markup in Kaml Views.  
+
+Normally, on which ever element the `v-for` directive appears, that will be the element that *repeats* for each row that is present in the data source. Consider the following example.
+
+```html
+<div class="row">
+    <div v-for="item in rbl.source('resultTable')">
+        <div class="col-6">{{item.key}}</div>
+        <div class="col-6">{{item.text}}</div>
+    </div>
+</div>
+
+<!-- Produces... -->
+<div class="row">
+    <div> <!-- Repeated element -->
+        <div class="col-6">Apple</div>
+        <div class="col-6">An apple a day keeps the doctor away.</div>
+    </div>
+    <div> <!-- Repeated element -->
+        <div class="col-6">Orange</div>
+        <div class="col-6">'Orange' you glad you didn't eat an apple.</div>
+    </div>
+    <div> <!-- Repeated element -->
+        <div class="col-6">Baked Beans</div>
+        <div class="col-6">Beans, beans, the magical fruit...</div>
+    </div>
+</div>
+```
+
+This is *not* the proper hierarchial structure that Bootstrap css expects.  It expects `col-*` elements to be placed as an *immediate* descending of an element with the `row` class applied.
+
+We can use the `<template>` element to solve this problem.  When a `v-for` is placed on a `<template>` element, **only** the content inside the template is repeated and not the actual `<template>` element (since template elements are never rendered in HTML).
+
+```html
+<div class="row">
+    <template v-for="item in rbl.source('resultTable')">
+        <div class="col-6">{{item.key}}</div>
+        <div class="col-6">{{item.text}}</div>
+    </template>
+</div>
+
+<!-- Produces... -->
+<div class="row">
+    <!-- Repeated content -->
+    <div class="col-6">Apple</div>
+    <div class="col-6">An apple a day keeps the doctor away.</div>
+    <!-- Repeated content -->
+    <div class="col-6">Orange</div>
+    <div class="col-6">'Orange' you glad you didn't eat an apple.</div>
+    <!-- Repeated content -->
+    <div class="col-6">Baked Beans</div>
+    <div class="col-6">Beans, beans, the magical fruit...</div>
+</div>
+```
+
+### v-for With v-bind Attributes
+
+When an element has `v-for` directive applied, [v-bind](#v-bind) attributes can also be used and has access to the current item of the iterator/array.
+
+```html
+<div v-for="item in rbl.source('resultTable')" :class="item.type">
+  {{item.key}}: {{item.text}}
+</div>
+
+<!-- Renders... -->
+<div class="Fruit">Apple: An apple a day keeps the doctor away.</div>
+<div class="Fruit">Orange: 'Orange' you glad you didn't eat an apple.</div>
+<div class="Vegetable">Baked Beans: Beans, beans, the magical fruit...</div>
 ```
 
 ## v-on
