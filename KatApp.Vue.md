@@ -1,3 +1,16 @@
+# KatApp Documentation Contents
+
+- [KatApp Framework](#katapp-framework)
+- [Initializing and Configuring a KatApp](#initializing-and-configuring-a-katapp)
+- [Kaml View Specifications](#kaml-view-specifications)
+- [KatApp State](#katapp-state)
+- [HTML Content Template Elements](#html-content-template-elements)
+- [Common Vue Directives](#common-vue-directives)
+- [Custom KatApp Directives](#custom-katapp-directives)
+- [KatApp API](#katapp-api)
+- [RBL Framework](#rbl-framework)
+- [Upcoming Documentation](#upcoming-documentation)
+
 # KatApp Framework
 
 The KatApp framework is an orchestrator of two other well established frameworks; RBLe framework and [Vue.js](https://vuejs.org/).  The primary function of the KatApp framework is to marshall inputs into a RBLe framework calculation, take the calculation results and turn them into a 'reactive' model that is then used for rendering HTML markup via Vue.  One caveat is that instead of standard Vue, KatApp framework is leveraging [petite-vue](https://github.com/vuejs/petite-vue).  
@@ -4596,9 +4609,9 @@ The array of [`ITabDef`s](#itabdef) returned from the most recent calculation.
 Property Type: [`ISubmitApiConfiguration`](#isubmitapiconfiguration);
 The configuration payload submitted to the most recent calculation.
 
-# RBLe Framework
+# RBL Framework
 
-The RBLe Framework is the backbone of KatApps.  The service is able to marshall inputs and results in and out of RBLe CalcEngines.  These results drive the functionality of KatApps.
+The RBL Framework is the backbone of KatApps.  The service is able to marshall inputs and results in and out of RBLe CalcEngines.  These results drive the functionality of KatApps.
 
 ## Framework Inputs
 
@@ -4879,7 +4892,8 @@ Configure two CalcEngines with different tabs to run in the pipeline before the 
 </rbl-config>
 ```
 
-# TODO - Documentation Coming
+
+# Upcoming Documentation
 
 1. Document custom 'view model' and how it is passed in...sample with doc center 'showDownload'
 1. Original Docs: See [calculate With Different CalcEngine](#calculate-With-Different-CalcEngine) for information about running secondary calculations via javascript and without requiring configuration up front.
