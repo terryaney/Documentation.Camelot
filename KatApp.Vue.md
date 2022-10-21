@@ -66,11 +66,10 @@ Below are the libraries required or used by KatApp framework.
 To initiate a KatApp, options are provided via a configuration object passed on the [`KatApp.createAppAsync()`](#KatApp.createAppAsync) method. In the sample below, minimal options are shown.  See [IKatAppOptions](IKatAppOptions) for all available options.
 
 ```javascript
-$(document).ready(function () {
-	(async () => {
-		await KatApp.createAppAsync(
-            '.katapp',
-			{ "view": "Nexgen:Channel.Home" }
+$(document).ready(() => {
+	// Async IIFE
+    (async () => {
+		await KatApp.createAppAsync( '.katapp', { "view": "Nexgen:Channel.Home" }
 		).catch(ex => {
 			console.log({ex});
 		});
