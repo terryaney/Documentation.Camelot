@@ -69,10 +69,8 @@ To initiate a KatApp, options are provided via a configuration object passed on 
 $(document).ready(() => {
 	// Async IIFE
     (async () => {
-		await KatApp.createAppAsync( '.katapp', { "view": "Nexgen:Channel.Home" }
-		).catch(ex => {
-			console.log({ex});
-		});
+        await KatApp.createAppAsync( '.katapp', { "view": "Nexgen:Channel.Home" } )
+            .catch(ex => console.log({ex}) );
 	})();
 });
 ```
