@@ -8,7 +8,7 @@
 - [Common Vue Directives](#common-vue-directives)
 - [Custom KatApp Directives](#custom-katapp-directives)
 - [KatApp API](#katapp-api)
-- [RBL Framework](#rbl-framework)
+- [RBLe Framework](#rbl-framework)
 - [Upcoming Documentation](#upcoming-documentation)
 
 # KatApp Framework
@@ -328,7 +328,7 @@ Warning array populated from the `warning` calculation result table or manually 
 Property Type: `IStringIndexer<IStringIndexer<Array<ITabDefRow>>>`  
 JSON object containing results of all assocatied CalcEngines.  Typically not used by Kaml developers.  Instead, use other methods of IRblApplicationData to grab results.  The `string` key to results is the concatenation of `CalcEngineKey.TabName`.
 
-See [RBL Framework Result Processing in KatApp State](#rbl-framework-result-processing-in-katapp-state) to understand how RBL Framework result managed in KatApp state to ensure proper `reactivity` after each calculation.
+See [RBLe Framework Result Processing in KatApp State](#rbl-framework-result-processing-in-katapp-state) to understand how RBLe Framework result managed in KatApp state to ensure proper `reactivity` after each calculation.
 
 ```javascript
 // The object can be visualized as follows
@@ -513,15 +513,15 @@ application.on("resultsProcessing.ka", (event, results, inputs) => {
 });
 ```
 
-## RBL Framework Result Processing in KatApp State
+## RBLe Framework Result Processing in KatApp State
 
-Since Vue directives and template syntax is driven by a [reactivity mental model](#https://vuejs.org/guide/essentials/reactivity-fundamentals.html), it is important to process RBL Framework calculations properly to subscribe into this reactivity correctly.
+Since Vue directives and template syntax is driven by a [reactivity mental model](#https://vuejs.org/guide/essentials/reactivity-fundamentals.html), it is important to process RBLe Framework calculations properly to subscribe into this reactivity correctly.
 
 There are three ways calculations tables are processed:
 
 1. **Merge the 'core KatApp table' into Vue state.** This is because with core tables, CalcEngines often only return rows that have 'changed'.  So if initial calculation returned 15 'core rows', then a subsequent calculation only returned the '1 affected row', the KatApp Framework cannot replace entire table with new results because all Vue reactivity bound to previous core table rows would be reprocessed (against a non-existent row).
 1. **Completely replace the table in Vue state.** All non-core tables that are returned are usually used in a [v-for directive](#v-for) and CalcEngines always return the complete list of rows needed to re-render the markup (partial updates are not allowed).  So it is safe to completely replace the table and allow Vue reactivity to process and re-render (any non-existant rows would be 'removed').
-1. **Process [`table-output-control`](#table-output-control) instructions that clear tables in Vue state.** All non-core tables that normally replace Vue state tables need a way to indicate when an original calculation returned table rows, then a subsequent calculation wants to return **no** rows; emptying out Vue state and triggering Vue reactivity run re-render (with zero rows as the Vue scope). When RBL Framework CalcEngines do *not* return a table (b/c nothing has changed and there is no need to re-process the results with Vue reactivity), there is no way for the KatApp Framework to know if a table is missing because no updates were made or because there is now no valid data.  To allow for this scenario, the `table-output-table` is processed and indicates how the Vue state should be updated.
+1. **Process [`table-output-control`](#table-output-control) instructions that clear tables in Vue state.** All non-core tables that normally replace Vue state tables need a way to indicate when an original calculation returned table rows, then a subsequent calculation wants to return **no** rows; emptying out Vue state and triggering Vue reactivity run re-render (with zero rows as the Vue scope). When RBLe Framework CalcEngines do *not* return a table (b/c nothing has changed and there is no need to re-process the results with Vue reactivity), there is no way for the KatApp Framework to know if a table is missing because no updates were made or because there is now no valid data.  To allow for this scenario, the `table-output-table` is processed and indicates how the Vue state should be updated.
 
 The following psuedo code demonstrates the work flow for result processing.
 
@@ -1247,7 +1247,7 @@ When an element is toggled, the element and its contained directives are destroy
 
 # Custom KatApp Directives
 
-Similiar to common Vue directives, the KatApp Framework provides custom directives that help rendering markup by leveraging/accessing RBL Framework calculation results.  The majority of the KatApp Framework directives take a 'model' coming in describing how the directive should function. [`v-ka-template`](#v-ka-template), [`v-ka-input`](#v-ka-input) and [`v-ka-input-group`](#v-ka-input-group) take a model *and* return a 'scope' object that can be used by the markup contained by the template. [`v-ka-needs-calc`](#v-ka-needs-calc) and [`v-ka-inline`](#v-ka-inline) are 'marker' directives and do not take a model or return a scope.
+Similiar to common Vue directives, the KatApp Framework provides custom directives that help rendering markup by leveraging/accessing RBLe Framework calculation results.  The majority of the KatApp Framework directives take a 'model' coming in describing how the directive should function. [`v-ka-template`](#v-ka-template), [`v-ka-input`](#v-ka-input) and [`v-ka-input-group`](#v-ka-input-group) take a model *and* return a 'scope' object that can be used by the markup contained by the template. [`v-ka-needs-calc`](#v-ka-needs-calc) and [`v-ka-inline`](#v-ka-inline) are 'marker' directives and do not take a model or return a scope.
 
 ## v-ka-value
 
@@ -1313,11 +1313,11 @@ The only required property is `keyValue`, the rest can be `undefined` or exclude
 
 ## v-ka-input
 
-The `v-ka-input` directive is responsible for initializing HTML inputs to be used in conjunction with the RBL Framework calculations via synchronizing [`state.inputs`](#iapplicationdatainputs) and HTML inputs.  Events are bound to inputs for default behaviors needed to handle RBL Framework calculations. Functionality of the [`v-ka-input` Scope](#v-ka-input-scope) is built from specific, known tables in the RBL Framework calculation (i.e. display,  disabled, etc.).
+The `v-ka-input` directive is responsible for initializing HTML inputs to be used in conjunction with the RBLe Framework calculations via synchronizing [`state.inputs`](#iapplicationdatainputs) and HTML inputs.  Events are bound to inputs for default behaviors needed to handle RBLe Framework calculations. Functionality of the [`v-ka-input` Scope](#v-ka-input-scope) is built from specific, known tables in the RBLe Framework calculation (i.e. display,  disabled, etc.).
 
 The `v-ka-input` directive can be used in three scenarios.
 
-1. Applied to a `div` element and provided a `template`. The `<template>` content will be rendered and the rendered content will be searched for any `HTMLInputElement`s and automatically have event watchers added to trigger RBL Framework calculations as needed and well as binding to the [state.inputs](#iapplicationdatainputs) model. The `<template>` markup will have access to the [scope](#v-ka-input-scope).
+1. Applied to a `div` element and provided a `template`. The `<template>` content will be rendered and the rendered content will be searched for any `HTMLInputElement`s and automatically have event watchers added to trigger RBLe Framework calculations as needed and well as binding to the [state.inputs](#iapplicationdatainputs) model. The `<template>` markup will have access to the [scope](#v-ka-input-scope).
 1. Applied to a `HTMLInputElement` directly without a `template`. Same as the inputs rendered in a template, this input will have events and binding set up and access to the scope.
 1. Applied to a 'container' `HTMLElement` without a `template`. Similar to when a `template` is provided, the container children will be searched for any `HTMLInputElement`s and automatically added events and bindings. The container will be given access to the scope. This can be envisioned as an 'inline template' so to speak where all the markup for an input is manually provided and only available to the current input.
 
@@ -1338,7 +1338,7 @@ The `v-ka-input` directive *does* have a `string` shorthand syntax that allows f
 #### IKaInputModel.name
 
 Property Type: `string`; Required  
-The name of the input.  In RBL Framework, input names start with lower case `i` and then the remaing part(s) is/are [Pascal Case](#https://www.codingem.com/what-is-pascal-case/) (i.e. `iFirstName`).
+The name of the input.  In RBLe Framework, input names start with lower case `i` and then the remaing part(s) is/are [Pascal Case](#https://www.codingem.com/what-is-pascal-case/) (i.e. `iFirstName`).
 
 #### IKaInputModel.template
 
@@ -1350,11 +1350,11 @@ Return an template ID if a [template](#html-content-template-elements) will be u
 Property Type: `string`; Optional  
 When the associated `HTMLInputElement` is an `INPUT` (vs `SELECT` or `TEXTAREA`), you can provide a [type](#https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#input_types).  By default `text` is used assumed.
 
-The value can also be provided via the `rbl-input.type` RBL Framework calculation value.
+The value can also be provided via the `rbl-input.type` RBLe Framework calculation value.
 
 ##### IKaInputModel.type for range Inputs
 
-In addition to events that trigger RBL Framework calculations, if the `HTMLInputElement.type` is of type `range`, the KatApp Framework adds a few more events to enable displaying the `range` value for the benefit of the user.  To enable this feature, the Kaml View developers have to take advantage of the [Template Refs](#https://vuejs.org/guide/essentials/template-refs.html#template-refs) feature of Vue and provide the following `ref` assignments, all of which are optional if the Kaml View does not desire the functionality.
+In addition to events that trigger RBLe Framework calculations, if the `HTMLInputElement.type` is of type `range`, the KatApp Framework adds a few more events to enable displaying the `range` value for the benefit of the user.  To enable this feature, the Kaml View developers have to take advantage of the [Template Refs](#https://vuejs.org/guide/essentials/template-refs.html#template-refs) feature of Vue and provide the following `ref` assignments, all of which are optional if the Kaml View does not desire the functionality.
 
 1. `ref="display"` - This is an `HTMLElement` whose `innerHTML` will be set to the value of the `range` every time the value changes.
 1. `ref="bubble"` - This is an `HTMLElement` that will have a CSS class of `active` toggled on and off.  It will be on while the user is moving the slider or hovering over the slider, and turned off when the user's mouse no longer is over the `range` input.
@@ -1365,49 +1365,49 @@ In addition to events that trigger RBL Framework calculations, if the `HTMLInput
 Property Type: `string`; Optional  
 A default value for the input scope can be provided.  
 
-The value can also be provided via the `rbl-defaults.value` or the `rbl-input.value` RBL Framework calculation value.
+The value can also be provided via the `rbl-defaults.value` or the `rbl-input.value` RBLe Framework calculation value.
 
 #### IKaInputModel.label
 
 Property Type: `string`; Optional  
 A label for the input scope can be provided.  
 
-The value can also be provided via the `rbl-value[@id=='l' + name].value` or the `rbl-input.label` RBL Framework calculation value.
+The value can also be provided via the `rbl-value[@id=='l' + name].value` or the `rbl-input.label` RBLe Framework calculation value.
 
 #### IKaInputModel.placeHolder
 
 Property Type: `string`; Optional  
 A [placeholder](#https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#placeholder) for the input scope can be provided.
 
-The value can also be provided via the `rbl-value[@id=='ph' + name].value` or the `rbl-input.placeholder` RBL Framework calculation value.
+The value can also be provided via the `rbl-value[@id=='ph' + name].value` or the `rbl-input.placeholder` RBLe Framework calculation value.
 
 #### IKaInputModel.hideLabel
 
 Property Type: `boolean`; Optional  
 A value for the input scope determining whether the label should be hidden can be provided.
 
-The value can also be provided via a RBL Framework calculation value. If `rbl-input.label == '-1'`, the label will be hidden.
+The value can also be provided via a RBLe Framework calculation value. If `rbl-input.label == '-1'`, the label will be hidden.
 
 #### IKaInputModel.help.title
 
 Property Type: `string`; Optional  
 Provide a `title` for contextual help to the input scope containing HTML markup.
 
-The value can also be provided via the `rbl-value[@id=='h' + name + 'Title'].value` or the `rbl-input.help-title` RBL Framework calculation value.
+The value can also be provided via the `rbl-value[@id=='h' + name + 'Title'].value` or the `rbl-input.help-title` RBLe Framework calculation value.
 
 #### IKaInputModel.help.content
 
 Property Type: `string`; Optional  
 Provide `content` for contextual help to the input scope containing HTML markup.
 
-The value can also be provided via the `rbl-value[@id=='h' + name].value` or the `rbl-input.help` RBL Framework calculation value.
+The value can also be provided via the `rbl-value[@id=='h' + name].value` or the `rbl-input.help` RBLe Framework calculation value.
 
 #### IKaInputModel.help.width
 
 Property Type: `number`; Optional  
-Provide a width for contextual help to the input scope. If the help is to be rendered with [Bootstrap popovers](#https://getbootstrap.com/docs/5.0/components/popovers/#options) and RBL Framework, the `width` can be provided. The default value is `250`.
+Provide a width for contextual help to the input scope. If the help is to be rendered with [Bootstrap popovers](#https://getbootstrap.com/docs/5.0/components/popovers/#options) and RBLe Framework, the `width` can be provided. The default value is `250`.
 
-The value can also be provided via the `rbl-input.help-width` RBL Framework calculation value.
+The value can also be provided via the `rbl-input.help-width` RBLe Framework calculation value.
 
 #### IKaInputModel.iconHtml
 
@@ -1419,7 +1419,7 @@ Provide additional HTML Markup that could be rendered next to other icons that p
 Property Type: `Array<{ key: string; text: string; }>`; Optional  
 Provide a `list` to the input scope if the input renders a list (i.e. `SELECT`, `type="radio"`, etc.).
 
-The value can also be provided via the `rbl-listcontrol.table` or `rbl-input.list` RBL Framework calculation value which points to a table containing columns of `key` an `text`.
+The value can also be provided via the `rbl-listcontrol.table` or `rbl-input.list` RBLe Framework calculation value which points to a table containing columns of `key` an `text`.
 
 #### IKaInputModel.css.input
 
@@ -1436,21 +1436,21 @@ Provide css strings to the input scope that could be applied to the 'container' 
 Property Type: `string`; Optional  
 Provide a `prefix` to the input scope that could be displayed before the actual input (i.e. with Bootstrap [input-group](#https://getbootstrap.com/docs/5.0/forms/input-group/) markup).
 
-The value can also be provided via the `rbl-input.prefix` RBL Framework calculation value.
+The value can also be provided via the `rbl-input.prefix` RBLe Framework calculation value.
 
 #### IKaInputModel.suffix
 
 Property Type: `string`; Optional  
 Provide a `suffix` to the input scope that could be displayed after the actual input (i.e. with Bootstrap [input-group](#https://getbootstrap.com/docs/5.0/forms/input-group/) markup).
 
-The value can also be provided via the `rbl-input.suffix` RBL Framework calculation value.
+The value can also be provided via the `rbl-input.suffix` RBLe Framework calculation value.
 
 #### IKaInputModel.maxLength
 
 Property Type: `number`; Optional  
 Provide a `maxLength` to the input scope that could be used to limit the length of textual inputs.
 
-The value can also be provided via the `rbl-input.max-length` RBL Framework calculation value.
+The value can also be provided via the `rbl-input.max-length` RBLe Framework calculation value.
 
 #### IKaInputModel.displayFormat
 
@@ -1462,28 +1462,28 @@ Provide a `displayFormat` to the input scope that could be used to format a valu
 1. [Standard date format strings](#https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-date-and-time-format-strings)
 1. [Custom date format strings](#https://learn.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings)
 
-The value can also be provided via the combination of `rbl-sliders.format` and `rbl-sliders.decimals` or the `rbl-input.display-format` RBL Framework calculation value. When the format comes from `rbl-sliders`, it will be turned into the string of `{0:format + decimals}` (i.e. {0:p2} if `format` was `p` and `decimals` was `2`).
+The value can also be provided via the combination of `rbl-sliders.format` and `rbl-sliders.decimals` or the `rbl-input.display-format` RBLe Framework calculation value. When the format comes from `rbl-sliders`, it will be turned into the string of `{0:format + decimals}` (i.e. {0:p2} if `format` was `p` and `decimals` was `2`).
 
 #### IKaInputModel.min
 
 Property Type: `number | string`; Optional  
 Provide a `min` value to the input scope that could be used to limit the minimum allowed value on `date` or `range` inputs.
 
-The value can also be provided via the `rbl-input.min` RBL Framework calculation value.
+The value can also be provided via the `rbl-input.min` RBLe Framework calculation value.
 
 #### IKaInputModel.max
 
 Property Type: `number | string`; Optional  
 Provide a `max` value to the input scope that could be used to limit the maximum allowed value on `date` or `range` inputs.
 
-The value can also be provided via the `rbl-input.max` RBL Framework calculation value.
+The value can also be provided via the `rbl-input.max` RBLe Framework calculation value.
 
 #### IKaInputModel.step
 
 Property Type: `number`; Optional  
 Provide a `step` increment value to the input scope that could be used to control the value increments for `range` inputs.
 
-The value can also be provided via the `rbl-input.step` RBL Framework calculation value.
+The value can also be provided via the `rbl-input.step` RBLe Framework calculation value.
 
 #### IKaInputModel.uploadEndpoint
 
@@ -1493,21 +1493,21 @@ Provide an `uploadEndpoint` value to the input scope that could be used if `type
 #### IKaInputModel.ce
 
 Property Type: `string`; Optional  
-Provide the CalcEngine key if all the values that automatically pull from RBL Framework calculation values should use a CalcEngine *different from the default CalcEngine*.
+Provide the CalcEngine key if all the values that automatically pull from RBLe Framework calculation values should use a CalcEngine *different from the default CalcEngine*.
 
 #### IKaInputModel.tab
 
 Property Type: `string`; Optional  
-Provide the CalcEngine result tab name if all the values that automatically pull from RBL Framework calculation values should use a tab name *different from the default tab specified for the associated CalcEngine*.
+Provide the CalcEngine result tab name if all the values that automatically pull from RBLe Framework calculation values should use a tab name *different from the default tab specified for the associated CalcEngine*.
 
 #### IKaInputModel.isNoCalc
 
 Property Type: `(base: IKaInputScopeBase) => boolean`; Optional
-Provide a delegate to the input scope that can be called to determine if an input should *not* trigger an RBL Framework calculation.
+Provide a delegate to the input scope that can be called to determine if an input should *not* trigger an RBLe Framework calculation.
 
-The value can also be provided via the `rbl-skip.value` or `rbl-input.skip` RBL Framework calculation value.
+The value can also be provided via the `rbl-skip.value` or `rbl-input.skip` RBLe Framework calculation value.
 
-The `base` parameter passed into the delegate gives access a `base.noCalc` property configured by the default RBL Framework calculation value processing described above.
+The `base` parameter passed into the delegate gives access a `base.noCalc` property configured by the default RBLe Framework calculation value processing described above.
 
 **Note:** Additionally if any input or input ancestor has `rbl-nocalc` or `rbl-exclude` in the class list, the calculation will not occur.
 
@@ -1516,18 +1516,18 @@ The `base` parameter passed into the delegate gives access a `base.noCalc` prope
 Property Type: `(base: IKaInputScopeBase) => boolean`; Optional
 Provide a delegate to the input scope that can be called to determine if an input should be disabled.
 
-The value can also be provided via the `rbl-disabled.value` or `rbl-input.disabled` RBL Framework calculation value.
+The value can also be provided via the `rbl-disabled.value` or `rbl-input.disabled` RBLe Framework calculation value.
 
-The `base` parameter passed into the delegate gives access a `base.disabled` property configured by the default RBL Framework calculation value processing described above.
+The `base` parameter passed into the delegate gives access a `base.disabled` property configured by the default RBLe Framework calculation value processing described above.
 
 #### IKaInputModel.isDisplay
 
 Property Type: `(base: IKaInputScopeBase) => boolean`; Optional
 Provide a delegate to the input scope that can be called to determine if an input should be displayed.
 
-The value can also be provided via the `rbl-display.value` or `rbl-input.display` RBL Framework calculation value.
+The value can also be provided via the `rbl-display.value` or `rbl-input.display` RBLe Framework calculation value.
 
-The `base` parameter passed into the delegate gives access a `base.display` property configured by the default RBL Framework calculation value processing described above.
+The `base` parameter passed into the delegate gives access a `base.display` property configured by the default RBLe Framework calculation value processing described above.
 
 #### IKaInputModel.events
 
@@ -1602,7 +1602,7 @@ Render an upload control and corresponding comment control.
 
 ### v-ka-input Scope
 
-The `IKaInputScope` represents the type containing the properties and methods available to inputs and templates that use the `v-ka-input` directive. For the most part, it is a 'read only' version of the `IKaInputModel` object, with default functionality provided from RBL Framework calculation results when needed.  Additionally, there are helper properties and methods available as well.
+The `IKaInputScope` represents the type containing the properties and methods available to inputs and templates that use the `v-ka-input` directive. For the most part, it is a 'read only' version of the `IKaInputModel` object, with default functionality provided from RBLe Framework calculation results when needed.  Additionally, there are helper properties and methods available as well.
 
 #### IKaInputScope.id
 
@@ -1619,11 +1619,11 @@ Gets the `name` to use for the current input.
 Property Type: `string`;  
 Gets the [`type`](#https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#input_types) to use if the associated `HTMLInputElement` is an `INPUT` (vs `SELECT` or `TEXTAREA`).
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. `rbl-input.type` RBL Framework calculation value
+1. `rbl-input.type` RBLe Framework calculation value
 1. `model.type` property
 1. `text` if no value provided.
 
@@ -1632,12 +1632,12 @@ Returns value based on following precedence:
 Property Type: `string`;  
 Gets the default value to use for the input.
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. `rbl-input.value` RBL Framework calculation value
-1. `rbl-defaults.value` RBL Framework calculation value
+1. `rbl-input.value` RBLe Framework calculation value
+1. `rbl-defaults.value` RBLe Framework calculation value
 1. `model.value` property
 1. `""` if no value provided.
 
@@ -1646,13 +1646,13 @@ Returns value based on following precedence:
 Property Type: `boolean`;  
 Gets a value indicating the disabled state of the current input.
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
 1. `model.isDisabled` delegate property
-1. `rbl-input.disabled` RBL Framework calculation value (if value is `1`)
-1. `rbl-disabled.value` RBL Framework calculation value (if value is `1`)
+1. `rbl-input.disabled` RBLe Framework calculation value (if value is `1`)
+1. `rbl-disabled.value` RBLe Framework calculation value (if value is `1`)
 1. `false` if no value provided.
 
 #### IKaInputScope.display
@@ -1660,27 +1660,27 @@ Returns value based on following precedence:
 Property Type: `boolean`;  
 Gets a value indicating the display state of the current input.
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
 1. `model.isDisplay` delegate property
-1. `rbl-input.display` RBL Framework calculation value (if value is *not* `0`)
-1. `rbl-display.value` RBL Framework calculation value (if value is *not* `0`)
+1. `rbl-input.display` RBLe Framework calculation value (if value is *not* `0`)
+1. `rbl-display.value` RBLe Framework calculation value (if value is *not* `0`)
 1. `true` if no value provided.
 
 #### IKaInputScope.noCalc
 
 Property Type: `boolean`;  
-Get a value indicating whether the current input should trigger a RBL Framework calculation on 'change'.
+Get a value indicating whether the current input should trigger a RBLe Framework calculation on 'change'.
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
 1. `model.isNoCalc` delegate property
-1. `rbl-input.skip` RBL Framework calculation value (if value is `1`)
-1. `rbl-skip.value` RBL Framework calculation value (if value is `1`)
+1. `rbl-input.skip` RBLe Framework calculation value (if value is `1`)
+1. `rbl-skip.value` RBLe Framework calculation value (if value is `1`)
 1. `false` if no value provided.
 
 **Note:** Additionally if any input or input ancestor has `rbl-nocalc` or `rbl-exclude` in the class list, the calculation will not occur.
@@ -1690,12 +1690,12 @@ Returns value based on following precedence:
 Property Type: `string`;  
 Gets the label to use for the input.
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. `rbl-input.label` RBL Framework calculation value
-1. `rbl-value[@id='l' + name].value` RBL Framework calculation value
+1. `rbl-input.label` RBLe Framework calculation value
+1. `rbl-value[@id='l' + name].value` RBLe Framework calculation value
 1. `model.label` property
 1. `""` if no value provided.
 
@@ -1704,11 +1704,11 @@ Returns value based on following precedence:
 Property Type: `boolean`;  
 Gets a value determining whether the label should be hidden or not.
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. `rbl-input.label` RBL Framework calculation value (return `true` if `label == "-1"`)
+1. `rbl-input.label` RBLe Framework calculation value (return `true` if `label == "-1"`)
 1. `model.hideLabel` property
 1. `false` if no value provided.
 
@@ -1717,12 +1717,12 @@ Returns value based on following precedence:
 Property Type: `string | undefined`;  
 Gets the placeholder to use for the input.
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. `rbl-input.placeholder` RBL Framework calculation value
-1. `rbl-value[@id='ph' + name].value` RBL Framework calculation value
+1. `rbl-input.placeholder` RBLe Framework calculation value
+1. `rbl-value[@id='ph' + name].value` RBLe Framework calculation value
 1. `model.placeHolder` property
 1. `undefined` if no value provided.
 
@@ -1733,12 +1733,12 @@ The property returns `undefined` if nothing provided vs `""` because some templa
 Property Type: `string`;  
 Gets the contextual help title to use for the input.
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. `rbl-input.help-title` RBL Framework calculation value
-1. `rbl-value[@id='h' + name + 'Title'].value` RBL Framework calculation value
+1. `rbl-input.help-title` RBLe Framework calculation value
+1. `rbl-value[@id='h' + name + 'Title'].value` RBLe Framework calculation value
 1. `model.help.title` property
 1. `""` if no value provided.
 
@@ -1747,12 +1747,12 @@ Returns value based on following precedence:
 Property Type: `string | undefined`;  
 Gets the contextual help content to use for the input.
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. `rbl-input.help` RBL Framework calculation value
-1. `rbl-value[@id='h' + name].value` RBL Framework calculation value
+1. `rbl-input.help` RBLe Framework calculation value
+1. `rbl-value[@id='h' + name].value` RBLe Framework calculation value
 1. `model.help.content` property
 1. `undefined` if no value provided.
 
@@ -1763,11 +1763,11 @@ The property returns `undefined` if nothing provided vs `""` because some templa
 Property Type: `number`;  
 Gets the contextual help width to use for the input. This is helpful when the rendering template uses the built in [Bootstrap Popover](#https://getbootstrap.com/docs/5.0/components/popovers/) support and the width of the popover can be configured via data attributes.
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. `rbl-input.help-width` RBL Framework calculation value
+1. `rbl-input.help-width` RBLe Framework calculation value
 1. `model.help.width` property
 1. `""` if no value provided.
 
@@ -1800,12 +1800,12 @@ Returns value based on following precedence:
 Property Type: `Array<{ key: string; text: string; }>`;  
 Gets the array of items to use when the rendered input is built from a list.
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. Get the RBL Framework calculation table where the name is provided in `rbl-input.list`
-1. Get the RBL Framework calculation table where the name is provided in `rbl-listcontrol.value`
+1. Get the RBLe Framework calculation table where the name is provided in `rbl-input.list`
+1. Get the RBLe Framework calculation table where the name is provided in `rbl-listcontrol.value`
 1. `model.list` property
 1. `[]` if no list is provided.
 
@@ -1814,11 +1814,11 @@ Returns value based on following precedence:
 Property Type: `string | undefined`;  
 Gets the prefix to display *before* the rendered input.
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. `rbl-input.prefix` RBL Framework calculation value
+1. `rbl-input.prefix` RBLe Framework calculation value
 1. `model.prefix` property
 1. `undefined` if no value provided.
 
@@ -1829,11 +1829,11 @@ The property returns `undefined` if nothing provided vs `""` because some templa
 Property Type: `string | undefined`;  
 Gets the suffix to display *after* the rendered input.
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. `rbl-input.suffix` RBL Framework calculation value
+1. `rbl-input.suffix` RBLe Framework calculation value
 1. `model.suffix` property
 1. `undefined` if no value provided.
 
@@ -1844,11 +1844,11 @@ The property returns `undefined` if nothing provided vs `""` because some templa
 Property Type: `number`;  
 Gets the max length a textual input value can be; often used with `TEXTAREA` inputs.
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. `rbl-input.max-length` RBL Framework calculation value
+1. `rbl-input.max-length` RBLe Framework calculation value
 1. `model.maxLength` property
 1. `250` if no value provided.
 
@@ -1857,11 +1857,11 @@ Returns value based on following precedence:
 Property Type: `string`;  
 Gets the min value allowed if the rendered input supports the concept of minimum value (i.e. `range` or `date` types).
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. `rbl-input.min` RBL Framework calculation value
+1. `rbl-input.min` RBLe Framework calculation value
 1. `model.min` property
 1. `""` if no value provided.
 
@@ -1870,11 +1870,11 @@ Returns value based on following precedence:
 Property Type: `string`;  
 Gets the max value allowed if the rendered input supports the concept of maximum value (i.e. `range` or `date` types).
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. `rbl-input.max` RBL Framework calculation value
+1. `rbl-input.max` RBLe Framework calculation value
 1. `model.max` property
 1. `""` if no value provided.
 
@@ -1883,11 +1883,11 @@ Returns value based on following precedence:
 Property Type: `number`;  
 Gets the step increment value to use if the rendered input supports the concept of incremental steps (i.e. `range` types).
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. `rbl-input.step` RBL Framework calculation value
+1. `rbl-input.step` RBLe Framework calculation value
 1. `model.step` property
 1. `1` if no value provided.
 
@@ -2002,7 +2002,7 @@ The following template uses most of the previous properties and additionally use
 
 ## v-ka-input-group
 
-The `v-ka-input-group` directive is responsible for initializing groups of HTML inputs to be used in conjunction with the RBL Framework calculations via synchronizing [`state.inputs`](#iapplicationdatainputs) and HTML inputs. It behaves the same as a [v-ka-input directive](#v-ka-input) except that all the properties on the model and scope are essentially array based to support whatever number of inputs the specified template supports.
+The `v-ka-input-group` directive is responsible for initializing groups of HTML inputs to be used in conjunction with the RBLe Framework calculations via synchronizing [`state.inputs`](#iapplicationdatainputs) and HTML inputs. It behaves the same as a [v-ka-input directive](#v-ka-input) except that all the properties on the model and scope are essentially array based to support whatever number of inputs the specified template supports.
 
 The `v-ka-input-group` directive can only be used when a `template` is assigned.
 
@@ -2015,7 +2015,7 @@ The `IKaInputGroupModel` represents the model type containing the properties tha
 #### IKaInputGroupModel.names
 
 Property Type: `Array<string>`; Required  
-The array of `string` names representing each input in the gruop.  In RBL Framework, input names start with lower case `i` and then the remaing part(s) is/are [Pascal Case](#https://www.codingem.com/what-is-pascal-case/) (i.e. [`"iFirstName"`, `"iFirstName2"`]).
+The array of `string` names representing each input in the gruop.  In RBLe Framework, input names start with lower case `i` and then the remaing part(s) is/are [Pascal Case](#https://www.codingem.com/what-is-pascal-case/) (i.e. [`"iFirstName"`, `"iFirstName2"`]).
 
 #### IKaInputGroupModel.template
 
@@ -2032,49 +2032,49 @@ When the associated group of `HTMLInputElement`s are a `INPUT` (vs `SELECT` or `
 Property Type: `Array<string>`; Optional  
 The default values for the input group scope can be provided.  
 
-The values can also be provided via the `rbl-defaults.value` or the `rbl-input.value` RBL Framework calculation value where the `@id` is one of the values provided by `names`.
+The values can also be provided via the `rbl-defaults.value` or the `rbl-input.value` RBLe Framework calculation value where the `@id` is one of the values provided by `names`.
 
 #### IKaInputGroupModel.labels
 
 Property Type: `Array<string>`; Optional  
 The labels to use for the input group scope can be provided.  
 
-The values can also be provided via the `rbl-value[@id=='l' + name].value` or the `rbl-input.label` RBL Framework calculation value where the `@id/name` is one of the values provided by `names`.
+The values can also be provided via the `rbl-value[@id=='l' + name].value` or the `rbl-input.label` RBLe Framework calculation value where the `@id/name` is one of the values provided by `names`.
 
 #### IKaInputGroupModel.placeHolders
 
 Property Type: `Array<string>`; Optional  
 The [placeholders](#https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#placeholder) for the input group scope can be provided.
 
-The values can also be provided via the `rbl-value[@id=='ph' + name].value` or the `rbl-input.placeholder` RBL Framework calculation value where the `@id/name` is one of the values provided by `names`.
+The values can also be provided via the `rbl-value[@id=='ph' + name].value` or the `rbl-input.placeholder` RBLe Framework calculation value where the `@id/name` is one of the values provided by `names`.
 
 #### IKaInputGroupModel.hideLabels
 
 Property Type: `Array<boolean>`; Optional  
 An array of values for the input group scope determining whether the labels should be hidden can be provided.
 
-The values can also be provided via a RBL Framework calculation value where the `@id` is one of the values provided by `names`. If `rbl-input.label == '-1'`, the label will be hidden.
+The values can also be provided via a RBLe Framework calculation value where the `@id` is one of the values provided by `names`. If `rbl-input.label == '-1'`, the label will be hidden.
 
 #### IKaInputGroupModel.helps.title
 
 Property Type: `Array<{ title?: string; content?: string; width?: number; }>`; Optional  
 Provide the `title`s to use for contextual help to the input group scope containing HTML markup.
 
-The values can also be provided via the `rbl-value[@id=='h' + name + 'Title'].value` or the `rbl-input.help-title` RBL Framework calculation value where the `@id/name` is one of the values provided by `names`.
+The values can also be provided via the `rbl-value[@id=='h' + name + 'Title'].value` or the `rbl-input.help-title` RBLe Framework calculation value where the `@id/name` is one of the values provided by `names`.
 
 #### IKaInputGroupModel.helps.content
 
 Property Type: `Array<{ title?: string; content?: string; width?: number; }>`; Optional  
 Provide the `content` values for contextual help to the input group scope containing HTML markup.
 
-The values can also be provided via the `rbl-value[@id=='h' + name].value` or the `rbl-input.help` RBL Framework calculation value where the `@id/name` is one of the values provided by `names`.
+The values can also be provided via the `rbl-value[@id=='h' + name].value` or the `rbl-input.help` RBLe Framework calculation value where the `@id/name` is one of the values provided by `names`.
 
 #### IKaInputGroupModel.helps.width
 
 Property Type: `Array<{ title?: string; content?: string; width?: number; }>`; Optional  
-Provide the widths for contextual help to the input group scope. If the help is to be rendered with [Bootstrap popovers](#https://getbootstrap.com/docs/5.0/components/popovers/#options) and RBL Framework, the `width` can be provided. The default value is `250`.
+Provide the widths for contextual help to the input group scope. If the help is to be rendered with [Bootstrap popovers](#https://getbootstrap.com/docs/5.0/components/popovers/#options) and RBLe Framework, the `width` can be provided. The default value is `250`.
 
-The values can also be provided via the `rbl-input.help-width` RBL Framework calculation value.
+The values can also be provided via the `rbl-input.help-width` RBLe Framework calculation value.
 
 #### IKaInputGroupModel.iconHtmls
 
@@ -2096,21 +2096,21 @@ Provide css strings to the input scope that could be applied to the 'container' 
 Property Type: `Array<string>`; Optional  
 Provide an array of `prefixes` to the input group scope that could be displayed before the actual inputs (i.e. with Bootstrap [input-group](#https://getbootstrap.com/docs/5.0/forms/input-group/) markup).
 
-The value can also be provided via the `rbl-input.prefix` RBL Framework calculation value where the `@id` is one of the values provided by `names`.
+The value can also be provided via the `rbl-input.prefix` RBLe Framework calculation value where the `@id` is one of the values provided by `names`.
 
 #### IKaInputGroupModel.suffixes
 
 Property Type: `Array<string>`; Optional  
 Provide an array of `suffixes` to the input group scope that could be displayed after the actual inputs (i.e. with Bootstrap [input-group](#https://getbootstrap.com/docs/5.0/forms/input-group/) markup).
 
-The value can also be provided via the `rbl-input.suffix` RBL Framework calculation value where the `@id` is one of the values provided by `names`.
+The value can also be provided via the `rbl-input.suffix` RBLe Framework calculation value where the `@id` is one of the values provided by `names`.
 
 #### IKaInputGroupModel.maxLengths
 
 Property Type: `Array<number>`; Optional  
 Provide an array of `maxLengths` to the input group scope that could be used to limit the length of textual inputs.
 
-The value can also be provided via the `rbl-input.max-length` RBL Framework calculation value where the `@id` is one of the values provided by `names`.
+The value can also be provided via the `rbl-input.max-length` RBLe Framework calculation value where the `@id` is one of the values provided by `names`.
 
 #### IKaInputGroupModel.displayFormats
 
@@ -2122,49 +2122,49 @@ Provide an array of `displayFormats` to the input group scope that could be used
 1. [Standard date format strings](#https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-date-and-time-format-strings)
 1. [Custom date format strings](#https://learn.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings)
 
-The value can also be provided via the combination of `rbl-sliders.format` and `rbl-sliders.decimals` or the `rbl-input.display-format` RBL Framework calculation value where the `@id` is one of the values provided by `names`. When the format comes from `rbl-sliders`, it will be turned into the string of `{0:format + decimals}` (i.e. {0:p2} if `format` was `p` and `decimals` was `2`).
+The value can also be provided via the combination of `rbl-sliders.format` and `rbl-sliders.decimals` or the `rbl-input.display-format` RBLe Framework calculation value where the `@id` is one of the values provided by `names`. When the format comes from `rbl-sliders`, it will be turned into the string of `{0:format + decimals}` (i.e. {0:p2} if `format` was `p` and `decimals` was `2`).
 
 #### IKaInputGroupModel.mins
 
 Property Type: `Array<number | string>`; Optional  
 Provide an array of `mins` values to the input group scope that could be used to limit the minimum allowed value on `date` or `range` inputs.
 
-The value can also be provided via the `rbl-input.min` RBL Framework calculation value where the `@id` is one of the values provided by `names`.
+The value can also be provided via the `rbl-input.min` RBLe Framework calculation value where the `@id` is one of the values provided by `names`.
 
 #### IKaInputGroupModel.maxes
 
 Property Type: `Array<number | string>`; Optional  
 Provide an array of `maxes` values to the input group scope that could be used to limit the maximum allowed value on `date` or `range` inputs.
 
-The value can also be provided via the `rbl-input.max` RBL Framework calculation value where the `@id` is one of the values provided by `names`.
+The value can also be provided via the `rbl-input.max` RBLe Framework calculation value where the `@id` is one of the values provided by `names`.
 
 #### IKaInputGroupModel.steps
 
 Property Type: `Array<number>`; Optional  
 Provide an array of `steps` increment values to the input group scope that could be used to control the value increments for `range` inputs.
 
-The value can also be provided via the `rbl-input.step` RBL Framework calculation value where the `@id` is one of the values provided by `names`.
+The value can also be provided via the `rbl-input.step` RBLe Framework calculation value where the `@id` is one of the values provided by `names`.
 
 #### IKaInputGroupModel.ce
 
 Property Type: `string`; Optional  
-Provide the CalcEngine key if all the values that automatically pull from RBL Framework calculation values should use a CalcEngine *different from the default CalcEngine*.
+Provide the CalcEngine key if all the values that automatically pull from RBLe Framework calculation values should use a CalcEngine *different from the default CalcEngine*.
 
 #### IKaInputGroupModel.tab
 
 Property Type: `string`; Optional  
-Provide the CalcEngine result tab name if all the values that automatically pull from RBL Framework calculation values should use a tab name *different from the default tab specified for the associated CalcEngine*.
+Provide the CalcEngine result tab name if all the values that automatically pull from RBLe Framework calculation values should use a tab name *different from the default tab specified for the associated CalcEngine*.
 
 #### IKaInputGroupModel.isNoCalc
 
 Property Type: `(index: number, base: IKaInputGroupScopeBase) => boolean`; Optional
-Provide a delegate to the input group scope that can be called to determine if an input should *not* trigger an RBL Framework calculation.
+Provide a delegate to the input group scope that can be called to determine if an input should *not* trigger an RBLe Framework calculation.
 
-The value can also be provided via the `rbl-skip.value` or `rbl-input.skip` RBL Framework calculation value where the `@id` is one of the values provided by `names`.
+The value can also be provided via the `rbl-skip.value` or `rbl-input.skip` RBLe Framework calculation value where the `@id` is one of the values provided by `names`.
 
 The `index` parameter can be used to know which 'item' of the group is being queried.
 
-The `base` parameter passed into the delegate gives access a `base.noCalc(index)` property configured by the default RBL Framework calculation value processing described above.
+The `base` parameter passed into the delegate gives access a `base.noCalc(index)` property configured by the default RBLe Framework calculation value processing described above.
 
 **Note:** Additionally if any input or input ancestor has `rbl-nocalc` or `rbl-exclude` in the class list, the calculation will not occur.
 
@@ -2173,22 +2173,22 @@ The `base` parameter passed into the delegate gives access a `base.noCalc(index)
 Property Type: `(index: number, base: IKaInputGroupScopeBase) => boolean`; Optional
 Provide a delegate to the input group scope that can be called to determine if an input should be disabled.
 
-The value can also be provided via the `rbl-disabled.value` or `rbl-input.disabled` RBL Framework calculation value where the `@id` is one of the values provided by `names`.
+The value can also be provided via the `rbl-disabled.value` or `rbl-input.disabled` RBLe Framework calculation value where the `@id` is one of the values provided by `names`.
 
 The `index` parameter can be used to know which 'item' of the group is being queried.
 
-The `base` parameter passed into the delegate gives access a `base.disabled(index)` property configured by the default RBL Framework calculation value processing described above.
+The `base` parameter passed into the delegate gives access a `base.disabled(index)` property configured by the default RBLe Framework calculation value processing described above.
 
 #### IKaInputGroupModel.isDisplay
 
 Property Type: `(index: number, base: IKaInputGroupScopeBase) => boolean`; Optional
 Provide a delegate to the input group scope that can be called to determine if an input should be displayed.
 
-The value can also be provided via the `rbl-display.value` or `rbl-input.display` RBL Framework calculation value where the `@id` is one of the values provided by `names`.
+The value can also be provided via the `rbl-display.value` or `rbl-input.display` RBLe Framework calculation value where the `@id` is one of the values provided by `names`.
 
 The `index` parameter can be used to know which 'item' of the group is being queried.
 
-The `base` parameter passed into the delegate gives access a `base.display(index)` property configured by the default RBL Framework calculation value processing described above.
+The `base` parameter passed into the delegate gives access a `base.display(index)` property configured by the default RBLe Framework calculation value processing described above.
 
 #### IKaInputGroupModel.events
 
@@ -2222,7 +2222,7 @@ when rendering the group, so only one element is required for both labels and he
 
 ### v-ka-input-group Scope
 
-The `IKaInputGroupScope` represents the type containing the properties and methods available to templates that use the `v-ka-input-group` directive. For the most part, it is a 'read only' version of the `IKaInputGroupModel` object, with default functionality provided from RBL Framework calculation results when needed.  Additionally, there are helper properties and methods available as well.  Since the input group is a 'group of items', almost all scope properties are functions that take a numerical `index` parameter and return the desired property.
+The `IKaInputGroupScope` represents the type containing the properties and methods available to templates that use the `v-ka-input-group` directive. For the most part, it is a 'read only' version of the `IKaInputGroupModel` object, with default functionality provided from RBLe Framework calculation results when needed.  Additionally, there are helper properties and methods available as well.  Since the input group is a 'group of items', almost all scope properties are functions that take a numerical `index` parameter and return the desired property.
 
 #### IKaInputGroupScope.id
 
@@ -2251,12 +2251,12 @@ Returns value based on following precedence:
 Property Type: `(index: number) => string`;  
 Given an input index, gets the default value to use for the input.
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. `rbl-input.value` RBL Framework calculation value
-1. `rbl-defaults.value` RBL Framework calculation value
+1. `rbl-input.value` RBLe Framework calculation value
+1. `rbl-defaults.value` RBLe Framework calculation value
 1. `model.values[index]` property
 1. `""` if no value provided.
 
@@ -2265,13 +2265,13 @@ Returns value based on following precedence:
 Property Type: `(index: number) => boolean`;  
 Given an input index, gets a value indicating the disabled state of the current input.
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
 1. `model.isDisabled` delegate property
-1. `rbl-input.disabled` RBL Framework calculation value (if value is `1`)
-1. `rbl-disabled.value` RBL Framework calculation value (if value is `1`)
+1. `rbl-input.disabled` RBLe Framework calculation value (if value is `1`)
+1. `rbl-disabled.value` RBLe Framework calculation value (if value is `1`)
 1. `false` if no value provided.
 
 #### IKaInputGroupScope.display
@@ -2279,27 +2279,27 @@ Returns value based on following precedence:
 Property Type: `(index: number) => boolean`;  
 Given an input index, gets a value indicating the display state of the current input.
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
 1. `model.isDisplay` delegate property
-1. `rbl-input.display` RBL Framework calculation value (if value is *not* `0`)
-1. `rbl-display.value` RBL Framework calculation value (if value is *not* `0`)
+1. `rbl-input.display` RBLe Framework calculation value (if value is *not* `0`)
+1. `rbl-display.value` RBLe Framework calculation value (if value is *not* `0`)
 1. `true` if no value provided.
 
 #### IKaInputGroupScope.noCalc
 
 Property Type: `(index: number) => boolean`;  
-Given an input index, gets a value indicating whether the current input should trigger a RBL Framework calculation on 'change'.
+Given an input index, gets a value indicating whether the current input should trigger a RBLe Framework calculation on 'change'.
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
 1. `model.isNoCalc` delegate property
-1. `rbl-input.skip` RBL Framework calculation value (if value is `1`)
-1. `rbl-skip.value` RBL Framework calculation value (if value is `1`)
+1. `rbl-input.skip` RBLe Framework calculation value (if value is `1`)
+1. `rbl-skip.value` RBLe Framework calculation value (if value is `1`)
 1. `false` if no value provided.
 
 **Note:** Additionally if any input or input ancestor has `rbl-nocalc` or `rbl-exclude` in the class list, the calculation will not occur.
@@ -2309,12 +2309,12 @@ Returns value based on following precedence:
 Property Type: `(index: number) => string`;  
 Given an input index, gets the label to use for the input.
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. `rbl-input.label` RBL Framework calculation value
-1. `rbl-value[@id='l' + name].value` RBL Framework calculation value
+1. `rbl-input.label` RBLe Framework calculation value
+1. `rbl-value[@id='l' + name].value` RBLe Framework calculation value
 1. `model.labels[index]` property
 1. `""` if no value provided.
 
@@ -2323,11 +2323,11 @@ Returns value based on following precedence:
 Property Type: `(index: number) => boolean`;  
 Given an input index, gets a value determining whether the label should be hidden or not.
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. `rbl-input.label` RBL Framework calculation value (return `true` if `label == "-1"`)
+1. `rbl-input.label` RBLe Framework calculation value (return `true` if `label == "-1"`)
 1. `model.hideLabels[index]` property
 1. `false` if no value provided.
 
@@ -2336,12 +2336,12 @@ Returns value based on following precedence:
 Property Type: `(index: number) => string | undefined`;  
 Given an input index, gets the placeholder to use for the input.
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. `rbl-input.placeholder` RBL Framework calculation value
-1. `rbl-value[@id='ph' + name].value` RBL Framework calculation value
+1. `rbl-input.placeholder` RBLe Framework calculation value
+1. `rbl-value[@id='ph' + name].value` RBLe Framework calculation value
 1. `model.placeHolders[index]` property
 1. `undefined` if no value provided.
 
@@ -2352,12 +2352,12 @@ The property returns `undefined` if nothing provided vs `""` because some templa
 Property Type: `(index: number) => { title: string, content?: string; width: number; }`;  
 Given an input index, gets the contextual help title to use for the input.
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. `rbl-input.help-title` RBL Framework calculation value
-1. `rbl-value[@id='h' + name + 'Title'].value` RBL Framework calculation value
+1. `rbl-input.help-title` RBLe Framework calculation value
+1. `rbl-value[@id='h' + name + 'Title'].value` RBLe Framework calculation value
 1. `model.helps[index]{title?: string}` property
 1. `""` if no value provided.
 
@@ -2366,12 +2366,12 @@ Returns value based on following precedence:
 Property Type: `(index: number) => { title: string, content?: string; width: number; }`;  
 Given an input index, gets the contextual help content to use for the input.
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. `rbl-input.help` RBL Framework calculation value
-1. `rbl-value[@id='h' + name].value` RBL Framework calculation value
+1. `rbl-input.help` RBLe Framework calculation value
+1. `rbl-value[@id='h' + name].value` RBLe Framework calculation value
 1. `model.helps[index]{ content?: string }` property
 1. `undefined` if no value provided.
 
@@ -2382,11 +2382,11 @@ The property returns `undefined` if nothing provided vs `""` because some templa
 Property Type: `(index: number) => { title: string, content?: string; width: number; }`;  
 Given an input index, gets the contextual help width to use for the input. This is helpful when the rendering template uses the built in [Bootstrap Popover](#https://getbootstrap.com/docs/5.0/components/popovers/) support and the width of the popover can be configured via data attributes.
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. `rbl-input.help-width` RBL Framework calculation value
+1. `rbl-input.help-width` RBLe Framework calculation value
 1. `model.helps[index]{ width?: number }` property
 1. `""` if no value provided.
 
@@ -2419,12 +2419,12 @@ Returns value based on following precedence:
 Property Type: `(index: number) => Array<{ key: string; text: string; }>`;  
 Given an input index, gets the array of items to use when the rendered input is built from a list.
 
-The list can by provided by the RBL Framework calculation.
+The list can by provided by the RBLe Framework calculation.
 
 Returns value based on following precedence:
 
-1. Get the RBL Framework calculation table where the name is provided in `rbl-input.list`
-1. Get the RBL Framework calculation table where the name is provided in `rbl-listcontrol.value`
+1. Get the RBLe Framework calculation table where the name is provided in `rbl-input.list`
+1. Get the RBLe Framework calculation table where the name is provided in `rbl-listcontrol.value`
 1. `[]` if no list is provided.
 
 #### IKaInputGroupScope.prefix
@@ -2432,11 +2432,11 @@ Returns value based on following precedence:
 Property Type: `(index: number) => string | undefined`;  
 Given an input index, gets the prefix to display *before* the rendered input.
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. `rbl-input.prefix` RBL Framework calculation value
+1. `rbl-input.prefix` RBLe Framework calculation value
 1. `model.prefixes[index]` property
 1. `undefined` if no value provided.
 
@@ -2447,11 +2447,11 @@ The property returns `undefined` if nothing provided vs `""` because some templa
 Property Type: `(index: number) => string | undefined`;  
 Given an input index, gets the suffix to display *after* the rendered input.
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. `rbl-input.suffix` RBL Framework calculation value
+1. `rbl-input.suffix` RBLe Framework calculation value
 1. `model.suffixes[index]` property
 1. `undefined` if no value provided.
 
@@ -2462,11 +2462,11 @@ The property returns `undefined` if nothing provided vs `""` because some templa
 Property Type: `(index: number) => number`;  
 Given an input index, gets the max length a textual input value can be; often used with `TEXTAREA` inputs.
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. `rbl-input.max-length` RBL Framework calculation value
+1. `rbl-input.max-length` RBLe Framework calculation value
 1. `model.maxLengths[index]` property
 1. `250` if no value provided.
 
@@ -2475,11 +2475,11 @@ Returns value based on following precedence:
 Property Type: `(index: number) => string`;  
 Given an input index, gets the min value allowed if the rendered input supports the concept of minimum value (i.e. `range` or `date` types).
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. `rbl-input.min` RBL Framework calculation value
+1. `rbl-input.min` RBLe Framework calculation value
 1. `model.mins[index]` property
 1. `""` if no value provided.
 
@@ -2488,11 +2488,11 @@ Returns value based on following precedence:
 Property Type: (index: number) => `string`;  
 Given an input index, gets the max value allowed if the rendered input supports the concept of maximum value (i.e. `range` or `date` types).
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. `rbl-input.max` RBL Framework calculation value
+1. `rbl-input.max` RBLe Framework calculation value
 1. `model.maxes[index]` property
 1. `""` if no value provided.
 
@@ -2501,11 +2501,11 @@ Returns value based on following precedence:
 Property Type: (index: number) => `number`;  
 Given an input index, gets the step increment value to use if the rendered input supports the concept of incremental steps (i.e. `range` types).
 
-The value can by provided by the model or a RBL Framework calculation value.
+The value can by provided by the model or a RBLe Framework calculation value.
 
 Returns value based on following precedence:
 
-1. `rbl-input.step` RBL Framework calculation value
+1. `rbl-input.step` RBLe Framework calculation value
 1. `model.steps[index]` property
 1. `1` if no value provided.
 
@@ -2699,7 +2699,7 @@ If the scope is of type `Array<ITabDefRow>`, then the scope provided will have a
 <!-- 
     To add to this sample, below is a complex version performing the same way where the model 
     is manually constructed (including the type row and the Array<ITabDefRow> rows property) 
-    where the type row is not part of the RBL Framework results 
+    where the type row is not part of the RBLe Framework results 
 -->
 <div v-ka-template="{ 
     name: 'notice-type1', 
@@ -2770,7 +2770,7 @@ If a confirmation dialog should be displayed to prompt the user whether or not t
 #### IKaApiModel.calculationInputs
 
 Property Type: [`ICalculationInputs`](#icalculationinputs); Optional  
-Often when an api endpoint is submitted to in a Host Environment that leverages the RBL Framework, an `iValidate=1` RBL calculation is the first action performed on the server.  This calculation can do UI validations or provide instructions to the Host Environment on what type of actions it should take.  All the inputs from the UI are always submit, but if additional inputs should be passed to the endpoint, an `ICalculationInputs` object can be provided.
+Often when an api endpoint is submitted to in a Host Environment that leverages the RBLe Framework, an `iValidate=1` RBL calculation is the first action performed on the server.  This calculation can do UI validations or provide instructions to the Host Environment on what type of actions it should take.  All the inputs from the UI are always submit, but if additional inputs should be passed to the endpoint, an `ICalculationInputs` object can be provided.
 
 #### IKaApiModel.apiParameters
 
@@ -2794,7 +2794,7 @@ If the api endpoint being submitted to accepts file uploads, this property can b
 #### IKaApiModel.calculateOnSuccess
 
 Property Type: `boolean | ICalculationInputs`; Optional  
-If after a successful submission to an api endpoint, the KatApp Framework should automatically trigger a RBL Framework Calculation, `calculateOnSuccess` can be set.  Setting the value to `true` indicates that a calculation should occur.  Setting the value to a `ICalculationInputs` object also indicates that a calculation should occur and additionally pass along the inputs provided.
+If after a successful submission to an api endpoint, the KatApp Framework should automatically trigger a RBLe Framework Calculation, `calculateOnSuccess` can be set.  Setting the value to `true` indicates that a calculation should occur.  Setting the value to a `ICalculationInputs` object also indicates that a calculation should occur and additionally pass along the inputs provided.
 
 ```html
 <!-- Submit to a estimate generation endpoint, and on success, run a calculation on the client side passing in iRefreshAfterEstimate = 1 -->
@@ -2925,7 +2925,7 @@ The `v-ka-table` directive *does* have a `string` shorthand syntax that allows f
 #### IKaTableModel.name
 
 Property Type: `string`; Required  
-The name of the RBL Framework result table to process.
+The name of the RBLe Framework result table to process.
 
 #### IKaTableModel.css
 
@@ -2944,12 +2944,12 @@ const tableCss = model.css != undefined
 #### IKaTableModel.ce
 
 Property Type: `string`; Optional  
-If the RBL Framework results to process is not part of the default Kaml View CalcEngine, a CalcEngine key can provided.
+If the RBLe Framework results to process is not part of the default Kaml View CalcEngine, a CalcEngine key can provided.
 
 #### IKaTableModel.tab
 
 Property Type: `string`; Optional  
-If the RBL Framework results to process is not part of the default result tab (`RBLResult`), a tab name can provided.
+If the RBLe Framework results to process is not part of the default result tab (`RBLResult`), a tab name can provided.
 
 ### v-ka-table Result Table Columns
 
@@ -3075,24 +3075,24 @@ The `v-ka-highchart` directive *does* have a `string` shorthand syntax that allo
 #### IKaHighchartModel.data
 
 Property Type: `string`; Required  
-The *partial* name of the RBL Framework result table providing the 'data' to the chart.  This value will be translated into `Highcharts-{model.data}-Data` when retrieving results from the calculation.
+The *partial* name of the RBLe Framework result table providing the 'data' to the chart.  This value will be translated into `Highcharts-{model.data}-Data` when retrieving results from the calculation.
 
 #### IKaHighchartModel.options
 
 Property Type: `string`; Optional  
-The *partial* name of the RBL Framework result table providing the 'options' for the chart.  This value will be translated into `Highcharts-{model.options}-Options` when retrieving results from the calculation. If not provided, the `model.data` property will be used.
+The *partial* name of the RBLe Framework result table providing the 'options' for the chart.  This value will be translated into `Highcharts-{model.options}-Options` when retrieving results from the calculation. If not provided, the `model.data` property will be used.
 
 By default, all 'option values' come from the table with the name of `Highcharts-{model.data}-Options`.  The CalcEngine developer may provide overrides to these values using the `Highcharts-Overrides` table.
 
 #### IKaHighchartModel.ce
 
 Property Type: `string`; Optional  
-If the RBL Framework results to process is not part of the default Kaml View CalcEngine, a CalcEngine key can provided.
+If the RBLe Framework results to process is not part of the default Kaml View CalcEngine, a CalcEngine key can provided.
 
 #### IKaHighchartModel.tab
 
 Property Type: `string`; Optional  
-If the RBL Framework results to process is not part of the default result tab (`RBLResult`), a tab name can provided.
+If the RBLe Framework results to process is not part of the default result tab (`RBLResult`), a tab name can provided.
 
 ### v-ka-highchart Table Layouts
 
@@ -3346,7 +3346,7 @@ row: {
 
 ## v-ka-needs-calc
 
-The `v-ka-needs-calc` directive helps brige the gap between UI 'button state' and the RBL Framework calculations and can be applied to `button` or `a` elements.  Inputs typically do not trigger a calculation until the `change` event (which normally triggers when an input loses focus).  When a screen has a series of inputs, then a submit button at the bottom, often users will fill in the last input value, then 'attempt' to click the submit button.
+The `v-ka-needs-calc` directive helps brige the gap between UI 'button state' and the RBLe Framework calculations and can be applied to `button` or `a` elements.  Inputs typically do not trigger a calculation until the `change` event (which normally triggers when an input loses focus).  When a screen has a series of inputs, then a submit button at the bottom, often users will fill in the last input value, then 'attempt' to click the submit button.
 
 Attempt is in quotes because when the user 'thinks' they click the button, they actually trigger the `change` event of the last input (the currently active input) which triggers a calculation.  Most Kaml Views will have some sort of UI blocker that enables during calculation and this will 'block' the users click attempt.  So it appears to the user as though they have to click twice to make the submit function correctly.
 
@@ -3479,7 +3479,7 @@ The name of the Kaml View to use in the KatApp in the format of `folder:name`.  
 ### IKatAppOptions.calculationUrl
 
 Property Type: `string`; Required  
-Url (usually an api endpoint in Host Environment) where RBL Framework calculations should be posted to. A common endpoint that is used is `api/rble/sessionless-proxy`.
+Url (usually an api endpoint in Host Environment) where RBLe Framework calculations should be posted to. A common endpoint that is used is `api/rble/sessionless-proxy`.
 
 ### IKatAppOptions.kamlRepositoryUrl
 
@@ -3507,14 +3507,14 @@ enum TraceVerbosity {
 ### IKatAppOptions.debug.refreshCalcEngine
 
 Property Type: `boolean | undefined`; Optional  
-Whether or not the RBL Framework should check for an updated CalcEngine every single calculation.  By default, the RBL Framework only checks every 5 minutes.  A `boolean` value can be passed in or using the querystring of `expireCE=1` will enable the settings.
+Whether or not the RBLe Framework should check for an updated CalcEngine every single calculation.  By default, the RBLe Framework only checks every 5 minutes.  A `boolean` value can be passed in or using the querystring of `expireCE=1` will enable the settings.
 
 The default value is `false`.
 
 ### IKatAppOptions.debug.useTestCalcEngine
 
 Property Type: `boolean | undefined`; Optional  
-Whether or not the RBL Framework should the test version of the specified CalcEngine.  A `boolean` value can be passed in or using the querystring of `test=1` will enable the settings.
+Whether or not the RBLe Framework should the test version of the specified CalcEngine.  A `boolean` value can be passed in or using the querystring of `test=1` will enable the settings.
 
 The default value is `false`.
 
@@ -3556,7 +3556,7 @@ If the Kaml View is running in the context of a logged in user, a `userIdHash` c
 Property Type: `string`; Required  
 The name of the current environment as it is known in the Host Environment. This can be used in Kaml View javascript or a CalcEngine if different functionality needs to occur based on which environment (i.e. DEV, QA, PROD) a Kaml View is running.
 
-This value is passed into the RBL Framework calculations via the `iEnvironment` input.
+This value is passed into the RBLe Framework calculations via the `iEnvironment` input.
 
 ### IKatAppOptions.requestIP
 
@@ -3568,19 +3568,19 @@ The IP address of the browser running the current KatApp.
 Property Type: `string`; Required  
 The current culture as it is known in the Host Environment.  This enables culture specific number and date formatting and is in the format of `languagecode2-country/regioncode2`. 
 
-This value is passed into the RBL Framework calculations via the `iCurrentUICulture` input.
+This value is passed into the RBLe Framework calculations via the `iCurrentUICulture` input.
 
 The default value is `en-US`.
 
 ### IKatAppOptions.inputs
 
 Property Type: `ICalculationInputs`; Optional  
-The Host Environment can pass in inputs that serve as the default values to inputs rendered in the Kaml View or simply as 'fixed' inputs (if no matching rendered inputs are present that would update them) that will be passed to every RBL Framework calculation.  This value becomes the initial value for [`IApplicationData.inputs`](#iapplicationdatainputs-icalculationinputs) when the KatApp is created.
+The Host Environment can pass in inputs that serve as the default values to inputs rendered in the Kaml View or simply as 'fixed' inputs (if no matching rendered inputs are present that would update them) that will be passed to every RBLe Framework calculation.  This value becomes the initial value for [`IApplicationData.inputs`](#iapplicationdatainputs-icalculationinputs) when the KatApp is created.
 
 ### IKatAppOptions.manualResults
 
 Property Type: `IManualTabDef[]`; Optional
-The Host Environment can pass in 'manual results'.  These are results that are usually generated one time on the server and cached as needed.  Passing manual results to a KatApp removes the overhead needed to perform a RBL Framework calculation.  Not only can the manual results be a RBL Framework calculation performed on the server, it can also be post processed and modified a bit before passing in to the KatApp or the manual results can be completely generated via server side code without using the RBL Framework.  As long as the results match the `IManualTabDef` interface, it can be used.
+The Host Environment can pass in 'manual results'.  These are results that are usually generated one time on the server and cached as needed.  Passing manual results to a KatApp removes the overhead needed to perform a RBLe Framework calculation.  Not only can the manual results be a RBLe Framework calculation performed on the server, it can also be post processed and modified a bit before passing in to the KatApp or the manual results can be completely generated via server side code without using the RBLe Framework.  As long as the results match the `IManualTabDef` interface, it can be used.
 
 ```javascript
 "manualResults": [
@@ -3649,12 +3649,12 @@ The `IKatAppOptions` that configure the options that control the `IKatApp`.
 #### IKatApp.isCalculating: boolean;
 
 Property Type: `boolean`; Read Only  
-Whether or not the KatApp is currently triggering and processing a RBL Framework calculation.
+Whether or not the KatApp is currently triggering and processing a RBLe Framework calculation.
 
 #### IKatApp.lastCalculation
 
 Property Type: [`ILastCalculation | undefined`](#ilastcalculation); Read Only  
-If a RBL Framework calculation has previously run, this property will contain a snapshot of the `ILastCalculation` object.
+If a RBLe Framework calculation has previously run, this property will contain a snapshot of the `ILastCalculation` object.
 
 #### IKatApp.state
 
@@ -3729,7 +3729,7 @@ The `off` method is a pass through to the [JQuery.off](#https://api.jquery.com/o
 
 **`calculateAsync(customInputs?: ICalculationInputs, processResults?: boolean, calcEngines?: ICalcEngine[]): Promise<ITabDef[] | void>;`**
 
-Manually call a RBL Framework calculation.  The parameters allow for a list of additional inputs to be passed in, whether or not the results should be [processed](#rbl-framework-result-processing-in-katapp-state) or simply return the raw results and an optional list of `ICalcEngines` to run in place of the KatApp's configured CalcEngines.
+Manually call a RBLe Framework calculation.  The parameters allow for a list of additional inputs to be passed in, whether or not the results should be [processed](#rbl-framework-result-processing-in-katapp-state) or simply return the raw results and an optional list of `ICalcEngines` to run in place of the KatApp's configured CalcEngines.
 
 #### IKatApp.apiAsync
 
@@ -3819,7 +3819,7 @@ By default, `allowDisabled` is `false`, but if `true` is passed in, and the inpu
 
 Given and input `name` and `value`, set the value of the HTML element and the value in the [`state.inputs`](#iapplicationdatainputs). If `value` is undefined, the input name and property will be removed from `state.inputs`.
 
-By default, `calculate` is `false` so that setting input values does not trigger a calculation and Kaml Views can safely set multiple input values without a calculation. If `true` is passed in, then a RBL Framework calculation will occur after the input value is applied.
+By default, `calculate` is `false` so that setting input values does not trigger a calculation and Kaml Views can safely set multiple input values without a calculation. If `true` is passed in, then a RBLe Framework calculation will occur after the input value is applied.
 
 #### IKatApp.select
 
@@ -3862,15 +3862,15 @@ await hostApplication.notifyAsync(application, "myNotificationName", { moreData:
 
 **`debugNext(saveLocations?: string | boolean, serverSideOnly?: boolean, trace?: boolean, expireCache?: boolean): void`**
 
-`debugNext` is a helper method to indicate to the KatApp that during the next *successful* RBL Framework calculation(s) should have their debug CalcEngines saved to KAT Team's CMS, traced, or version checked. This is helpful to Kaml View or CalcEngine developers to aid in their debugging.  This method is manually invoked via the browser's console window while debugging the site.
+`debugNext` is a helper method to indicate to the KatApp that during the next *successful* RBLe Framework calculation(s) should have their debug CalcEngines saved to KAT Team's CMS, traced, or version checked. This is helpful to Kaml View or CalcEngine developers to aid in their debugging.  This method is manually invoked via the browser's console window while debugging the site.
 
 `saveLocations` can be a comma delimitted list of KAT Team folder names or multiple calls to `debugNext` can take place before triggering a calculation and acheive the same result.  To clear out all currently specified locations specified, call `debugNext( false )`.
 
-Setting `serverSideOnly` to `true` will only save calculations that occur in the Host Environment's server side code.  This is beneficial if an event handler triggers a calculation *then* posts to an api endpoint (which usually runs an initial RBL Framework calculation).  If you only want to save the calculation that occurs when processing the api endpoint, setting this parameter to `true` accomplishes that.
+Setting `serverSideOnly` to `true` will only save calculations that occur in the Host Environment's server side code.  This is beneficial if an event handler triggers a calculation *then* posts to an api endpoint (which usually runs an initial RBLe Framework calculation).  If you only want to save the calculation that occurs when processing the api endpoint, setting this parameter to `true` accomplishes that.
 
-Setting `trace` to `true` instructs the RBL Framework to return detailed trace information inside the calculation results.
+Setting `trace` to `true` instructs the RBLe Framework to return detailed trace information inside the calculation results.
 
-Setting `expireCache` to `true` instructs the RBL Framework to immediately check for an updated CalcEngine from the CalcEngine CMS instead of waiting for the RBL Framework's CalcEngine cache to expire.
+Setting `expireCache` to `true` instructs the RBLe Framework to immediately check for an updated CalcEngine from the CalcEngine CMS instead of waiting for the RBLe Framework's CalcEngine cache to expire.
 
 #### IKatApp.getTemplateContent
 
@@ -3946,7 +3946,7 @@ application.on("nestedAppInitialized.ka", (e, nestedApplication) => {
 
 **`updateCalculationOptions( event: Event, submitApiOptions: IGetSubmitApiOptions, application: IKatApp )`**
 
-This event is triggered during RBL Framework calculations immediately before submission to RBL Framework.  It allows Kaml Views to massage the [`IGetSubmitApiOptions.configuration`](#igetsubmitapioptionsconfiguration) or the [`IGetSubmitApiOptions.inputs`](#icalculationinputs) before being submitted.  Use this method to add custom inputs/tables to the submission that wouldn't normally be processed by the KatApp Framework.
+This event is triggered during RBLe Framework calculations immediately before submission to RBLe Framework.  It allows Kaml Views to massage the [`IGetSubmitApiOptions.configuration`](#igetsubmitapioptionsconfiguration) or the [`IGetSubmitApiOptions.inputs`](#icalculationinputs) before being submitted.  Use this method to add custom inputs/tables to the submission that wouldn't normally be processed by the KatApp Framework.
 
 ```javascript
 application.on("updateCalculationOptions.ka", (event, submitOptions) => {
@@ -3986,7 +3986,7 @@ application.on("updateCalculationOptions.ka", (event, submitOptions) => {
 
 **`calculateStart( event: Event, submitApiOptions: IGetSubmitApiOptions, application: IKatApp ) => boolean`**
 
-This event is triggered at the start of a RBL Framework calculation after the `updateCalculationOptions` has been triggered.  Use this event to perform any actions that need to occur before the calculation is submitted (i.e. custom processing of UI blockers or enabled state of inputs).  If the handler returns `false` or calls `e.preventDefault()`, then the calculation is immediately cancelled and only the `calculateEnd` event will be triggered.
+This event is triggered at the start of a RBLe Framework calculation after the `updateCalculationOptions` has been triggered.  Use this event to perform any actions that need to occur before the calculation is submitted (i.e. custom processing of UI blockers or enabled state of inputs).  If the handler returns `false` or calls `e.preventDefault()`, then the calculation is immediately cancelled and only the `calculateEnd` event will be triggered.
 
 #### IKatApp.inputsCache
 
@@ -3998,7 +3998,7 @@ This event is triggered immediately before inputs are cached to `sessionStorage`
 
 **`resultsProcessing( event: Event, results: Array<ITabDef>, inputs: ICalculationInputs, submitApiOptions: IGetSubmitApiOptions, application: IKatApp )`**
 
-This event is triggered during a RBL Framework calculation _after a successful calculation_ from the RBL Framework and _before [KatApp Framework result processing](#rbl-framework-result-processing-in-katapp-state)_.  This handler allows Kaml Views to manually push 'additional result rows' into a calculation result table.
+This event is triggered during a RBLe Framework calculation _after a successful calculation_ from the RBLe Framework and _before [KatApp Framework result processing](#rbl-framework-result-processing-in-katapp-state)_.  This handler allows Kaml Views to manually push 'additional result rows' into a calculation result table.
 
 ```javascript
 application.on("resultsProcessing.ka", (event, results, inputs) => {
@@ -4020,13 +4020,13 @@ application.on("resultsProcessing.ka", (event, results, inputs) => {
 
 **`configureUICalculation( event: Event, lastCalculation: ILastCalculation, application: IKatApp )`**
 
-This event is triggered during RBL Framework calculation _after a successful calculation and result processing_ and _only_ for a calculation where `iConfigureUI == 1`.  The `configureUICalculation` event is a one time calculation event and can be used to finish setting up Kaml View UI where logic is dependent upon the first calculation results being processed.
+This event is triggered during RBLe Framework calculation _after a successful calculation and result processing_ and _only_ for a calculation where `iConfigureUI == 1`.  The `configureUICalculation` event is a one time calculation event and can be used to finish setting up Kaml View UI where logic is dependent upon the first calculation results being processed.
 
 #### IKatApp.calculation
 
 **`calculation( event: Event, lastCalculation: ILastCalculation, application: IKatApp )`**
 
-This event is triggered during RBL Framework calculation _after a successful calculation and result processing_ (even if the calculation has `iConfigureUI == 1`).  Use this handler to process any additional requirements that may be dependent on calculation results.
+This event is triggered during RBLe Framework calculation _after a successful calculation and result processing_ (even if the calculation has `iConfigureUI == 1`).  Use this handler to process any additional requirements that may be dependent on calculation results.
 
 Note: If calculation contains 'jwt data updating' instructions all the standard [API Lifecycle events](#api-lifecycle) will occur with the `endpoint` being set to `rble/jwtupdate`.
 
@@ -4034,7 +4034,7 @@ Note: If calculation contains 'jwt data updating' instructions all the standard 
 
 **`calculationErrors( event: Event, key: string, exception: Error | undefined, application: IKatApp )`**
 
-This event is triggered during RBL Framework calculation if an exception happens.  Use this handler to clean up an UI components that may need processing when calculation results are not available.
+This event is triggered during RBLe Framework calculation if an exception happens.  Use this handler to clean up an UI components that may need processing when calculation results are not available.
 
 The `key` parameter can be `SubmitCalculation`, `SubmitCalculation..ConfigureUI`, `ProcessDocGenResults`, or `ProcessDataUpdateResults` to identify which stage of the [calculation lifecycle](#calculation-lifecycle) failed.
 
@@ -4044,7 +4044,7 @@ Note: If calculation contains 'jwt data updating' instructions and an exception 
 
 **`calculateEnd( event: Event, application: IKatApp )`**
 
-This event is triggered to signal the 'end' of a RBL Framework calculation regardless of whether the calculation succeeds, fails, or is cancelled.  Use this event to perform any actions that need to occur after a calculation is completely finished (i.e. UI blockers, processing indicators, etc.).
+This event is triggered to signal the 'end' of a RBLe Framework calculation regardless of whether the calculation succeeds, fails, or is cancelled.  Use this event to perform any actions that need to occur after a calculation is completely finished (i.e. UI blockers, processing indicators, etc.).
 
 
 #### IKatApp.updateApiOptions
@@ -4222,11 +4222,11 @@ Generally speaking, `ICalculationInputs` is a [IStringIndexer&lt;string>](#istri
 
 ### ITabDef
 
-`ITabDef` is the object returned from RBL Framework calculations for each 'result tab' processed. The properties available on this object represent the result tables (`Array<ITabDefRow>`) returned from the CalcEngine tab.
+`ITabDef` is the object returned from RBLe Framework calculations for each 'result tab' processed. The properties available on this object represent the result tables (`Array<ITabDefRow>`) returned from the CalcEngine tab.
 
 ### ITabDefRow
 
-`ITabDefRow` represents each row in a `ITabDef` table returned from a RBL Framework calculation.  Note that it is simply a shorthand name for the underlying `IStringIndexer<string>` interface since every value returned from the RBL Framework is typed as a `string`.  If a 'value' needs to be treated as `number` or `date`, the KatApp Framework or Kaml Views will need to first parse it into the appropriate type.
+`ITabDefRow` represents each row in a `ITabDef` table returned from a RBLe Framework calculation.  Note that it is simply a shorthand name for the underlying `IStringIndexer<string>` interface since every value returned from the RBLe Framework is typed as a `string`.  If a 'value' needs to be treated as `number` or `date`, the KatApp Framework or Kaml Views will need to first parse it into the appropriate type.
 
 ### IManualTabDef
 
@@ -4264,7 +4264,7 @@ If the content for the modal being displayed is static HTML that the current app
 #### IModalOptions.calculateOnConfirm
 
 Property Type: `ICalculationInputs | boolean | undefined`; Optional  
-When a modal application is 'confirmed', using the `calculateOnConfirm` property can instruct the KatApp Framework to automatically run a RBL Framework calculation.
+When a modal application is 'confirmed', using the `calculateOnConfirm` property can instruct the KatApp Framework to automatically run a RBLe Framework calculation.
 
 Setting this property to `true` or providing a [`ICalculationInputs`](#icalculationinputs) object will trigger the automatic calculation.
 
@@ -4475,22 +4475,22 @@ If the current modal application was launched via a [`v-ka-modal`](#v-ka-modal) 
 
 ### ISubmitApiConfiguration
 
-The payload representing the current configuration to submit to either a RBL Framework calculation or a api endpoint in the Host Application.
+The payload representing the current configuration to submit to either a RBLe Framework calculation or a api endpoint in the Host Application.
 
 #### ISubmitApiConfiguration.Token
 
 Property Type: `string`; Optional  
-If the data used in RBL Framework calculations was 'registered' with the RBL Framework web service, this is the token returned uniquely identifying the user's transaction package.
+If the data used in RBLe Framework calculations was 'registered' with the RBLe Framework web service, this is the token returned uniquely identifying the user's transaction package.
 
 #### ISubmitApiConfiguration.TestCE
 
 Property Type: `boolean`; Required  
-Whether or not the RBL Framework should use the 'test' CalcEngine when running the calculation.
+Whether or not the RBLe Framework should use the 'test' CalcEngine when running the calculation.
 
 #### ISubmitApiConfiguration.TraceEnabled
 
 Property Type: `number`; Required  
-Whether or not the RBL Framework should provide diagnostic trace for the next calculation. A value of `1` will trace and `0` will not.
+Whether or not the RBLe Framework should provide diagnostic trace for the next calculation. A value of `1` will trace and `0` will not.
 
 #### ISubmitApiConfiguration.SaveCE
 
@@ -4512,7 +4512,7 @@ If an admin user is impersonating a normal user during the execution of the Kaml
 #### ISubmitApiConfiguration.RefreshCalcEngine
 
 Property Type: `boolean`; Required  
-Whether or not the RBL Framework should check for an updated CalcEngine the next calculation. This value is determined from the [`options.debug.refreshCalcEngine'](#ikatappoptionsdebugrefreshcalcengine) property.
+Whether or not the RBLe Framework should check for an updated CalcEngine the next calculation. This value is determined from the [`options.debug.refreshCalcEngine'](#ikatappoptionsdebugrefreshcalcengine) property.
 
 #### ISubmitApiConfiguration.CurrentPage
 
@@ -4537,7 +4537,7 @@ The name of the current environment as it is known in the Host Environment. This
 #### ISubmitApiConfiguration.Framework: string;
 
 Property Type: `string`; Required  
-The name of the current 'framework' submitting to the RBL Framework. This value is set to `"KatApp"`.
+The name of the current 'framework' submitting to the RBLe Framework. This value is set to `"KatApp"`.
 
 ### IGetSubmitApiOptions
 
@@ -4560,7 +4560,7 @@ The `IApiOptions` interface represents the configuration to use when submitting 
 #### IApiOptions.calculationInputs
 
 Property Type: [`ICalculationInputs`](#icalculationinputs); Optional  
-Often when an api endpoint is submitted to in a Host Environment that leverages the RBL Framework, an `iValidate=1` RBL calculation is the first action performed on the server.  This calculation can do UI validations or provide instructions to the Host Environment on what type of actions it should take.  All the inputs from the UI are always submit, but if additional inputs should be passed to the endpoint, an `ICalculationInputs` object can be provided.
+Often when an api endpoint is submitted to in a Host Environment that leverages the RBLe Framework, an `iValidate=1` RBL calculation is the first action performed on the server.  This calculation can do UI validations or provide instructions to the Host Environment on what type of actions it should take.  All the inputs from the UI are always submit, but if additional inputs should be passed to the endpoint, an `ICalculationInputs` object can be provided.
 
 #### IApiOptions.apiParameters
 
@@ -4579,7 +4579,7 @@ If the api endpoint being posted to will return binary content representing a do
 #### IApiOptions.calculateOnSuccess
 
 Property Type: `boolean | ICalculationInputs`; Optional  
-If after a successful submission to an api endpoint, the KatApp Framework should automatically trigger a RBL Framework Calculation, `calculateOnSuccess` can be set.  Setting the value to `true` indicates that a calculation should occur.  Setting the value to a `ICalculationInputs` object also indicates that a calculation should occur and additionally pass along the inputs provided.
+If after a successful submission to an api endpoint, the KatApp Framework should automatically trigger a RBLe Framework Calculation, `calculateOnSuccess` can be set.  Setting the value to `true` indicates that a calculation should occur.  Setting the value to a `ICalculationInputs` object also indicates that a calculation should occur and additionally pass along the inputs provided.
 
 #### IApiOptions.files
 
@@ -4605,9 +4605,9 @@ The array of [`ITabDef`s](#itabdef) returned from the most recent calculation.
 Property Type: [`ISubmitApiConfiguration`](#isubmitapiconfiguration);
 The configuration payload submitted to the most recent calculation.
 
-# RBL Framework
+# RBLe Framework
 
-The RBL Framework is the backbone of KatApps.  The service is able to marshall inputs and results in and out of RBLe CalcEngines.  These results drive the functionality of KatApps.
+The RBLe Framework is the backbone of KatApps.  The service is able to marshall inputs and results in and out of RBLe CalcEngines.  These results drive the functionality of KatApps.
 
 ## Framework Inputs
 
@@ -4651,7 +4651,7 @@ application.on("updateCalculationOptions.ka", (event, submitOptions) => {
 
 ## Result Tables
 
-All tables processed by RBL Framework follow the rules described below.
+All tables processed by RBLe Framework follow the rules described below.
 
 Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Location&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Description
 ---|---|---
