@@ -661,6 +661,11 @@ Sometimes, templates are complex enough that they provide their own `<style>` an
 
 However, `<script>` tags can be processed similarily (i.e. only processed on the first time a template is used and rendered) or can be configured to inject the script content every time the template is rendered. This is accomplished with a `setup` attribute.
 
+Vue has a concept for element 'lifecycle events'.  The two events available are `mounted` and `unmounted` than run the specified code every time reactivity causes an element to be rendered or removed.  See [v-on](#v-on) for more information.  KatApp Framework followed this convention for template script code.
+
+The only two methods that can be provided inside template `<script>` tags are a `mounted` and `unmounted` function. Both functions are optional; if the functions do not exist, the script will do nothing. Below are the function signatures.
+
+
 ```html
 <template id="widget-resources">
     <!-- 
@@ -669,7 +674,11 @@ However, `<script>` tags can be processed similarily (i.e. only processed on the
     is rendred.
     -->
     <script setup>
-        // code ran one time
+        // code only runs the first time the template is rendered and the first time a rendered template item is removed (if ever)
+		function mounted(application) {
+		}
+		function unmounted(application) {
+		}
     </script>
 
     <!--
@@ -680,66 +689,162 @@ However, `<script>` tags can be processed similarily (i.e. only processed on the
     applied appropriately.
     -->
     <script>
-        // code runs every time the template is rendered
-    </script>
-</template>
-```
-
-Vue has a concept for element 'lifecycle events'.  The two events available are `mounted` and `unmounted` than run the specified code every time reactivity causes an element to be rendered or removed.  See [v-on](#v-on) for more information.  KatApp Framework followed this convention for template script code.
-
-The only two methods that can be provided inside template `<script>` tags are a `mounted` and `unmounted` function.  Below is a sample showing the function signatures.  If the functions do not exist, the script will do nothing.
-
-```html
-<template id="widget-resources">
-    <script setup>
-		function mounted(view, application, scope) {
-            // This function runs the first time the template is rendered for a given 
-            // KatApp.  Any 'input' elements present at the time of mounting will have
-            // this event hooked up to them.
-
-            console.log("widget-resources rendered for first time: setup script mounted");
-
-			application.select("input").on("input.nexgen-once", function () {
-				console.log(`${$(this).attr("name")} change triggered from 'one time mount'`);
-			});
-		}
-		function unmounted(view, application, scope) {
-            // This function runs the first time a rendered element for a given 
-            // KatApp is removed.  Any 'input' elements present at the time of 
-            // unmounting will have input.nexgen-once removed.
-
-            console.log("widget-resources removed for first time: setup script unmounted");
-			
-            application.select("input").off("input.nexgen-once");
-		}
-    </script>
-
-    <script>
+        // code runs every time the template is rendered and when a rendered template item is removed
 		function mounted(application) {
-            // This function runs the every time the template is rendered for a given 
-            // KatApp.  Any 'input' elements present at the time of mounting will have
-            // this event hooked up to them.
-
-            console.log("widget-resources rendered: script mounted");
-
-			application.select("input").off("input.nexgen").on("input.nexgen", function () {
-				console.log(`${$(this).attr("name")} change triggered from 'every time mount' script`);
-			});
 		}
 		function unmounted(application) {
-            // This function runs the every time a rendered element for a given 
-            // KatApp is removed.  Any 'input' elements present at the time of 
-            // unmounting will have input.nexgen removed.
-
-            console.log("widget-resources removed: script unmounted");
-			
-            application.select("input").off("input.nexgen");
 		}
     </script>
 </template>
 ```
 
-As the sample shows, the `mounted` and `unmounted` functions are primary used to hookup up events or set some application state.  Both functions are passed the current KatApp application rendering the template which allows access to options, results, or the Kaml View HTML Element container.
+The most common use for these functions are to hook to [IKatApp Events](#ikatapp-events), but the template scripts can also opt to simply perform some DOM manipulation of its own.  When performing DOM manipulation on the template's elements, a mechanism is required to ensure proper 'selection' of rendered template markup.
+
+1. Vue caches the `mounted` and `unmounted` function calls until all elements are rendered. If a template was manually called twice, the results of both template calls would be rendered and *then* the `mounted`/`unmounted` functions would be called.  This can lead to adverse affects.  For example, if a `mounted` function was designated to run every time the template was ran, the content from two template calls would already be rendered before each of their `mounted` functions were called. This essentially results in double processing.
+1. If a template is provided an `Array<>` data source, and uses a [`v-for="row in rows"`](#v-for) to render content, the `mounted` functions in both the `setup` and the 'every time' script sections will only be called one time, *not for iteraction of the `v-for`*.
+1. To aid in selection scoping, the 'scope' of the template will have a special `$renderId` property assigned that is an unique ID that can be rendered and used during selection actions to ensure proper scoping. The `$renderId` is made up via `{templateId}_{application.id}_{index}` where `index` is a number 1..N representing how many times this template has been rendered.
+
+Below is an example of how to leverage the `$renderId` to allow for proper scoping.
+
+```html
+<script>
+// Create a model we can use in markup
+(function () {
+	var application = KatApp.get('{id}');
+	application.update({
+		model: {
+			list: ["Pension", "LifeEvents", "Savings"]
+		}
+    });
+)();
+</script>
+
+<!-- Loop each item in list and call template with non-array source -->
+<div class="rbl-nocalc" v-for="item in model.list">
+    <div v-ka-template="{ name: 'templateWithScript', source: { name: item } }"></div>
+</div>
+
+<template id="templateWithScript">
+	<script setup type="text/javascript">
+		function mounted(application) {
+			// Use {{ }} syntax to grab value and store it in string selector
+            const renderId = '.{{$renderId}}';
+			console.log(`setup templateMounted:, ${application.select(renderId).length} scoped items found`);
+			console.log(`setup templateMounted:, ${application.select(renderId).length} template-script-input items found`);
+		}
+		function unmounted(application) {
+			const renderId = '.{{$renderId}}';
+			console.log(`setup templateUnmounted:, ${application.select(renderId).length} scoped items found`);
+			console.log(`setup templateUnmounted:, ${application.select(renderId).length} template-script-input items found`);
+		}
+	</script>
+	<script type="text/javascript">
+		function mounted(application) {
+			const renderId = '.{{$renderId}}';
+			console.log(`templateMounted:, ${application.select(renderId).length} scoped items found`);
+			console.log(`templateMounted:, ${application.select(".template-script-input").length} template-script-input items found`);
+		}
+		function unmounted(application) {
+			const renderId = '.{{$renderId}}';
+			console.log(`templateUnmounted:, ${application.select(".template-script-input").length} template-script-input items found`);
+		}
+	</script>
+	<input v-ka-input="{name: 'iTemplateInput' + name }" type="text" :class="['form-control template-script-input', $renderId]" />
+</template>
+
+<!-- Rendered HTML -->
+<div class="rbl-nocalc">
+    <input name="iTemplateInputPension" 
+        type="text" 
+        class="form-control template-script-input iTemplateInputPension templateWithScript_templateWithScript_ka1e46825c_1">
+    <input name="iTemplateInputLifeEvents" 
+        type="text" 
+        class="form-control template-script-input iTemplateInputLifeEvents templateWithScript_templateWithScript_ka1e46825c_2">
+    <input name="iTemplateInputPension" 
+        type="text" 
+        class="form-control template-script-input iTemplateInputSavings templateWithScript_templateWithScript_ka1e46825c_3">
+</div>
+```
+
+With the above example, you could expect the following in the console ouput (remembering that all rendering completes before `mounted` is called):
+
+> templateWithScript setup templateMounted:, 1 scoped items found
+> templateWithScript setup templateMounted:, 3 template-script-input items found
+> templateWithScript templateMounted:, 1 scoped items found
+> templateWithScript templateMounted:, 3 template-script-input items found
+> templateWithScript templateMounted:, 1 scoped items found
+> templateWithScript templateMounted:, 3 template-script-input items found
+> templateWithScript templateMounted:, 1 scoped items found
+> templateWithScript templateMounted:, 3 template-script-input items found
+
+```html
+<script>
+// Create a model we can use in markup
+(function () {
+	var application = KatApp.get('{id}');
+	application.update({
+		model: {
+			list: ["Pension", "LifeEvents", "Savings"]
+		}
+    });
+)();
+</script>
+
+<!-- Call template with array source -->
+<div class="rbl-nocalc" v-ka-template="{ name: 'templateWithScript', source: model.list.map( item => ({ name: item }) ) }"></div>
+
+<template id="templateWithScript">
+	<script setup type="text/javascript">
+		function mounted(application) {
+			// Use {{ }} syntax to grab value and store it in string selector
+            const renderId = '.{{$renderId}}';
+			console.log(`setup templateMounted:, ${application.select(renderId).length} scoped items found`);
+			console.log(`setup templateMounted:, ${application.select(renderId).length} template-script-input items found`);
+		}
+		function unmounted(application) {
+			const renderId = '.{{$renderId}}';
+			console.log(`setup templateUnmounted:, ${application.select(renderId).length} scoped items found`);
+			console.log(`setup templateUnmounted:, ${application.select(renderId).length} template-script-input items found`);
+		}
+	</script>
+	<script type="text/javascript">
+		function mounted(application) {
+			const renderId = '.{{$renderId}}';
+			console.log(`templateMounted:, ${application.select(renderId).length} scoped items found`);
+			console.log(`templateMounted:, ${application.select(".template-script-input").length} template-script-input items found`);
+		}
+		function unmounted(application) {
+			const renderId = '.{{$renderId}}';
+			console.log(`templateUnmounted:, ${application.select(".template-script-input").length} template-script-input items found`);
+		}
+	</script>
+
+    <!-- Render items with v-for -->
+	<input v-for="(row, index) in rows" v-ka-input="{name: 'iTemplateInput' + row.name }" type="text" :class="['form-control template-script-input', $renderId]" />
+</template>
+
+<!-- Rendered HTML (notice how the last segment of renderId is always 1 in this case) -->
+<div class="rbl-nocalc">
+    <input name="iTemplateInputPension" 
+        type="text" 
+        class="form-control template-script-input iTemplateInputPension templateWithScript_templateWithScript_ka1e46825c_1">
+    <input name="iTemplateInputLifeEvents" 
+        type="text" 
+        class="form-control template-script-input iTemplateInputLifeEvents templateWithScript_templateWithScript_ka1e46825c_1">
+    <input name="iTemplateInputPension" 
+        type="text" 
+        class="form-control template-script-input iTemplateInputSavings templateWithScript_templateWithScript_ka1e46825c_1">
+</div>
+```
+
+With the above example, you could expect the following in the console ouput (remembering that all rendering completes before `mounted` is called):
+
+> templateWithScript setup templateMounted:, 3 scoped items found
+> templateWithScript setup templateMounted:, 3 template-script-input items found
+> templateWithScript templateMounted:, 3 scoped items found
+> templateWithScript templateMounted:, 3 template-script-input items found
+
+**Note**: When a template with `<script>` tags is called and passed an `Array` data source, you can see that both the `setup` and 'normal' scripts excecute only one time, therefore it is recommended to always use the 'normal' script mode.
 
 ## Input Templates
 
