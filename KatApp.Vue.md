@@ -2662,6 +2662,7 @@ If the scope is of type `Array<ITabDefRow>`, then the scope provided will have a
 ```html
 <!-- Template where the model.source is an array, so the template iterated through the 'rows' property -->
 <ul class="dropdown-menu dropdown-menu-lg-end" v-ka-template="{ name: 'more-menu-links', source: rbl.source('contentContextLinks') }"></ul>
+
 <template id="more-menu-links">
     <li v-for="link in rows">
         <a v-if="( link.modalModel || '' ) == ''" class="dropdown-item d-flex justify-content-between align-items-start me-3" v-ka-navigate="{ view: link.viewID }">
@@ -2683,6 +2684,7 @@ If the scope is of type `Array<ITabDefRow>`, then the scope provided will have a
 <div v-for="type in rbl.source('typeMessage')">
     <div v-ka-template="{ name: 'notice-type1', source: rbl.source('messages', 'Messages').filter( r => r.type == type.type ) }"></div>
 </div>
+
 <template id="notice-type1">
     <div v-for="message in rows" :class="'alert alert-' + type.alertType">
         <div class="d-flex w-100 justify-content-between d-none">
@@ -2708,12 +2710,12 @@ If the scope is of type `Array<ITabDefRow>`, then the scope provided will have a
         get rows() { return rbl.source('messages', 'Messages').filter( r => r['@id'] == 'hw-action-enroll' ); } 
     } 
 }"></div>
-
 ```
 
 ```html
 <!-- Calling a template without a data source, the template is just accessing the global scope (errors/warnings) directly -->
 <div v-ka-template="validation-summary"></div>
+
 <template id="validation-summary">
     <div v-if="errors.length > 0" :id="kaId + '_ModelerValidationTable'" class="validation-summary alert alert-danger" role="alert" title="Please review the following issues:">
         <p><strong><i class="fa-duotone fa-circle-exclamation"></i> Please review the following issues:</strong></p>
@@ -2739,6 +2741,7 @@ If the scope is of type `Array<ITabDefRow>`, then the scope provided will have a
         message: '<p>Do you want to delete this HSA transaction?</p><p>If you delete this transaction, you will not be making a one-time contribution to your HSA.</p><p>Are you sure you want to delete this transaction?</p>' 
     } 
 }"></div>
+
 <template id="confirm-danger">
     <div :class="['d-none align-items-center', selector]">
         <div class="d-flex align-items-center h6">
@@ -3878,11 +3881,44 @@ Setting `expireCache` to `true` instructs the RBLe Framework to immediately chec
 
 `getTemplateContent` returns the 'content' of a requested template.  This can be helpful if the Host Environment needs to render template content outside the context of a KatApp. The most common scenario is when a Host Environment needs to get the content for a `validation-summary` to render errors before a KatApp can finish rendering property.
 
-### IKatApp Events
+### IKatApp Lifecycles
 
-The KatApp framework raises events throughout the stages of different [lifecycles](#ikatapp-lifecycles) allowing Kaml View developers to catch and respond to these events as needed. All event handlers are registered on the application itself via the [`on` method](#ikatappon). When using events, it is best practice to use the `.ka` namespace.  It is not required when using the `on` because the method automatically ensures each event type processed has the `.ka` namespace, but explicitly using the namespace makes auditing Kaml View code bases much easier.
+There are three main event lifecycles that occur during the life time of a KatApp; the initial 'create application' lifecycle, the 'calculation' lifecycle, and the 'api' lifecycle.
 
-Details for each event type can be found below.
+#### Create Application Lifecycle
+
+When a KatApp is being created via the [`KatApp.createAppAsync`](#katappcreateappasync), the following lifecycle occurs.
+
+1. initialized
+1. modalAppInitialized - if application is a modal application
+1. nestedAppInitialized - if application is a nested application
+1. All events in the [Calculation Lifecycle](#calculation-lifecycle) - if any CalcEngines are [configured to all iConfigureUI calculations](#configuring-calcengines-and-template-files)
+1. rendered
+
+#### Calculation Lifecycle
+
+When a calculation is initiated via an [input change triggering a calculation](#v-ka-input) or by a Kaml View calling [`application.calculateAsync`](#ikatappcalculateasync), the following lifecycle occurs.
+
+1. updateCalculationOptions - allow Kaml View to update inputs and configuration used during calculation
+1. calculateStart
+1. inputsCache - allow Kaml View to provide additional inputs/information to cache before caching current inputs (if configured to cache)
+1. resultsProcessing - all Kaml View to inspect and/or modify the calculation results before they are [processed](#rbl-framework-result-processing-in-katapp-state)
+1. All events in [Api Lifecycle](#api-lifecycle) is `jwt-updates` result table is provided and processed
+1. configureUICalculation - if current calculation has an input of `iConfigureUI="1"`
+1. calculation - allow Kaml View to inspect/use the `ILastCalculation`
+1. calculationErrors - allow Kaml View to gracefully display information on calculation errors
+1. calculateEnd
+
+#### Api Lifecycle
+
+When a submission to an api endpiont is initiated via [`v-ka-api`](#v-ka-api) or by a Kaml View calling [`application.apiAsync`](#ikatappapiasync), the following lifecycle occurs.
+
+1. updateApiOptions - allow Kaml View to update inputs and configuration used during an api submission
+1. apiStart - allow Kaml View to inspect and/or update the payload used during an api submission
+1. apiComplete - allow Kaml View to inspect/use results from an successful api submission
+1. apiFailed - allow Kaml View to inspect/use error response from a failed api submission
+
+
 
 #### IKatApp.initialized
 
@@ -3941,6 +3977,12 @@ application.on("nestedAppInitialized.ka", (e, nestedApplication) => {
 });
 </script>
 ```
+
+#### IKatApp.rendered
+
+**`rendered(event: Event, application: IKatApp )`**
+
+Triggered after Kaml View has been made visible to the user (will wait for CSS transitions to complete).
 
 #### IKatApp.updateCalculationOptions
 
@@ -4076,7 +4118,6 @@ interface ISubmitApiData {
 }
 ```
 
-
 #### IKatApp.apiComplete
 
 **`apiComplete( event: Event, endpoint: string, successResponse: IStringAnyIndexer | undefined, trigger: JQuery<HTMLElement> | undefined, apiOptions: IApiOptions, application: IKatApp )`**
@@ -4106,42 +4147,11 @@ application.on("apiFailed.ka", (event, endpoint) => {
 });
 ```
 
-### IKatApp Lifecycles
+### IKatApp Events
 
-There are three main event lifecycles that occur during the life time of a KatApp; the initial 'create application' lifecycle, the 'calculation' lifecycle, and the 'api' lifecycle.
+The KatApp framework raises events throughout the stages of different [lifecycles](#ikatapp-lifecycles) allowing Kaml View developers to catch and respond to these events as needed. All event handlers are registered on the application itself via the [`on` method](#ikatappon). When using events, it is best practice to use the `.ka` namespace.  It is not required when using the `on` because the method automatically ensures each event type processed has the `.ka` namespace, but explicitly using the namespace makes auditing Kaml View code bases much easier.
 
-### Create Application Lifecycle
-
-When a KatApp is being created via the [`KatApp.createAppAsync`](#katappcreateappasync), the following lifecycle occurs.
-
-1. initialized
-1. modalAppInitialized - if application is a modal application
-1. nestedAppInitialized - if application is a nested application
-1. All events in the [Calculation Lifecycle](#calculation-lifecycle) - if any CalcEngines are [configured to all iConfigureUI calculations](#configuring-calcengines-and-template-files)
-
-### Calculation Lifecycle
-
-When a calculation is initiated via an [input change triggering a calculation](#v-ka-input) or by a Kaml View calling [`application.calculateAsync`](#ikatappcalculateasync), the following lifecycle occurs.
-
-1. updateCalculationOptions - allow Kaml View to update inputs and configuration used during calculation
-1. calculateStart
-1. inputsCache - allow Kaml View to provide additional inputs/information to cache before caching current inputs (if configured to cache)
-1. resultsProcessing - all Kaml View to inspect and/or modify the calculation results before they are [processed](#rbl-framework-result-processing-in-katapp-state)
-1. All events in [Api Lifecycle](#api-lifecycle) is `jwt-updates` result table is provided and processed
-1. configureUICalculation - if current calculation has an input of `iConfigureUI="1"`
-1. calculation - allow Kaml View to inspect/use the `ILastCalculation`
-1. calculationErrors - allow Kaml View to gracefully display information on calculation errors
-1. calculateEnd
-
-### Api Lifecycle
-
-When a submission to an api endpiont is initiated via [`v-ka-api`](#v-ka-api) or by a Kaml View calling [`application.apiAsync`](#ikatappapiasync), the following lifecycle occurs.
-
-1. updateApiOptions - allow Kaml View to update inputs and configuration used during an api submission
-1. apiStart - allow Kaml View to inspect and/or update the payload used during an api submission
-1. apiComplete - allow Kaml View to inspect/use results from an successful api submission
-1. apiFailed - allow Kaml View to inspect/use error response from a failed api submission
-
+Details for each event type can be found below.
 
 ## Supporting Interfaces
 
