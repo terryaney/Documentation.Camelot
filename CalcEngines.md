@@ -1295,6 +1295,8 @@ As mentioned above, array properties (`[]`) are *only* processed if an `apiDataS
 
 When the nested arrays *are* processed, all the mapping rules process in the exact same fashion except for the generation of the `index` field.  Regardless of what is provided in the `indexField` mapping row, a child array will have the index of all its ancenstors prepended to help in illustrating the relationship. 
 
+Additionally, each field that built an 'ancestor index' will be injected into the history row in the format of `xDSTable.fieldName`.
+
 **Note:** When index includes a prefix of ancestor index(es), the field specified in the `indexField` for each child mapping **is not** excluded in the resulting history row as happens during normal index processing.
 
 dataSource|apiTable|xdsTable|indexField|manualFields
@@ -1318,6 +1320,7 @@ sampleAPI|addresses|beneficiaryAddress|addressType
             <city>New York</city>
             <postalCode>12121</postalCode>
             <state>NY</state>
+            <beneficiaries.ssn>011669594</beneficiaries.ssn>
         </HistoryItem>
         <HistoryItem hisType="beneficiaryAddress" hisIndex="011669594-MAILING">
             <index>011669594-MAILING</index>
@@ -1326,6 +1329,7 @@ sampleAPI|addresses|beneficiaryAddress|addressType
             <city>Manhattan</city>
             <postalCode>34343</postalCode>
             <state>NY</state>
+            <beneficiaries.ssn>011669594</beneficiaries.ssn>
         </HistoryItem>
     </HistoryData>
 </xDataDef>
