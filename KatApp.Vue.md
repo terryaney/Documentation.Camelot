@@ -863,6 +863,13 @@ Vue supports [many directives](#https://vuejs.org/api/built-in-directives.html),
 
 **Note:** Usually, 'inside' the actual directive markup, the content is simply 'valid javascript' with the given context/scope.
 
+- [v-html / v-text](#v-html--v-text) - Update the element's `innerHTML` or text content.
+- [v-bind](#v-bind) - Dynamically bind one or more attributes to an expression.
+- [v-for](#v-for) - Render the element or template block multiple times based on the source data.
+- [v-on](#v-on) - Attach an event listener to the element.
+- [v-if / v-else / v-else-if](#v-if--v-else--v-else-if) - Conditionally render an element or a template fragment based on the truthy-ness of the expression value.
+- [v-show](#v-show) - Toggle the element's visibility based on the truthy-ness of the expression value.
+
 ## v-html / v-text
 
 Use the `v-text` directive to:
@@ -3532,6 +3539,15 @@ row: {
 # KatApp API
 
 This section describes all the interfaces and their properties, methods and events present in the KatApp Framework.
+
+- [KatApp Static Methods](#katapp-static-methods)
+- [IKatAppOptions](#IKatAppOptions)
+- [IKatApp](#IKatApp)
+    - [IKatApp Properties](#ikatapp-properties)
+    - [IKatApp Methods](#ikatapp-methods)
+    - [IKatApp Lifecycles](#ikatapp-lifecycles)
+    - [IKatApp Events](#ikatapp-events)
+- [Supporting Interfaces](#supporting-interfaces)
 
 ## KatApp Static Methods
 
