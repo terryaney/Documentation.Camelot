@@ -3749,6 +3749,11 @@ The Host Environment can pass in 'manual results'.  These are results that are u
 ]
 ```
 
+### IKatAppOptions.manualResultsEndpoint
+
+Property Type: `string`; Optional
+Similiar to `manualResults`, this endpoint should be called to retrieve a `manualResults` object from the Host Environment that is the same structure as described above.  Used to leverage browser caching.
+
 ### IKatAppOptions.relativePathTemplates
 
 Property Type: `IStringIndexer<string>`; Optional  
