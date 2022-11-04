@@ -1645,7 +1645,7 @@ Provide the CalcEngine result tab name if all the values that automatically pull
 Property Type: `(base: IKaInputScopeBase) => boolean`; Optional
 Provide a delegate to the input scope that can be called to determine if an input should *not* trigger an RBLe Framework calculation.
 
-The value can also be provided via the `rbl-skip.value` or `rbl-input.skip` RBLe Framework calculation value.
+The value can also be provided via the `rbl-skip.value` or `rbl-input.skip-calc` RBLe Framework calculation value.
 
 The `base` parameter passed into the delegate gives access a `base.noCalc` property configured by the default RBLe Framework calculation value processing described above.
 
@@ -1819,7 +1819,7 @@ The value can by provided by the model or a RBLe Framework calculation value.
 Returns value based on following precedence:
 
 1. `model.isNoCalc` delegate property
-1. `rbl-input.skip` RBLe Framework calculation value (if value is `1`)
+1. `rbl-input.skip-calc` RBLe Framework calculation value (if value is `1`)
 1. `rbl-skip.value` RBLe Framework calculation value (if value is `1`)
 1. `false` if no value provided.
 
@@ -2300,7 +2300,7 @@ Provide the CalcEngine result tab name if all the values that automatically pull
 Property Type: `(index: number, base: IKaInputGroupScopeBase) => boolean`; Optional
 Provide a delegate to the input group scope that can be called to determine if an input should *not* trigger an RBLe Framework calculation.
 
-The value can also be provided via the `rbl-skip.value` or `rbl-input.skip` RBLe Framework calculation value where the `@id` is one of the values provided by `names`.
+The value can also be provided via the `rbl-skip.value` or `rbl-input.skip-calc` RBLe Framework calculation value where the `@id` is one of the values provided by `names`.
 
 The `index` parameter can be used to know which 'item' of the group is being queried.
 
@@ -2438,7 +2438,7 @@ The value can by provided by the model or a RBLe Framework calculation value.
 Returns value based on following precedence:
 
 1. `model.isNoCalc` delegate property
-1. `rbl-input.skip` RBLe Framework calculation value (if value is `1`)
+1. `rbl-input.skip-calc` RBLe Framework calculation value (if value is `1`)
 1. `rbl-skip.value` RBLe Framework calculation value (if value is `1`)
 1. `false` if no value provided.
 
