@@ -1659,11 +1659,36 @@ The `v-ka-input` directive *does* have a `string` shorthand syntax that allows f
 <input v-ka-input="{ name: 'iNameFirst' }" type="text"></input>
 ```
 
-Name | Type | Default | Description
----|---|---|---
-<code>name</code> | string || The name of the input.  In RBLe Framework, input names start with lower case `i` and then the remaing part(s) is/are [Pascal Case](#https://www.codingem.com/what-is-pascal-case/) (i.e. `iFirstName`).
-`template` | string || Optional; The template ID if a [template](#html-content-template-elements) will be used to render markup with the scope.
+<style>
+    table.table thead tr th {
+        border-bottom: 2px solid Black;
+    }
+</style>
 
+<table class="table">
+    <thead>
+        <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>`name`</td>
+            <td>string</td>
+            <td></td>
+            <td>The name of the input.  In RBLe Framework, input names start with lower case `i` and then the remaing part(s) is/are [Pascal Case](#https://www.codingem.com/what-is-pascal-case/) (i.e. `iFirstName`).</td>
+        </tr>
+    </tbody>
+</table>
+
+Property | Type | Default | Description
+---|---|---|---
+`name` | string || The name of the input.  In RBLe Framework, input names start with lower case `i` and then the remaing part(s) is/are [Pascal Case](#https://www.codingem.com/what-is-pascal-case/) (i.e. `iFirstName`).
+`template` | string | `''` | The template ID if a [template](#html-content-template-elements) will be used to render markup with the scope.
+`type` | string | `text` | Set the [type](#https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#input_types) of the associated `HTMLInputElement` when the `tagName=INPUT` (vs `SELECT` or `TEXTAREA`).
 #### IKaInputModel.name
 
 Property Type: `string`; Required  
