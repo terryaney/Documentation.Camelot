@@ -1533,119 +1533,12 @@ The `v-ka-input` directive can be used in three scenarios.
 
 Internally, KatApp Framework leverages the [`v-scope`](#https://github.com/vuejs/petite-vue#petite-vue-only) directive to append 'input helper properties and methods' onto the 'global scope' object that can be used by inputs or templates.
 
-- [v-ka-nomount](#v-ka-nomount) - Control whether or not the associated HTML input element allows for the KatApp framework to wire up all automatic processing.
-- [rbl-input Table](#rbl-input-table) - Discusses RBLe Framework `rbl-input` table layout that can be used to automatically control many of the `v-ka-input` model properties.
 - [v-ka-input Model](#v-ka-input-model) - Discusses the properties that can be passed in to configure the `v-ka-input` directive.
+- [rbl-input Table](#rbl-input-table) - Discusses RBLe Framework `rbl-input` table layout that can be used to automatically control many of the `v-ka-input` model properties.
 - [v-ka-input Model Samples](#v-ka-input-model-samples) - Examples illustrating the different properties that can be assigned on the `v-ka-input` model object.
 - [v-ka-input Scope](#v-ka-input-scope) - Discusses the properties that are exposed on the `v-ka-input` scope and can be used in Kaml View markup.
 - [v-ka-input Scope Samples](#v-ka-input-scope-samples) - Examples illustrating uses of the different properties returned by the `v-ka-input` scope object.
-
-### v-ka-nomount
-
-When using `v-ka-input` or [input templates](#input-templates), all 'discovered' inputs are automatically processed when they are mounted (rendered) or unmounted (removed from the page) to ensure that the KatApp [`state.inputs`](#iapplicationdatainputs) are properly synchronized and additionally HTML DOM events are attached for default behaviors needed to handle RBLe Framework calculations.
-
-There are some situations where **inputs should not be automatically processed** (i.e. if a template has hidden inputs that are for internal use only - i.e. file upload templates).  When an input should **not** be processed, the `v-ka-nomount` attribute can be applied to the input.
-
-During the mounting of a KatApp input the following occurs:
-
-1. The input `name` attribute is set appropriately to the [`scope.name`](#ikainputscopename).
-1. The `scope.name` is added to the input's `classList`.
-1. If the input (or a container of the input) does *not* contain the `rbl-exclude` class
-    1. The input value will be assigned from the [`scope.value`](#ikainputscopevalue) (if provided), or
-    1. `state.inputs` are initialized with the current value from markup (if there is one).
-1. DOM events are attached
-    1. All Inputs
-        1. On 'change' (i.e. any modification to the input value)
-            1. Remove an [`state.errors`](#iapplicationdataerrors) associated with the input.
-            1. Set [`state.needsCalculation`](#iapplicationdataneedscalculation) to `true`.
-        1. On 'update', syncronize `state.inputs` if `rbl-exclude` class is not used.
-        1. On 'update', trigger RBLe Calculation if `rbl-skip` class is not used and [`scope.noCalc`](#ikainputscopenocalc) is `false`.
-        1. On `update`, set `state.needsCalculation` to `false`.
-        1. Attach any events provided in the [`model.events`](#ikainputmodelevents) property.
-    1. Specific Input Processing
-        1. Date Inputs ([`scope.type`](#ikainputscopetype) is `date`)
-            1. The `state.inputs` are only assigned a valid date or `undefined` and not each time a keypress occurs.
-            1. When `state.inputs` are set, a `value.ka` event is triggered for Kaml Views to catch as needed.
-        1. Range Inputs (`scope.type` is `range`)
-            1. Add additional events to handle displaying range value in UI for the user (see [IKaInputModel.type for range Inputs](#ikainputmodeltype-for-range-inputs) for more information).
-            1. Watches for a `rangeset.ka` event (triggered via [`application.setInputValue`](#ikatappsetinputvalue)) to update display
-        1. Text Inputs (excluding `TEXTAREA`)
-            1. When `enter` is pressed, trigger an 'update' event.
-            1. Process [`scope.mask`](#ikainputscopemask) if provided.
-
-During the unmounting of a KatApp input the following occurs:
-
-1. If the [`model.clearOnUnmount`](#ikainputmodelclearonunmount) is `true`, the input will be removed from the [`state.inputs`](#iapplicationdatainputs).
-1. If the input, or a container, has a `rbl-clear-on-unmount` class, the input will be removed from the `state.inputs`.
-    1. Note, since Vue handles [`v-if`](#v-if--v-else--v-else-if) and [`v-for`](#v-for) directives with special 'cloned nodes', if the `rbl-clear-on-unmount` is applied *outside* of these elements, they will not work properly.
-    1. `rbl-clear-on-unmount` is useful to use if you can wrap a group of inputs with the class and the inputs themselves will never show and hide based on their `display` property.  For example if a modal has a 'view' mode and 'edit' mode.  The 'edit' mode gets processed and returns the 'view' mode.  If the user wants to edit/create again in the 'edit' mode, you want all the inputs to be cleared after they were hidden/processed.
-
-```html
-<!--
-    When iAge is removed from DOM because showAgeInputs is set to false, 
-    it WILL be removed from state.inputs since the element that 'triggered' the unmount
-    is the v-if element and the class is on/within that element.
--->
-<div v-if="showAgeInputs" class="rbl-clear-on-unmount">
-    <div v-ka-input="{ name: 'iAge', template: 'age-input' }"></div>
-</div>
-
-<!--
-    When iAge is removed from DOM because showAgeInputs is set to false, 
-    it will NOT be removed from state.inputs because the class is outside the
-    'cloned' node that has the v-if on it.
-    
-    In this situation, the clearOnUnmount property should be set specifically on the v-ka-input model.
--->
-<div class="rbl-clear-on-unmount">
-    <div v-if="showAgeInputs">
-        <div v-ka-input="{ name: 'iAge', template: 'age-input' }"></div>
-    </div>
-</div>
-
-<!--
-    When iAge is removed from DOM because rbl-input[@id='iAge'].display is set to 0
-    it will NOT be removed from state.inputs because the v-ka-input renders its own
-    v-if directive inside the div.v-ka-input element and rbl-clear-on-unmount will
-    be ouside the 'cloned' node.
-    
-    In this situation, the clearOnUnmount property should be set specifically on the v-ka-input model.
--->
-<div class="rbl-clear-on-unmount">
-    <div v-ka-input="{ name: 'iAge', template: 'age-input' }"></div>
-</div>
-```
-
-The `<template>` content will be rendered and searched for any `HTMLInputElement`s and automatically have event watchers added to trigger RBLe Framework calculations as needed and well as binding to the [state.inputs](#iapplicationdatainputs) model. The `<template>` markup will have access to the [scope](#v-ka-input-scope).
-
-### rbl-input Table
-
-The `rbl-input` table is the preferred RBLe Calculation table to use to manage `v-ka-input` and `v-ka-input-group` scopes.  This table supercedes the functionality of the legacy tables of `rbl-display`, `rbl-disabled`, `rbl-skip`, `rbl-value`, `rbl-listcontrol`, `rbl-defaults` and `rbl-sliders`. The KatApp framework still supports the legacy tables if `rbl-input` isn't present (see [KatApp Provider: Push Table Processing](#https://github.com/terryaney/nexgen-documentation/blob/main/KatApps.md#push-table-processing) for more information.).
-
-Column | Description
----|---
-id | The id/name of the input (matches [`model.name`](#ikainputmodelname)).
-type | For textual inputs, a [HTML5 input type](#https://developer.mozilla.org/en-US/docs/Learn/Forms/HTML5_input_types) can be specified.  The default value is `text`.
-label | Provide the associated label for the current input.
-placeholder | For textual inputs, provided the associated placeholder to display when the input is empty.  
-help | Provide help content (can be HTML). Default is blank.
-help-title | If the help popup should have a 'title', can return it here. Default is blank.
-help-width | By default, when help popup is displayed, the width is 250px, provide a width (without the `px`) if you need it larger.
-value | A input value can be set from the CalcEngine whenever a calculation occurs.  Normally, this column is only returned during `iConfigureUI` calculations to return the 'default' value, but if it is non-blank, the value will be assigned during any calculation.
-display | Whether or not the input should be displayed.  Returning `0` will hide the input, anything else will display the input.
-disabled | Whether or not the input should be disabled.  Returning `1` will disable the input, anything else will enable the input.
-skip-calc | Whether or not this input should trigger a calculation when it is changed by the user.  Returning `1` will prevent the input from triggering a calculation, anything else will allow a calculation to occur.
-list | If the input is a 'list' control (dropdown, option list, checkbox list, etc.), return the name of the table that provides the list of items used to populate the control.
-prefix | If the input should have a prefix (usually a [Bootstrap `input-group`](#https://getbootstrap.com/docs/5.0/forms/input-group/)) prepended to the front, provide a value here (i.e. `$`).
-suffix | If the input should have a prefix (usually a Bootstrap `input-group`) appended to the end, provide a value here (i.e. `%`).
-max-length | For textual inputs (i.e. TEXTAREA inputs), a maximum allowed input length can be provided.  Default is `250`.
-min | For inputs with the concept of minimum values (sliders, dates), a minimum value can be provided.
-max | For inputs with the concept of maximum values (sliders, dates), a minimum value can be provided.
-step | For range/slider inputs, a `step` increment can be provided. Default is `1`.
-mask | For textual inputs, if an input mask should be applied while the user is typing information, a mask pattern can be provided (i.e. `(###) ###-####`).
-display-format | For range/slider inputs, a display format can be provided. See [`model.displayFormat`](#ikainputmodeldisplayformat) for more details.
-error | During validation calculations (usually `iValidate=1`), if an input is invalid, an error message can be provided here.  Additionally, the `errors` table can be used as well.
-warning | During validation calculations (usually `iValidate=1`), if an input triggers a warning, an warning message can be provided here.  Additionally, the `warnings` table can be used as well.
+- [v-ka-nomount](#v-ka-nomount) - Control whether or not the associated HTML input element allows for the KatApp framework to wire up all automatic processing.
 
 ### v-ka-input Model
 
@@ -1721,6 +1614,35 @@ The value can also be provided via the combination of `rbl-sliders.format` and `
 ```
 
 <sup>5</sup> The `base` parameter passed into the delegate gives access to the associated `base.display`, `base.disabled`, and `base.noCalc` properties configured by the default RBLe Framework calculation value processing described above in each property.
+
+### rbl-input Table
+
+The `rbl-input` table is the preferred RBLe Calculation table to use to manage `v-ka-input` and `v-ka-input-group` scopes.  This table supercedes the functionality of the legacy tables of `rbl-display`, `rbl-disabled`, `rbl-skip`, `rbl-value`, `rbl-listcontrol`, `rbl-defaults` and `rbl-sliders`. The KatApp framework still supports the legacy tables if `rbl-input` isn't present (see [KatApp Provider: Push Table Processing](#https://github.com/terryaney/nexgen-documentation/blob/main/KatApps.md#push-table-processing) for more information.).
+
+Column | Description
+---|---
+id | The id/name of the input (matches [`model.name`](#ikainputmodelname)).
+type | For textual inputs, a [HTML5 input type](#https://developer.mozilla.org/en-US/docs/Learn/Forms/HTML5_input_types) can be specified.  The default value is `text`.
+label | Provide the associated label for the current input.
+placeholder | For textual inputs, provided the associated placeholder to display when the input is empty.  
+help | Provide help content (can be HTML). Default is blank.
+help-title | If the help popup should have a 'title', can return it here. Default is blank.
+help-width | By default, when help popup is displayed, the width is 250px, provide a width (without the `px`) if you need it larger.
+value | A input value can be set from the CalcEngine whenever a calculation occurs.  Normally, this column is only returned during `iConfigureUI` calculations to return the 'default' value, but if it is non-blank, the value will be assigned during any calculation.
+display | Whether or not the input should be displayed.  Returning `0` will hide the input, anything else will display the input.
+disabled | Whether or not the input should be disabled.  Returning `1` will disable the input, anything else will enable the input.
+skip-calc | Whether or not this input should trigger a calculation when it is changed by the user.  Returning `1` will prevent the input from triggering a calculation, anything else will allow a calculation to occur.
+list | If the input is a 'list' control (dropdown, option list, checkbox list, etc.), return the name of the table that provides the list of items used to populate the control.
+prefix | If the input should have a prefix (usually a [Bootstrap `input-group`](#https://getbootstrap.com/docs/5.0/forms/input-group/)) prepended to the front, provide a value here (i.e. `$`).
+suffix | If the input should have a prefix (usually a Bootstrap `input-group`) appended to the end, provide a value here (i.e. `%`).
+max-length | For textual inputs (i.e. TEXTAREA inputs), a maximum allowed input length can be provided.  Default is `250`.
+min | For inputs with the concept of minimum values (sliders, dates), a minimum value can be provided.
+max | For inputs with the concept of maximum values (sliders, dates), a minimum value can be provided.
+step | For range/slider inputs, a `step` increment can be provided. Default is `1`.
+mask | For textual inputs, if an input mask should be applied while the user is typing information, a mask pattern can be provided (i.e. `(###) ###-####`).
+display-format | For range/slider inputs, a display format can be provided. See [`model.displayFormat`](#ikainputmodeldisplayformat) for more details.
+error | During validation calculations (usually `iValidate=1`), if an input is invalid, an error message can be provided here.  Additionally, the `errors` table can be used as well.
+warning | During validation calculations (usually `iValidate=1`), if an input triggers a warning, an warning message can be provided here.  Additionally, the `warnings` table can be used as well.
 
 ### v-ka-input Model Samples
 
@@ -2199,6 +2121,85 @@ The following template uses most of the previous properties and additionally use
     </div>
 </template>
 ```
+
+### v-ka-nomount
+
+When using `v-ka-input` or [input templates](#input-templates), all 'discovered' inputs are automatically processed when they are mounted (rendered) or unmounted (removed from the page) to ensure that the KatApp [`state.inputs`](#iapplicationdatainputs) are properly synchronized and additionally HTML DOM events are attached for default behaviors needed to handle RBLe Framework calculations.
+
+There are some situations where **inputs should not be automatically processed** (i.e. if a template has hidden inputs that are for internal use only - i.e. file upload templates).  When an input should **not** be processed, the `v-ka-nomount` attribute can be applied to the input.
+
+During the mounting of a KatApp input the following occurs:
+
+1. The input `name` attribute is set appropriately to the [`scope.name`](#ikainputscopename).
+1. The `scope.name` is added to the input's `classList`.
+1. If the input (or a container of the input) does *not* contain the `rbl-exclude` class
+    1. The input value will be assigned from the [`scope.value`](#ikainputscopevalue) (if provided), or
+    1. `state.inputs` are initialized with the current value from markup (if there is one).
+1. DOM events are attached
+    1. All Inputs
+        1. On 'change' (i.e. any modification to the input value)
+            1. Remove an [`state.errors`](#iapplicationdataerrors) associated with the input.
+            1. Set [`state.needsCalculation`](#iapplicationdataneedscalculation) to `true`.
+        1. On 'update', syncronize `state.inputs` if `rbl-exclude` class is not used.
+        1. On 'update', trigger RBLe Calculation if `rbl-skip` class is not used and [`scope.noCalc`](#ikainputscopenocalc) is `false`.
+        1. On `update`, set `state.needsCalculation` to `false`.
+        1. Attach any events provided in the [`model.events`](#ikainputmodelevents) property.
+    1. Specific Input Processing
+        1. Date Inputs ([`scope.type`](#ikainputscopetype) is `date`)
+            1. The `state.inputs` are only assigned a valid date or `undefined` and not each time a keypress occurs.
+            1. When `state.inputs` are set, a `value.ka` event is triggered for Kaml Views to catch as needed.
+        1. Range Inputs (`scope.type` is `range`)
+            1. Add additional events to handle displaying range value in UI for the user (see [IKaInputModel.type for range Inputs](#ikainputmodeltype-for-range-inputs) for more information).
+            1. Watches for a `rangeset.ka` event (triggered via [`application.setInputValue`](#ikatappsetinputvalue)) to update display
+        1. Text Inputs (excluding `TEXTAREA`)
+            1. When `enter` is pressed, trigger an 'update' event.
+            1. Process [`scope.mask`](#ikainputscopemask) if provided.
+
+During the unmounting of a KatApp input the following occurs:
+
+1. If the [`model.clearOnUnmount`](#ikainputmodelclearonunmount) is `true`, the input will be removed from the [`state.inputs`](#iapplicationdatainputs).
+1. If the input, or a container, has a `rbl-clear-on-unmount` class, the input will be removed from the `state.inputs`.
+    1. Note, since Vue handles [`v-if`](#v-if--v-else--v-else-if) and [`v-for`](#v-for) directives with special 'cloned nodes', if the `rbl-clear-on-unmount` is applied *outside* of these elements, they will not work properly.
+    1. `rbl-clear-on-unmount` is useful to use if you can wrap a group of inputs with the class and the inputs themselves will never show and hide based on their `display` property.  For example if a modal has a 'view' mode and 'edit' mode.  The 'edit' mode gets processed and returns the 'view' mode.  If the user wants to edit/create again in the 'edit' mode, you want all the inputs to be cleared after they were hidden/processed.
+
+```html
+<!--
+    When iAge is removed from DOM because showAgeInputs is set to false, 
+    it WILL be removed from state.inputs since the element that 'triggered' the unmount
+    is the v-if element and the class is on/within that element.
+-->
+<div v-if="showAgeInputs" class="rbl-clear-on-unmount">
+    <div v-ka-input="{ name: 'iAge', template: 'age-input' }"></div>
+</div>
+
+<!--
+    When iAge is removed from DOM because showAgeInputs is set to false, 
+    it will NOT be removed from state.inputs because the class is outside the
+    'cloned' node that has the v-if on it.
+    
+    In this situation, the clearOnUnmount property should be set specifically on the v-ka-input model.
+-->
+<div class="rbl-clear-on-unmount">
+    <div v-if="showAgeInputs">
+        <div v-ka-input="{ name: 'iAge', template: 'age-input' }"></div>
+    </div>
+</div>
+
+<!--
+    When iAge is removed from DOM because rbl-input[@id='iAge'].display is set to 0
+    it will NOT be removed from state.inputs because the v-ka-input renders its own
+    v-if directive inside the div.v-ka-input element and rbl-clear-on-unmount will
+    be ouside the 'cloned' node.
+    
+    In this situation, the clearOnUnmount property should be set specifically on the v-ka-input model.
+-->
+<div class="rbl-clear-on-unmount">
+    <div v-ka-input="{ name: 'iAge', template: 'age-input' }"></div>
+</div>
+```
+
+The `<template>` content will be rendered and searched for any `HTMLInputElement`s and automatically have event watchers added to trigger RBLe Framework calculations as needed and well as binding to the [state.inputs](#iapplicationdatainputs) model. The `<template>` markup will have access to the [scope](#v-ka-input-scope).
+
 
 ## v-ka-input-group
 
