@@ -1,4 +1,8 @@
-# KatApp Documentation Contents
+# KatApp Framework
+
+The KatApp framework is an orchestrator of two other well established frameworks; RBLe framework and [Vue.js](https://vuejs.org/).  The primary function of the KatApp framework is to marshall inputs into a RBLe framework calculation, take the calculation results and turn them into a 'reactive' model that is then used for rendering HTML markup via Vue.  One caveat is that instead of standard Vue, KatApp framework is leveraging [petite-vue](https://github.com/vuejs/petite-vue).  
+
+> `petite-vue` is an alternative distribution of Vue optimized for progressive enhancement. It provides the same template syntax and reactivity mental model as standard Vue. However, it is specifically optimized for "sprinkling" a small amount of interactions on an existing HTML page rendered by a server framework.
 
 - [KatApp Framework](#katapp-framework)
 - [Initializing and Configuring a KatApp](#initializing-and-configuring-a-katapp)
@@ -10,12 +14,6 @@
 - [KatApp API](#katapp-api)
 - [RBLe Framework](#rble-framework)
 - [Upcoming Documentation](#upcoming-documentation)
-
-# KatApp Framework
-
-The KatApp framework is an orchestrator of two other well established frameworks; RBLe framework and [Vue.js](https://vuejs.org/).  The primary function of the KatApp framework is to marshall inputs into a RBLe framework calculation, take the calculation results and turn them into a 'reactive' model that is then used for rendering HTML markup via Vue.  One caveat is that instead of standard Vue, KatApp framework is leveraging [petite-vue](https://github.com/vuejs/petite-vue).  
-
-> `petite-vue` is an alternative distribution of Vue optimized for progressive enhancement. It provides the same template syntax and reactivity mental model as standard Vue. However, it is specifically optimized for "sprinkling" a small amount of interactions on an existing HTML page rendered by a server framework.
 
 ## Definitions
 
@@ -1660,6 +1658,11 @@ The `v-ka-input` directive *does* have a `string` shorthand syntax that allows f
 <input v-ka-input="iNameFirst" type="text"></input>
 <input v-ka-input="{ name: 'iNameFirst' }" type="text"></input>
 ```
+
+Name | Type | Default | Description
+---|---|---|---
+<code>name</code> | string || The name of the input.  In RBLe Framework, input names start with lower case `i` and then the remaing part(s) is/are [Pascal Case](#https://www.codingem.com/what-is-pascal-case/) (i.e. `iFirstName`).
+`template` | string || Optional; The template ID if a [template](#html-content-template-elements) will be used to render markup with the scope.
 
 #### IKaInputModel.name
 
