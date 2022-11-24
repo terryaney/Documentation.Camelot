@@ -1704,7 +1704,11 @@ Date input rendered via an `input-textbox-nexgen` template;
     template: 'input-textbox-nexgen', 
     label: 'Date of Birth', 
     type: 'date',
-    help: { content: 'Enter your DOB :), also 1 + 2 = {{1+2}}.<br/><b>I\'m bold</b><br/><a v-ka-navigate=&quot;{ view: \'Channel.Home\', inputs: { iFromTooltip: 1 } }&quot;>Go home</a>' }, 
+    help: { 
+        content: 
+            '1 + 2 = {{1+2}}.<br/><b>I\'m bold</b><br/>' + 
+            '<a v-ka-navigate=&quot;{ view: \'Channel.Home\', inputs: { iFromTooltip: 1 } }&quot;>Go home</a>' 
+    }, 
     isDisplay: base => inputs.iHideDateBirth != '1' && base.display,
     events: { 
         'keypress.enter.once': () => console.log('Hooray, enter pressed!'), 
