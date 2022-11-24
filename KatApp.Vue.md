@@ -1680,10 +1680,15 @@ Property | Type | Description
 `mask`<sup>3</sup> | string | Provide an input `mask` to apply during user input for text inputs.  The value can also be provided via the `rbl-input.mask` RBLe Framework calculation value.
 `uploadEndpoint` | string | Provide an `uploadEndpoint` value for the input that could be used if `type="file"` or if the template will render a 'file upload' UI component.
 `clearOnUnmount` | boolean | If `true`, when an input is removed from the DOM, the associated [`state.inputs`](#iapplicationdatainputs) value is also removed.
+`help.title`<sup>4</sup> | HTML | Provide a `title` used when the input displays contextual help.  The value can also be provided via the `rbl-value[@id=='h' + name + 'Title'].value` or the `rbl-input.help-title` RBLe Framework calculation value.
+`help.content`<sup>4</sup> | HTML | Provide a `content` used when the input displays contextual help.  The value can also be provided via the `rbl-value[@id=='h' + name].value` or the `rbl-input.help` RBLe Framework calculation value.
+`help.width`<sup>4</sup> | number | Provide a width used when the input displays contextual help. If the help is to be rendered with [Bootstrap popovers](#https://getbootstrap.com/docs/5.0/components/popovers/#options) and RBLe Framework, the `width` can be provided. The value can also be provided via the `rbl-input.help-width` RBLe Framework calculation value.
+`css.container`<sup>4</sup> | string | Provide css string for the input that could be applied to the 'container' in the template markup.
+`css.input`<sup>4</sup> | string | Provide css string for input that could be applied to any 'inputs' in the template markup.
 `events` | `IStringIndexer<((e: Event, application: KatApp) => void)>` | Provide a javascript object where each property is an event handler.  These event handlers will automatically be added to `HTMLInputElements` based on the property name.  The property name follows the same patterns as the [`v-on`](#v-on) directive (including [modifiers](#v-on-modifiers)).
-`isNoCalc` | `(base: IKaInputScopeBase) => boolean` | Provide a delegate for the input that will be called to determine if an input should *not* trigger an RBLe Framework calculation.  The value can also be provided via the `rbl-skip.value` or `rbl-input.skip-calc` RBLe Framework calculation value.<br/><br/>The `base` parameter passed into the delegate gives access a `base.noCalc` property configured by the default RBLe Framework calculation value processing described above.<br/><br/>**Note:** Additionally if any input or input ancestor has `rbl-nocalc` or `rbl-exclude` in the class list, the calculation will not occur.
-`isDisabled` | `(base: IKaInputScopeBase) => boolean` | Provide a delegate for the input that will be called to determine if an input should be disabled.<br/><br/>The value can also be provided via the `rbl-disabled.value` or `rbl-input.disabled` RBLe Framework calculation value.<br/><br/>The `base` parameter passed into the delegate gives access a `base.disabled` property configured by the default RBLe Framework calculation value processing described above.
-`isDisplay` | `(base: IKaInputScopeBase) => boolean` | Provide a delegate for the input that will be called to determine if an input should be displayed.<br/><br/>The value can also be provided via the `rbl-display.value` or `rbl-input.display` RBLe Framework calculation value.<br/><br/>The `base` parameter passed into the delegate gives access a `base.display` property configured by the default RBLe Framework calculation value processing described above.
+`isNoCalc`<sup>5</sup> | `(base: IKaInputScopeBase) => boolean` | Provide a delegate for the input that will be called to determine if an input should *not* trigger an RBLe Framework calculation.  The value can also be provided via the `rbl-skip.value` or `rbl-input.skip-calc` RBLe Framework calculation value.<br/><br/>**Note:** Additionally if any input or input ancestor has `rbl-nocalc` or `rbl-exclude` in the class list, the calculation will not occur.
+`isDisabled`<sup>5</sup> | `(base: IKaInputScopeBase) => boolean` | Provide a delegate for the input that will be called to determine if an input should be disabled.<br/><br/>The value can also be provided via the `rbl-disabled.value` or `rbl-input.disabled` RBLe Framework calculation value.
+`isDisplay`<sup>5</sup> | `(base: IKaInputScopeBase) => boolean` | Provide a delegate for the input that will be called to determine if an input should be displayed.<br/><br/>The value can also be provided via the `rbl-display.value` or `rbl-input.display` RBLe Framework calculation value.
 `ce` | string | Provide the CalcEngine key if all the values that automatically pull from RBLe Framework calculation values should use a CalcEngine *different from the default CalcEngine*.
 `tab` | string | Provide the CalcEngine result tab name if all the values that automatically pull from RBLe Framework calculation values should use a tab name *different from the default tab specified for the associated CalcEngine*.
 
@@ -1705,6 +1710,17 @@ The value can also be provided via the combination of `rbl-sliders.format` and `
 <sup>3</sup> The supported masks are:
 
 * (###) ###-####
+
+<sup>4</sup> The `help` and `css` properties of the input model are objects with nested properties defined.
+
+```javascript
+{
+    help: { title: 'Retirement Age', content: 'Provide your retirement age.' },
+    css: { container: 'wrapper', input: 'custom-input' }
+}
+```
+
+<sup>5</sup> The `base` parameter passed into the delegate gives access to the associated `base.display`, `base.disabled`, and `base.noCalc` properties configured by the default RBLe Framework calculation value processing described above in each property.
 
 #### IKaInputModel.name
 
