@@ -1661,7 +1661,7 @@ The `v-ka-input` directive *does* have a `string` shorthand syntax that allows f
 
 Property | Type | Description
 ---|---|---
-`name` | string || **Required;** The name of the input.  In RBLe Framework, input names start with lower case `i` and then the remaing part(s) is/are [Pascal Case](#https://www.codingem.com/what-is-pascal-case/) (i.e. `iFirstName`).
+`name` | string | **Required;** The name of the input.  In RBLe Framework, input names start with lower case `i` and then the remaing part(s) is/are [Pascal Case](#https://www.codingem.com/what-is-pascal-case/) (i.e. `iFirstName`).
 `template` | string | The template ID if a [template](#html-content-template-elements) will be used to render markup with the scope.
 `type`<sup>1</sup> | string | Set the [type](#https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#input_types) of the associated `HTMLInputElement` when the `tagName=INPUT` (vs `SELECT` or `TEXTAREA`).
 `value` | string | Provide a default value for the input.  The value can also be provided via the `rbl-defaults.value` or the `rbl-input.value` RBLe Framework calculation value.
@@ -1680,13 +1680,13 @@ Property | Type | Description
 `mask`<sup>3</sup> | string | Provide an input `mask` to apply during user input for text inputs.  The value can also be provided via the `rbl-input.mask` RBLe Framework calculation value.
 
 
-\1. In addition to events that trigger RBLe Framework calculations, if the `HTMLInputElement.type` is of type `range`, the KatApp Framework adds a few more events to enable displaying the `range` value for the benefit of the user.  To enable this feature, the Kaml View developers have to take advantage of the [Template Refs](#https://vuejs.org/guide/essentials/template-refs.html#template-refs) feature of Vue and provide the following `ref` assignments, all of which are optional if the Kaml View does not desire the functionality.
+<sup>1</sup> In addition to events that trigger RBLe Framework calculations, if the `HTMLInputElement.type` is of type `range`, the KatApp Framework adds a few more events to enable displaying the `range` value for the benefit of the user.  To enable this feature, the Kaml View developers have to take advantage of the [Template Refs](#https://vuejs.org/guide/essentials/template-refs.html#template-refs) feature of Vue and provide the following `ref` assignments, all of which are optional if the Kaml View does not desire the functionality.
 
 * `ref="display"` - This is an `HTMLElement` whose `innerHTML` will be set to the value of the `range` every time the value changes.
 * `ref="bubble"` - This is an `HTMLElement` that will have a CSS class of `active` toggled on and off.  It will be on while the user is moving the slider or hovering over the slider, and turned off when the user's mouse no longer is over the `range` input.
 * `ref="bubbleValue" - This is an `HTMLElement` whose `innerHTML` will be set to the value of the `range` every time the value changes.
 
-\2. The format should be valid a C# format string in the format of `{0:format}` where `format` is a format string described in one of the links below.
+<sup>2</sup> The format should be valid a C# format string in the format of `{0:format}` where `format` is a format string described in one of the links below.
 
 * [Standard number format strings](#https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings)
 * [Custom number format strings](#https://learn.microsoft.com/en-us/dotnet/standard/base-types/custom-numeric-format-strings)
@@ -1695,7 +1695,7 @@ Property | Type | Description
 
 The value can also be provided via the combination of `rbl-sliders.format` and `rbl-sliders.decimals` or the `rbl-input.display-format` RBLe Framework calculation value. When the format comes from `rbl-sliders`, it will be turned into the string of `{0:format + decimals}` (i.e. {0:p2} if `format` was `p` and `decimals` was `2`).
 
-\3. The supported masks are:
+<sup>3</sup> The supported masks are:
 
 * (###) ###-####
 
