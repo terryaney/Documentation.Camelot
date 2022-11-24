@@ -2306,14 +2306,18 @@ Additionally, it is advised to use the [`:key`](#https://vuejs.org/api/built-in-
 <div v-ka-template="validation-summary"></div>
 
 <template id="validation-summary">
-    <div v-if="errors.length > 0" :id="kaId + '_ModelerValidationTable'" class="validation-summary alert alert-danger" role="alert" title="Please review the following issues:">
-        <p><strong><i class="fa-duotone fa-circle-exclamation"></i> Please review the following issues:</strong></p>
+    <div v-if="errors.length > 0" :id="kaId + '_ModelerValidationTable'" 
+        class="validation-summary alert alert-danger" 
+        role="alert" title="Please review the following issues:">
+        <p><b><i class="fa-duotone fa-circle-exclamation"></i> Please review the following issues:</b></p>
         <ul>
             <li v-for="error in errors" v-html="error.text"></li>
         </ul>
     </div>
-    <div v-if="warnings.length > 0" :id="kaId + '_ModelerWarnings'" class="validation-warning-summary alert alert-warning" role="alert" title="Please review the following warnings:">
-        <p><strong><i class="fa-duotone fa-triangle-exclamation"></i> Please review the following warnings:</strong></p>
+    <div v-if="warnings.length > 0" :id="kaId + '_ModelerWarnings'" 
+        class="validation-warning-summary alert alert-warning" 
+        role="alert" title="Please review the following warnings:">
+        <p><b><i class="fa-duotone fa-triangle-exclamation"></i> Please review the following warnings:</b></p>
         <ul>
             <li v-for="warning in warnings" v-html="warning.text"></li>
         </ul>
@@ -2327,7 +2331,10 @@ Additionally, it is advised to use the [`:key`](#https://vuejs.org/api/built-in-
     name: 'confirm-danger', 
     source: { 
         selector: 'delete-confirm', 
-        message: '<p>Do you want to delete this HSA transaction?</p><p>If you delete this transaction, you will not be making a one-time contribution to your HSA.</p><p>Are you sure you want to delete this transaction?</p>' 
+        message: 
+            '<p>Do you want to delete this HSA transaction?</p>' + 
+            '<p>If you delete this transaction, you will not be making a one-time contribution to your HSA.</p>' + 
+            '<p>Are you sure you want to delete this transaction?</p>' 
     } 
 }"></div>
 
