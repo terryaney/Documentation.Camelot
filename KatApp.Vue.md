@@ -1659,27 +1659,21 @@ The `v-ka-input` directive *does* have a `string` shorthand syntax that allows f
 <input v-ka-input="{ name: 'iNameFirst' }" type="text"></input>
 ```
 
-<style>
-    table.table thead tr th {
-        border-bottom: 2px solid Black;
-    }
-</style>
-
 <table class="table">
     <thead>
         <tr>
-            <th>Property</th>
-            <th>Type</th>
-            <th>Default</th>
-            <th>Description</th>
+            <th style="border:0">Property</th>
+            <th style="border:0">Type</th>
+            <th style="border:0">Default</th>
+            <th style="border:0">Description</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody style="border-bottom: 2px solid Black;">
         <tr>
-            <td>`name`</td>
-            <td>string</td>
-            <td></td>
-            <td>The name of the input.  In RBLe Framework, input names start with lower case `i` and then the remaing part(s) is/are [Pascal Case](#https://www.codingem.com/what-is-pascal-case/) (i.e. `iFirstName`).</td>
+            <td style="border:0">`name`</td>
+            <td style="border:0">string</td>
+            <td style="border:0"></td>
+            <td style="border:0">The name of the input.  In RBLe Framework, input names start with lower case `i` and then the remaing part(s) is/are [Pascal Case](#https://www.codingem.com/what-is-pascal-case/) (i.e. `iFirstName`).</td>
         </tr>
     </tbody>
 </table>
