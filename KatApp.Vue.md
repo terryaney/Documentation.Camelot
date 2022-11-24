@@ -883,10 +883,10 @@ With the above example, you could expect the following in the console ouput (rem
 
 With the above example, you could expect the following in the console ouput (remembering that all rendering completes before `mounted` is called):
 
-> templateWithScript setup templateMounted:, 3 scoped items found
-> templateWithScript setup templateMounted:, 3 template-script-input items found
-> templateWithScript templateMounted:, 3 scoped items found
-> templateWithScript templateMounted:, 3 template-script-input items found
+> templateWithScript setup templateMounted:, 3 scoped items found  
+> templateWithScript setup templateMounted:, 3 template-script-input items found  
+> templateWithScript templateMounted:, 3 scoped items found  
+> templateWithScript templateMounted:, 3 template-script-input items found  
 
 **Note**: When a template with `<script>` tags is called and passed an `Array` data source, you can see that both the `setup` and 'normal' scripts excecute only one time, therefore it is recommended to always use the 'normal' script mode.
 
@@ -1620,24 +1620,23 @@ type | For textual inputs, a [HTML5 input type](#https://developer.mozilla.org/e
 label | Provide the associated label for the current input.
 placeholder | For textual inputs, provided the associated placeholder to display when the input is empty.  
 help | Provide help content (can be HTML). Default is blank.
-help-title | If the help popup should have a 'title', can return it here. Default is blank.
-help-width | By default, when help popup is displayed, the width is 250px, provide a width (without the `px`) if you need it larger.
+help&#x2011;title | If the help popup should have a 'title', can return it here. Default is blank.
+help&#x2011;width | By default, when help popup is displayed, the width is 250px, provide a width (without the `px`) if you need it larger.
 value | A input value can be set from the CalcEngine whenever a calculation occurs.  Normally, this column is only returned during `iConfigureUI` calculations to return the 'default' value, but if it is non-blank, the value will be assigned during any calculation.
 display | Whether or not the input should be displayed.  Returning `0` will hide the input, anything else will display the input.
 disabled | Whether or not the input should be disabled.  Returning `1` will disable the input, anything else will enable the input.
-skip-calc | Whether or not this input should trigger a calculation when it is changed by the user.  Returning `1` will prevent the input from triggering a calculation, anything else will allow a calculation to occur.
+skip&#x2011;calc | Whether or not this input should trigger a calculation when it is changed by the user.  Returning `1` will prevent the input from triggering a calculation, anything else will allow a calculation to occur.
 list | If the input is a 'list' control (dropdown, option list, checkbox list, etc.), return the name of the table that provides the list of items used to populate the control.
 prefix | If the input should have a prefix (usually a [Bootstrap `input-group`](#https://getbootstrap.com/docs/5.0/forms/input-group/)) prepended to the front, provide a value here (i.e. `$`).
 suffix | If the input should have a prefix (usually a Bootstrap `input-group`) appended to the end, provide a value here (i.e. `%`).
-max-length | For textual inputs (i.e. TEXTAREA inputs), a maximum allowed input length can be provided.  Default is `250`.
+max&#x2011;length | For textual inputs (i.e. TEXTAREA inputs), a maximum allowed input length can be provided.  Default is `250`.
 min | For inputs with the concept of minimum values (sliders, dates), a minimum value can be provided.
 max | For inputs with the concept of maximum values (sliders, dates), a minimum value can be provided.
 step | For range/slider inputs, a `step` increment can be provided. Default is `1`.
 mask | For textual inputs, if an input mask should be applied while the user is typing information, a mask pattern can be provided (i.e. `(###) ###-####`).
-display-format | For range/slider inputs, a display format can be provided. See [`model.displayFormat`](#ikainputmodeldisplayformat) for more details.
+display&#x2011;format | For range/slider inputs, a display format can be provided. See [`model.displayFormat`](#ikainputmodeldisplayformat) for more details.
 error | During validation calculations (usually `iValidate=1`), if an input is invalid, an error message can be provided here.  Additionally, the `errors` table can be used as well.
 warning | During validation calculations (usually `iValidate=1`), if an input triggers a warning, an warning message can be provided here.  Additionally, the `warnings` table can be used as well.
-
 
 ### v-ka-input Samples
 
@@ -2526,8 +2525,8 @@ There are some configuration options that are explicitly handled by the ResultBu
 
 Configuration&nbsp;Setting | Description
 ---|---
-config-style | By default, the Highcharts template has no style applied to the `<div class="chart chart-responsive"></div>` element.  If, the CalcEngine wants to apply any CSS styles (i.e. height and width), the config-style value
-config-tooltipFormat | When tooltips are enabled, there is a default `tooltip.formatter` function provided by KatApps where this value provides the template to apply a `string.format` to.  For example `<b>{x}</b>{seriesDetail}<br/>`<br/><br/>The available substitution tokens are `x` (current X-Axis value), `stackTotal` (sum of all Y-Axis values at this current `x` value), and `seriesDetail` (list of all Y-Axis points in format of `name: value`).  For more information see [tooltip.formatter API](https://api.highcharts.com/highcharts/tooltip.formatter) and [Property Value Parsing](#v-ka-highchart-Prpoerty-Value-Parsing).
+config&#x2011;style | By default, the Highcharts template has no style applied to the `<div class="chart chart-responsive"></div>` element.  If, the CalcEngine wants to apply any CSS styles (i.e. height and width), the config-style value
+config&#x2011;tooltipFormat | When tooltips are enabled, there is a default `tooltip.formatter` function provided by KatApps where this value provides the template to apply a `string.format` to.  For example `<b>{x}</b>{seriesDetail}<br/>`<br/><br/>The available substitution tokens are `x` (current X-Axis value), `stackTotal` (sum of all Y-Axis values at this current `x` value), and `seriesDetail` (list of all Y-Axis points in format of `name: value`).  For more information see [tooltip.formatter API](https://api.highcharts.com/highcharts/tooltip.formatter) and [Property Value Parsing](#v-ka-highchart-Prpoerty-Value-Parsing).
 
 ### v-ka-highchart Standard Options
 
@@ -2609,9 +2608,9 @@ Series options are created by having a row in the `Highcharts-{rbl-chartdata}-Da
 
 Configuration&nbsp;Setting | Description
 ---|---
-config-visible | You can disable a series from being processed by setting its `config-visible` value to `0`.
-config-hidden | Similar to `config-visible` except, if hidden, the series is _processed_ in the chart rendering, but it is not displayed in the chart or the legend.  Hidden series are essentially only available for tooltip processing.
-config-format | Specify a format to use when display date or number values for this series in the tooltip.  See Microsoft documentation for available [date](https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings) and [number](https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings) format strings.
+config&#x2011;visible | You can disable a series from being processed by setting its `config-visible` value to `0`.
+config&#x2011;hidden | Similar to `config-visible` except, if hidden, the series is _processed_ in the chart rendering, but it is not displayed in the chart or the legend.  Hidden series are essentially only available for tooltip processing.
+config&#x2011;format | Specify a format to use when display date or number values for this series in the tooltip.  See Microsoft documentation for available [date](https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings) and [number](https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings) format strings.
 
 <br/>
 
@@ -2620,8 +2619,8 @@ An example of how these might look in a CalcEngine result table.
 category | series1 | series2 | series3 | series4
 ---|---|---|---|---
 config&#x2011;visible | 1 | 1 | 1 | 0
-config-hidden | 0 | 0 | 1 | 1
-config-format | c2 | c2 | c2 | c2
+config&#x2011;hidden | 0 | 0 | 1 | 1
+config&#x2011;format | c2 | c2 | c2 | c2
 
 <br/> 
 
@@ -2639,10 +2638,10 @@ Example of settings used for KatApp Sharkfin Income chart.
 
 category | series1 | series2 | series3 | series4 | series5 | series6
 ---|---|---|---|---|---|--
-config-name | Shortfall | 401(k) Plan | Non Qualified Savings Plan | HSA | Personal Savings | Retirement Income  Needed
-config-color | #FFFFFF | #006BD6 | #DDDDDD | #6F743A | #FD9F13 | #D92231
-config-type | areaspline | column | column | column | column | spline
-config-fillOpacity | 0 |||||			
+config&#x2011;name | Shortfall | 401(k) Plan | Non Qualified Savings Plan | HSA | Personal Savings | Retirement Income  Needed
+config&#x2011;color | #FFFFFF | #006BD6 | #DDDDDD | #6F743A | #FD9F13 | #D92231
+config&#x2011;type | areaspline | column | column | column | column | spline
+config&#x2011;fillOpacity | 0 |||||			
 config&#x2011;showInLegend | 0 | 1 | 1 | 1 | 1 | 1
 
 <br/>
@@ -3551,7 +3550,7 @@ Property | Type | Description
 `model` | `any` | Kaml Views can pass in 'custom models' that hold state but are not built from Calculation Results.
 `options` | [`IKatAppOptions`](#ikatappoptions) | Kaml Views can provide partial updates to the [`IKatApp.options`](#ikatappoptions) object.  Typically, only inputs or modal templates are updated.
 `handlers` | `IStringAnyIndexer` | Provide an object where each property is a function delegate that can be used with [`v-on`](#v-on) directives.
-`components` | `IStringAnyIndexer` Provide an object where each property is a Vue component that can be used with [`v-scope`](#v-scope) directives.
+`components` | `IStringAnyIndexer` | Provide an object where each property is a Vue component that can be used with [`v-scope`](#v-scope) directives.
 `directives` | `IStringIndexer<(ctx: DirectiveContext<Element>) => (() => void) \| void>` | Provide an object where each property name is the directive tag name (i.e. `v-*`) and the value is a function delegate that returns a [custom directive](#custom-katapp-directives) that can be used in the Kaml View markup.
 
 
@@ -3798,12 +3797,12 @@ There are many features available during RBLe Framework processing that are cont
 Name | Location | Description
 ---|---|---
 Case Specific | General | All configuration information (input name, table names, column names, switches) are case specific.
-`/work-table`<br/>`/off` | Table Switch | By default, all tables on a CalcEngine tab are processed (until two blank columns are encountered).  To flag a table as simply a temp/work table that doesn't need to be processed, use the `/work-table` or `/off` switch on the table name.<br/><br/> **Note:** It is preferred to use the `/off` switch versus inserted two blank columns to disable a table because it allows for 'work tables' to be placed in the most logical position in CalcEngine tabs instead of being forced to always be at the end right of all tables and additionally, it allows for the KAT Excel Addin to navigate to these tables since the table configuration is detected before encountering two blank columns.
-`/off` | Column Switch | Optional switch used on table columns to indicate that the column should not be processed during calculations
-`/sort-field` | Table Switch | To configure how the table data is sorted, use the `/sort-field:field[,direction,isNumber]` switch on the table name. `direction` and `isNumber` are optional parameters.  `direction` can be `asc` or `desc` (defaulting to `asc`) while `isNumber` can be `true` or `false` (defaulting to `false`).  To specify multiple columns to sort, provide a `|` delimitted list of column configurations.  For example `/sort-field:status|pay,,true|year,desc,true` would sort by `status` *text* ascending, then by `pay` *number* ascending, then by `year` *number* descending.
-`/sort-field` Legacy | Table Switch | To configure how the table data is sorted, use the `/sort-field:field-name` switch on the table name.  To specify multiple columns to use in the sort, provide a comma delimitted list of field names.  When used on an _Input Tab Table_, the data is sorted _before_ it is loaded into the tab.  Conversely, when used on a _Result Tab Table_, the data is sorted _after_ exporting the results from the CalcEngine.
-`/sort-direction` Legacy | Table Switch | Optional sort control (`asc` or `desc`) used in conjunction with `sort-field`.  By default, data will be sorted ascending.  Use the `/sort-direction:direction` to control how field(s) specified in the `/sort-field` switch are sorted.  If `/sort-direction:` is provided, there must be the same number of comma delimitted values as the number of comma delimitted fields found in `/sort-field`.
-`/sort-number` Legacy | Table Switch | Optional switch (`true` or `false`) used in conjunction with `sort-field`.  By default, data will be sorted using a `string` comparison.  Use the `/sort-number:true` to indicate that field(s) specified in the `/sort-field` switch should be treated as numeric when sorting.  If `/sort-number:` is provided, there must be the same number of comma delimitted values as the number of comma delimitted fields found in `/sort-field`.
+/work&#x2011;table<br/>/off` | Table Switch | By default, all tables on a CalcEngine tab are processed (until two blank columns are encountered).  To flag a table as simply a temp/work table that doesn't need to be processed, use the `/work-table` or `/off` switch on the table name.<br/><br/> **Note:** It is preferred to use the `/off` switch versus inserted two blank columns to disable a table because it allows for 'work tables' to be placed in the most logical position in CalcEngine tabs instead of being forced to always be at the end right of all tables and additionally, it allows for the KAT Excel Addin to navigate to these tables since the table configuration is detected before encountering two blank columns.
+/off | Column Switch | Optional switch used on table columns to indicate that the column should not be processed during calculations
+/sort&#x2011;field | Table Switch | To configure how the table data is sorted, use the `/sort-field:field[,direction,isNumber]` switch on the table name. `direction` and `isNumber` are optional parameters.  `direction` can be `asc` or `desc` (defaulting to `asc`) while `isNumber` can be `true` or `false` (defaulting to `false`).  To specify multiple columns to sort, provide a `|` delimitted list of column configurations.  For example `/sort-field:status|pay,,true|year,desc,true` would sort by `status` *text* ascending, then by `pay` *number* ascending, then by `year` *number* descending.
+/sort&#x2011;field Legacy | Table Switch | To configure how the table data is sorted, use the `/sort-field:field-name` switch on the table name.  To specify multiple columns to use in the sort, provide a comma delimitted list of field names.  When used on an _Input Tab Table_, the data is sorted _before_ it is loaded into the tab.  Conversely, when used on a _Result Tab Table_, the data is sorted _after_ exporting the results from the CalcEngine.
+/sort&#x2011;direction Legacy | Table Switch | Optional sort control (`asc` or `desc`) used in conjunction with `sort-field`.  By default, data will be sorted ascending.  Use the `/sort-direction:direction` to control how field(s) specified in the `/sort-field` switch are sorted.  If `/sort-direction:` is provided, there must be the same number of comma delimitted values as the number of comma delimitted fields found in `/sort-field`.
+/sort&#x2011;number Legacy | Table Switch | Optional switch (`true` or `false`) used in conjunction with `sort-field`.  By default, data will be sorted using a `string` comparison.  Use the `/sort-number:true` to indicate that field(s) specified in the `/sort-field` switch should be treated as numeric when sorting.  If `/sort-number:` is provided, there must be the same number of comma delimitted values as the number of comma delimitted fields found in `/sort-field`.
 
 ### RBLe CalcEngine Input Tabs
 
@@ -3818,8 +3817,8 @@ Name | Location | Description
 inputTable | `StartTables` Element | Surrounding a table name with `<< >>` indicates that, for each calculation, the rows of the table will be cleared and populated with data from KAT CMS 'Global Lookups CalcEngine' table with the matching `globalTable` (i.e. `<<IrsRates>>`). The columns specified will popualte with the global lookup fields with the exact same name.
 inputTable | `StartTables` Element | A table name with *no wrapping characters* indicates that, for each calculation, the rows of the table will be cleared and populated with *tabular input data* provided from the UI (see [Input Table Management](#input-table-management) for more information) with the matching `inputTable` (i.e. `RetirementDates`). The columns specified will popualte with the input table fields with the exact same name.
 `[configureUiInputData]` | `StartTables` Element | Surrounding a table name with `[ ]` indicates that the table is a hybrid of a `<dataTable>` and an `inputTable`. When a calculation is an [`iConfigureUI` calculation](#framework-inputs), the rows of the table will be cleared and populated as if it were a `<dataTable>`.  For all other calculations, the rows of the table will be cleared and populated as if it were an `inputTable`.  This enabled a 'single input table' to be referenced in the CalcEngine an 'input table' is managed by the UI but initially populated by 'matching' data saved in xDS data store. The most common example of this is an 'UI Input Table' that has the capability of being saved to xDS and reloaded into the UI in a subsequent user session.
-`/unique-summary:sourceTable` | Table Switch | The RBLe Framework supports automatic 'grouping' to produce a unique list of values for input tables (`inputTable`, `<dataTable>`, or `<<globalTable>>`).  The `sourceTable` parameter indicates which table/data aggregate before loading it into the current table. See [Unique Summary Configuration](#Unique-Summary-Configuration) for more information.
-`/id-locked` | Table Switch | The RBLe Framework allows loading only specific xDS History data rows based on indexes that provided the desired row indexes to load in an `id` column of the table, *which must be the first column specified* in the table. The index value provided in the `id` column can be a specific index value (must match exactly) or a positional based index; `first`, `last`, `first+N` or `last-N`. When using `first+` or `last-` if the expression results in an 'overflow' position (i.e. `first+10` but only 5 rows exist), then no row data will be populated. See [id-locked Configuration](#id-locked-configuration) for more information.
+/unique&#x2011;summary:sourceTable | Table Switch | The RBLe Framework supports automatic 'grouping' to produce a unique list of values for input tables (`inputTable`, `<dataTable>`, or `<<globalTable>>`).  The `sourceTable` parameter indicates which table/data aggregate before loading it into the current table. See [Unique Summary Configuration](#Unique-Summary-Configuration) for more information.
+/id&#x2011;locked | Table Switch | The RBLe Framework allows loading only specific xDS History data rows based on indexes that provided the desired row indexes to load in an `id` column of the table, *which must be the first column specified* in the table. The index value provided in the `id` column can be a specific index value (must match exactly) or a positional based index; `first`, `last`, `first+N` or `last-N`. When using `first+` or `last-` if the expression results in an 'overflow' position (i.e. `first+10` but only 5 rows exist), then no row data will be populated. See [id-locked Configuration](#id-locked-configuration) for more information.
 
 ### RBLe CalcEngine Result Tabs
 
