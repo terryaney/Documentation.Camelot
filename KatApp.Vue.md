@@ -1534,10 +1534,9 @@ The `v-ka-input` directive can be used in three scenarios.
 Internally, KatApp Framework leverages the [`v-scope`](#https://github.com/vuejs/petite-vue#petite-vue-only) directive to append 'input helper properties and methods' onto the 'global scope' object that can be used by inputs or templates.
 
 - [v-ka-input Model](#v-ka-input-model) - Discusses the properties that can be passed in to configure the `v-ka-input` directive.
-- [rbl-input Table](#rbl-input-table) - Discusses RBLe Framework `rbl-input` table layout that can be used to automatically control many of the `v-ka-input` model properties.
-- [v-ka-input Model Samples](#v-ka-input-model-samples) - Examples illustrating the different properties that can be assigned on the `v-ka-input` model object.
 - [v-ka-input Scope](#v-ka-input-scope) - Discusses the properties that are exposed on the `v-ka-input` scope and can be used in Kaml View markup.
-- [v-ka-input Scope Samples](#v-ka-input-scope-samples) - Examples illustrating uses of the different properties returned by the `v-ka-input` scope object.
+- [rbl-input Table](#rbl-input-table) - Discusses RBLe Framework `rbl-input` table layout that can be used to automatically control many of the `v-ka-input` model properties.
+- [v-ka-input Samples](#v-ka-input-samples) - Examples illustrating uses of the different features of the `v-ka-input` directive.
 - [v-ka-nomount](#v-ka-nomount) - Control whether or not the associated HTML input element allows for the KatApp framework to wire up all automatic processing.
 
 ### v-ka-input Model
@@ -1615,127 +1614,15 @@ The value can also be provided via the combination of `rbl-sliders.format` and `
 
 <sup>5</sup> The `base` parameter passed into the delegate gives access to the associated `base.display`, `base.disabled`, and `base.noCalc` properties configured by the default RBLe Framework calculation value processing described above in each property.
 
-### rbl-input Table
-
-The `rbl-input` table is the preferred RBLe Calculation table to use to manage `v-ka-input` and `v-ka-input-group` scopes.  This table supercedes the functionality of the legacy tables of `rbl-display`, `rbl-disabled`, `rbl-skip`, `rbl-value`, `rbl-listcontrol`, `rbl-defaults` and `rbl-sliders`. The KatApp framework still supports the legacy tables if `rbl-input` isn't present (see [KatApp Provider: Push Table Processing](#https://github.com/terryaney/nexgen-documentation/blob/main/KatApps.md#push-table-processing) for more information.).
-
-Column | Description
----|---
-id | The id/name of the input (matches [`model.name`](#ikainputmodelname)).
-type | For textual inputs, a [HTML5 input type](#https://developer.mozilla.org/en-US/docs/Learn/Forms/HTML5_input_types) can be specified.  The default value is `text`.
-label | Provide the associated label for the current input.
-placeholder | For textual inputs, provided the associated placeholder to display when the input is empty.  
-help | Provide help content (can be HTML). Default is blank.
-help-title | If the help popup should have a 'title', can return it here. Default is blank.
-help-width | By default, when help popup is displayed, the width is 250px, provide a width (without the `px`) if you need it larger.
-value | A input value can be set from the CalcEngine whenever a calculation occurs.  Normally, this column is only returned during `iConfigureUI` calculations to return the 'default' value, but if it is non-blank, the value will be assigned during any calculation.
-display | Whether or not the input should be displayed.  Returning `0` will hide the input, anything else will display the input.
-disabled | Whether or not the input should be disabled.  Returning `1` will disable the input, anything else will enable the input.
-skip-calc | Whether or not this input should trigger a calculation when it is changed by the user.  Returning `1` will prevent the input from triggering a calculation, anything else will allow a calculation to occur.
-list | If the input is a 'list' control (dropdown, option list, checkbox list, etc.), return the name of the table that provides the list of items used to populate the control.
-prefix | If the input should have a prefix (usually a [Bootstrap `input-group`](#https://getbootstrap.com/docs/5.0/forms/input-group/)) prepended to the front, provide a value here (i.e. `$`).
-suffix | If the input should have a prefix (usually a Bootstrap `input-group`) appended to the end, provide a value here (i.e. `%`).
-max-length | For textual inputs (i.e. TEXTAREA inputs), a maximum allowed input length can be provided.  Default is `250`.
-min | For inputs with the concept of minimum values (sliders, dates), a minimum value can be provided.
-max | For inputs with the concept of maximum values (sliders, dates), a minimum value can be provided.
-step | For range/slider inputs, a `step` increment can be provided. Default is `1`.
-mask | For textual inputs, if an input mask should be applied while the user is typing information, a mask pattern can be provided (i.e. `(###) ###-####`).
-display-format | For range/slider inputs, a display format can be provided. See [`model.displayFormat`](#ikainputmodeldisplayformat) for more details.
-error | During validation calculations (usually `iValidate=1`), if an input is invalid, an error message can be provided here.  Additionally, the `errors` table can be used as well.
-warning | During validation calculations (usually `iValidate=1`), if an input triggers a warning, an warning message can be provided here.  Additionally, the `warnings` table can be used as well.
-
-### v-ka-input Model Samples
-
-```html
-<!-- Range input rendered via an 'input-slider-nexgen' template -->
-<div v-ka-input="{ 
-    name: 'iSlider', 
-    template: 'input-slider-nexgen', 
-    css: { input: 'input-slider' },
-    help: { content: 'Pick the age to stop working, the younger the better!' }, 
-    label: 'What age do you want to stop working?', 
-    min: '20', max: '80', value: '65' }"></div>
-
-<!-- 
-Date input rendered via an `input-textbox-nexgen` template; 
-1. Providing help markup - markup can contain other directives (help popovers are rendered as their own KatApps)
-2. Providing a isDisplay delegate that looks at another input value and falls back to using base.display functionality
-3. Providing events object hooking up two events to inputs (and using modifiers)
--->
-<div class="col-4" v-ka-input="{ 
-    name: 'iDateBirth', 
-    template: 'input-textbox-nexgen', 
-    label: 'Date of Birth', 
-    type: 'date',
-    help: { content: 'Enter your DOB :), also 1 + 2 = {{1+2}}.<br/><b>I\'m bold</b><br/><a v-ka-navigate=&quot;{ view: \'Channel.Home\', inputs: { iFromTooltip: 1 } }&quot;>Go home</a>' }, 
-    isDisplay: base => inputs.iHideDateBirth != '1' && base.display,
-    events: { 
-        'keypress.enter.once': () => console.log('Hooray, enter pressed!'), 
-        'input.prevent': e => console.log($(e.currentTarget).attr('name')) 
-    }
-}"></div>
-
-<!--
-Render an upload control and corresponding comment control.
-
-1. iComment and iUpload are rendered with templates
-2. iComment has max length of 250 and keyup handler to display remaining characters
-3. iUpload is provided uploadEndpoint and template renders a button called iUploadUpload that leverages IKaInputScope.uploadAsync
--->
-<script>
-    application.update({
-        handlers: {
-            processUpload: () => application.select('.iUploadUpload').trigger('click'),
-            textAreaCharCount: e => application.select("#{id}_count").text(Math.max(0, 250 - $(e.currentTarget).val().length))
-        }
-    });
-</script>
-<div class="col-md-12">
-    <div v-ka-input="{ 
-        name: 'iComment', 
-        template: 'input-textarea-nexgen', 
-        label: 'Notes (250 character maximum) – you have <span id=\'{id}_count\'>250</span> characters remaining', 
-        maxLength: 250, 
-        events: { keyup: handlers.textAreaCharCount } 
-    }"></div>
-    <div v-ka-input="{ 
-        name: 'iUpload', 
-        template: 'input-fileupload-nexgen', 
-        label: 'File Name', 
-        uploadEndpoint: 'document-center/upload' 
-    }"></div>
-    <div class="mt-2">
-        <a href="#" @click.prevent="handlers.processUpload" class='btn btn-primary'><i class="fa-solid fa-upload"></i> Upload</a>
-    </div>
-</div>
-```
-
 ### v-ka-input Scope
 
-The `IKaInputScope` represents the type containing the properties and methods available to inputs and templates that use the `v-ka-input` directive. For the most part, it is a 'read only' version of the `IKaInputModel` object, with default functionality provided from RBLe Framework calculation results when needed.  Additionally, there are helper properties and methods available as well.
+The `IKaInputScope` represents the type containing the properties and methods available to inputs and templates that use the `v-ka-input` directive. For the most part, it is a 'read only' version of the [`v-ka-input` model](#v-ka-input-model) object, with default functionality provided from RBLe Framework calculation results when needed.  Additionally, there are helper properties and methods available as well.
 
-#### IKaInputScope.id
-
-Property Type: `string`;  
-Gets the unique, generated `id` for the current input. This value *should* be used if an `id` attribute needs to be rendered on an `HTMLInputElement`.
-
-#### IKaInputScope.name
-
-Property Type: `string`;  
-Gets the `name` to use for the current input.
-
-#### IKaInputScope.type
-
-Property Type: `string`;  
-Gets the [`type`](#https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#input_types) to use if the associated `HTMLInputElement` is an `INPUT` (vs `SELECT` or `TEXTAREA`).
-
-The value can by provided by the model or a RBLe Framework calculation value.
-
-Returns value based on following precedence:
-
-1. `rbl-input.type` RBLe Framework calculation value
-1. `model.type` property
-1. `text` if no value provided.
+Property | Type | Description
+---|---|---|---
+`id` | string | Gets the unique, generated `id` for the current input. This value *should* be used if an `id` attribute needs to be rendered on an `HTMLInputElement`.
+`name` | string | Gets the `name` to use for the current input.
+`type` | string | Gets the [`type`](#https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#input_types) to use if the associated `HTMLInputElement` is an `INPUT` (vs `SELECT` or `TEXTAREA`).<br/><br/>The value can by provided by the model or a RBLe Framework calculation value.<br/><br/>Returns value based on following precedence:<br/>1. `rbl-input.type` RBLe Framework calculation value<br/>1. `model.type` property<br/>1. `text` if no value provided.
 
 #### IKaInputScope.value
 
@@ -2032,7 +1919,105 @@ The value can only by provided the `state.warnings` property.
 Property Type: `() => void | undefined`;  
 If an [uploadEndpoint](#ikainputmodeluploadendpoint) was provided, the KatApp Framework provides a help function that can be called to automatically submit the rendered [input.files](#https://developer.mozilla.org/en-US/docs/Web/API/File_API/Using_files_from_web_applications#getting_information_about_selected_files) list to the uploadEndpoint for processing.  Error handling is built in and 'success' is implied if no error occurs.
 
-### v-ka-input Scope Samples
+### rbl-input Table
+
+The `rbl-input` table is the preferred RBLe Calculation table to use to manage `v-ka-input` and `v-ka-input-group` scopes.  This table supercedes the functionality of the legacy tables of `rbl-display`, `rbl-disabled`, `rbl-skip`, `rbl-value`, `rbl-listcontrol`, `rbl-defaults` and `rbl-sliders`. The KatApp framework still supports the legacy tables if `rbl-input` isn't present (see [KatApp Provider: Push Table Processing](#https://github.com/terryaney/nexgen-documentation/blob/main/KatApps.md#push-table-processing) for more information.).
+
+Column | Description
+---|---
+id | The id/name of the input (matches [`model.name`](#ikainputmodelname)).
+type | For textual inputs, a [HTML5 input type](#https://developer.mozilla.org/en-US/docs/Learn/Forms/HTML5_input_types) can be specified.  The default value is `text`.
+label | Provide the associated label for the current input.
+placeholder | For textual inputs, provided the associated placeholder to display when the input is empty.  
+help | Provide help content (can be HTML). Default is blank.
+help-title | If the help popup should have a 'title', can return it here. Default is blank.
+help-width | By default, when help popup is displayed, the width is 250px, provide a width (without the `px`) if you need it larger.
+value | A input value can be set from the CalcEngine whenever a calculation occurs.  Normally, this column is only returned during `iConfigureUI` calculations to return the 'default' value, but if it is non-blank, the value will be assigned during any calculation.
+display | Whether or not the input should be displayed.  Returning `0` will hide the input, anything else will display the input.
+disabled | Whether or not the input should be disabled.  Returning `1` will disable the input, anything else will enable the input.
+skip-calc | Whether or not this input should trigger a calculation when it is changed by the user.  Returning `1` will prevent the input from triggering a calculation, anything else will allow a calculation to occur.
+list | If the input is a 'list' control (dropdown, option list, checkbox list, etc.), return the name of the table that provides the list of items used to populate the control.
+prefix | If the input should have a prefix (usually a [Bootstrap `input-group`](#https://getbootstrap.com/docs/5.0/forms/input-group/)) prepended to the front, provide a value here (i.e. `$`).
+suffix | If the input should have a prefix (usually a Bootstrap `input-group`) appended to the end, provide a value here (i.e. `%`).
+max-length | For textual inputs (i.e. TEXTAREA inputs), a maximum allowed input length can be provided.  Default is `250`.
+min | For inputs with the concept of minimum values (sliders, dates), a minimum value can be provided.
+max | For inputs with the concept of maximum values (sliders, dates), a minimum value can be provided.
+step | For range/slider inputs, a `step` increment can be provided. Default is `1`.
+mask | For textual inputs, if an input mask should be applied while the user is typing information, a mask pattern can be provided (i.e. `(###) ###-####`).
+display-format | For range/slider inputs, a display format can be provided. See [`model.displayFormat`](#ikainputmodeldisplayformat) for more details.
+error | During validation calculations (usually `iValidate=1`), if an input is invalid, an error message can be provided here.  Additionally, the `errors` table can be used as well.
+warning | During validation calculations (usually `iValidate=1`), if an input triggers a warning, an warning message can be provided here.  Additionally, the `warnings` table can be used as well.
+
+
+### v-ka-input Samples
+
+#### v-ka-input Model Samples
+
+```html
+<!-- Range input rendered via an 'input-slider-nexgen' template -->
+<div v-ka-input="{ 
+    name: 'iSlider', 
+    template: 'input-slider-nexgen', 
+    css: { input: 'input-slider' },
+    help: { content: 'Pick the age to stop working, the younger the better!' }, 
+    label: 'What age do you want to stop working?', 
+    min: '20', max: '80', value: '65' }"></div>
+
+<!-- 
+Date input rendered via an `input-textbox-nexgen` template; 
+1. Providing help markup - markup can contain other directives (help popovers are rendered as their own KatApps)
+2. Providing a isDisplay delegate that looks at another input value and falls back to using base.display functionality
+3. Providing events object hooking up two events to inputs (and using modifiers)
+-->
+<div class="col-4" v-ka-input="{ 
+    name: 'iDateBirth', 
+    template: 'input-textbox-nexgen', 
+    label: 'Date of Birth', 
+    type: 'date',
+    help: { content: 'Enter your DOB :), also 1 + 2 = {{1+2}}.<br/><b>I\'m bold</b><br/><a v-ka-navigate=&quot;{ view: \'Channel.Home\', inputs: { iFromTooltip: 1 } }&quot;>Go home</a>' }, 
+    isDisplay: base => inputs.iHideDateBirth != '1' && base.display,
+    events: { 
+        'keypress.enter.once': () => console.log('Hooray, enter pressed!'), 
+        'input.prevent': e => console.log($(e.currentTarget).attr('name')) 
+    }
+}"></div>
+
+<!--
+Render an upload control and corresponding comment control.
+
+1. iComment and iUpload are rendered with templates
+2. iComment has max length of 250 and keyup handler to display remaining characters
+3. iUpload is provided uploadEndpoint and template renders a button called iUploadUpload that leverages IKaInputScope.uploadAsync
+-->
+<script>
+    application.update({
+        handlers: {
+            processUpload: () => application.select('.iUploadUpload').trigger('click'),
+            textAreaCharCount: e => application.select("#{id}_count").text(Math.max(0, 250 - $(e.currentTarget).val().length))
+        }
+    });
+</script>
+<div class="col-md-12">
+    <div v-ka-input="{ 
+        name: 'iComment', 
+        template: 'input-textarea-nexgen', 
+        label: 'Notes (250 character maximum) – you have <span id=\'{id}_count\'>250</span> characters remaining', 
+        maxLength: 250, 
+        events: { keyup: handlers.textAreaCharCount } 
+    }"></div>
+    <div v-ka-input="{ 
+        name: 'iUpload', 
+        template: 'input-fileupload-nexgen', 
+        label: 'File Name', 
+        uploadEndpoint: 'document-center/upload' 
+    }"></div>
+    <div class="mt-2">
+        <a href="#" @click.prevent="handlers.processUpload" class='btn btn-primary'><i class="fa-solid fa-upload"></i> Upload</a>
+    </div>
+</div>
+```
+
+#### v-ka-input Scope Samples
 
 ```html
 <!--
