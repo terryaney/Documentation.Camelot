@@ -2097,11 +2097,19 @@ Sample two column 'textbox' input.  Illustrates how to access scope properties v
                 <div v-if="inputs.iScenarios > 1" class="d-block d-sm-none scenario-header-mobile m-1">Scenario 1</div>
                 <div class="mb-3 tip-icon-wrapper">
                     <input :value="value(0)" :name="name(0)" :id="id(0)" :type="type" 
-                        :class="['form-control', name(0), css(0).input, { 'is-invalid': error(0), 'is-warning': warning(0) }]" 
+                        :class="['form-control', name(0), css(0).input, { 
+                            'is-invalid': error(0), 
+                            'is-warning': warning(0) 
+                        }]" 
                         :disabled="disabled(0)" />
                     <span 
-                        :class="['error-icon-hover-area', { 'd-none': !error(0) && !warning(0), 'error': error(0), 'warning': warning(0) }]" 
-                        :data-bs-content="error(0) || warning(0) || 'Error content'" data-bs-toggle="tooltip" data-bs-placement="top"></span>
+                        :class="['error-icon-hover-area', { 
+                            'd-none': !error(0) && !warning(0), 
+                            'error': error(0), 
+                            'warning': warning(0) 
+                        }]" 
+                        :data-bs-content="error(0) || warning(0) || 'Error content'" 
+                        data-bs-toggle="tooltip" data-bs-placement="top"></span>
                 </div>
             </div>
             <div class="col-md-6" v-if="inputs.iScenarios > 1">
@@ -2113,11 +2121,19 @@ Sample two column 'textbox' input.  Illustrates how to access scope properties v
                 </div>
                 <div class="mb-3 tip-icon-wrapper">
                     <input :value="value(1)" :name="name(1)" :id="id(1)" :type="type" 
-                        :class="['form-control', name(1), css(1).input, { 'is-invalid': error(1), 'is-warning': warning(1) }]" 
+                        :class="['form-control', name(1), css(1).input, { 
+                            'is-invalid': error(1), 
+                            'is-warning': warning(1) 
+                        }]" 
                         :disabled="disabled(1)" />
                     <span 
-                        :class="['error-icon-hover-area', { 'd-none': !error(1) && !warning(1), 'error': error(1), 'warning': warning(1) }]" 
-                        :data-bs-content="error(1) || warning(1) || 'Error content'" data-bs-toggle="tooltip" data-bs-placement="top"></span>
+                        :class="['error-icon-hover-area', { 
+                            'd-none': !error(1) && !warning(1), 
+                            'error': error(1), 
+                            'warning': warning(1) 
+                        }]" 
+                        :data-bs-content="error(1) || warning(1) || 'Error content'" 
+                        data-bs-toggle="tooltip" data-bs-placement="top"></span>
                 </div>
             </div>
         </div>
@@ -2219,14 +2235,19 @@ Additionally, it is advised to use the [`:key`](#https://vuejs.org/api/built-in-
 
 ```html
 <!-- Template where the model.source is an array, so the template iterated through the 'rows' property -->
-<ul class="dropdown-menu dropdown-menu-lg-end" v-ka-template="{ name: 'more-menu-links', source: rbl.source('contentContextLinks') }"></ul>
+<ul class="dropdown-menu dropdown-menu-lg-end" 
+    v-ka-template="{ name: 'more-menu-links', source: rbl.source('contentContextLinks') }"></ul>
 
 <template id="more-menu-links">
     <li v-for="link in rows">
-        <a v-if="( link.modalModel || '' ) == ''" class="dropdown-item d-flex justify-content-between align-items-start me-3" v-ka-navigate="{ view: link.viewID }">
+        <a v-if="( link.modalModel || '' ) == ''" 
+            class="dropdown-item d-flex justify-content-between align-items-start me-3" 
+            v-ka-navigate="{ view: link.viewID }">
             {{link.text}} <i :class="['fa-light fs-6 link-primary align-self-center', link.linkIcon]"></i>
         </a>
-        <a v-if="( link.modalModel || '' ) != ''" class="dropdown-item d-flex justify-content-between align-items-start me-3" v-ka-modal="{ model: link.modalModel }">
+        <a v-if="( link.modalModel || '' ) != ''" 
+            class="dropdown-item d-flex justify-content-between align-items-start me-3" 
+            v-ka-modal="{ model: link.modalModel }">
             {{link.text}} <i :class="['fa-light fs-6 link-primary align-self-center', link.linkIcon]"></i>
         </a>
     </li>
@@ -2236,22 +2257,30 @@ Additionally, it is advised to use the [`:key`](#https://vuejs.org/api/built-in-
 ```html
 <!-- 
 1. Same as above where the model.source is an array
-2. Demonstrates how the 'scope' to the template takes into account parent scope.  The 'type' iteration item from 'typeMessage' table
-    is expected in the template.  The template uses both the 'type' iteration item and its own 'message' iteration item.
+2. Demonstrates how the 'scope' to the template takes into account parent scope.  The 'type' iteration item 
+    from 'typeMessage' table is expected in the template.  The template uses both the 'type' iteration item 
+    and its own 'message' iteration item.
 -->
 <div v-for="type in rbl.source('typeMessage')">
-    <div v-ka-template="{ name: 'notice-type1', source: rbl.source('messages', 'Messages').filter( r => r.type == type.type ) }"></div>
+    <div v-ka-template="{ 
+        name: 'notice-type1', 
+        source: rbl.source('messages', 'Messages').filter( r => r.type == type.type ) 
+    }"></div>
 </div>
 
 <template id="notice-type1">
     <div v-for="message in rows" :class="'alert alert-' + type.alertType">
         <div class="d-flex w-100 justify-content-between d-none">
-            <h4 class="alert-heading mb-1 d-flex align-content-center text-dark"><i :class="'fa-light me-2 ' + type.icon"></i> {{type.text}}</h4>
+            <h4 class="alert-heading mb-1 d-flex align-content-center text-dark">
+                <i :class="'fa-light me-2 ' + type.icon"></i> {{type.text}}
+            </h4>
         </div>
         <p class="mb-1 fw-bold text-dark"><i :class="'fa-light me-1 ' + type.icon"></i>{{message.title}}</p>
         <small v-html="message.message"></small>
         <div class="text-center border-top border-secondary mt-2 pt-2" v-if="message.linkText!=''">
-            <a class="link-dark" v-ka-navigate="{ view: message.linkDest }"><i class="fa-light fa-circle-chevron-right me-1"></i><span v-html="message.linkText"></span></a>
+            <a class="link-dark" v-ka-navigate="{ view: message.linkDest }">
+                <i class="fa-light fa-circle-chevron-right me-1"></i><span v-html="message.linkText"></span>
+            </a>
         </div>
     </div>
 </template>
