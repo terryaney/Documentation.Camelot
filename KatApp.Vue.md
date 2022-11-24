@@ -1678,7 +1678,31 @@ Property | Type | Description
 `max` | number, string | Provide a `max` value for the input that could be used to limit the maximum allowed value on `date` or `range` inputs.  The value can also be provided via the `rbl-input.max` RBLe Framework calculation value.
 `step` | number | Provide a `step` increment value for the input that could be used to control the value increments for `range` inputs.  The value can also be provided via the `rbl-input.step` RBLe Framework calculation value.
 `mask`<sup>3</sup> | string | Provide an input `mask` to apply during user input for text inputs.  The value can also be provided via the `rbl-input.mask` RBLe Framework calculation value.
+`uploadEndpoint` | string | Provide an `uploadEndpoint` value for the input that could be used if `type="file"` or if the template will render a 'file upload' UI component.
+`clearOnUnmount` | boolean | If `true`, when an input is removed from the DOM, the associated [`state.inputs`](#iapplicationdatainputs) value is also removed.
+`events` | `IStringIndexer<((e: Event, application: KatApp) => void)>` | Provide a javascript object where each property is an event handler.  These event handlers will automatically be added to `HTMLInputElements` based on the property name.  The property name follows the same patterns as the [`v-on`](#v-on) directive (including [modifiers](#v-on-modifiers)).
+`isNoCalc` | `(base: IKaInputScopeBase) => boolean` | Provide a delegate for the input that will be called to determine if an input should *not* trigger an RBLe Framework calculation.  The value can also be provided via the `rbl-skip.value` or `rbl-input.skip-calc` RBLe Framework calculation value.<br/><br/>The `base` parameter passed into the delegate gives access a `base.noCalc` property configured by the default RBLe Framework calculation value processing described above.<br/><br/>**Note:** Additionally if any input or input ancestor has `rbl-nocalc` or `rbl-exclude` in the class list, the calculation will not occur.
+`ce` | string | Provide the CalcEngine key if all the values that automatically pull from RBLe Framework calculation values should use a CalcEngine *different from the default CalcEngine*.
+`tab` | string | Provide the CalcEngine result tab name if all the values that automatically pull from RBLe Framework calculation values should use a tab name *different from the default tab specified for the associated CalcEngine*.
 
+
+#### IKaInputModel.isDisabled
+
+Property Type: `(base: IKaInputScopeBase) => boolean`; Optional
+Provide a delegate to the input scope that can be called to determine if an input should be disabled.
+
+The value can also be provided via the `rbl-disabled.value` or `rbl-input.disabled` RBLe Framework calculation value.
+
+The `base` parameter passed into the delegate gives access a `base.disabled` property configured by the default RBLe Framework calculation value processing described above.
+
+#### IKaInputModel.isDisplay
+
+Property Type: `(base: IKaInputScopeBase) => boolean`; Optional
+Provide a delegate to the input scope that can be called to determine if an input should be displayed.
+
+The value can also be provided via the `rbl-display.value` or `rbl-input.display` RBLe Framework calculation value.
+
+The `base` parameter passed into the delegate gives access a `base.display` property configured by the default RBLe Framework calculation value processing described above.
 
 <sup>1</sup> In addition to events that trigger RBLe Framework calculations, if the `HTMLInputElement.type` is of type `range`, the KatApp Framework adds a few more events to enable displaying the `range` value for the benefit of the user.  To enable this feature, the Kaml View developers have to take advantage of the [Template Refs](#https://vuejs.org/guide/essentials/template-refs.html#template-refs) feature of Vue and provide the following `ref` assignments, all of which are optional if the Kaml View does not desire the functionality.
 
