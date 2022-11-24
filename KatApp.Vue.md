@@ -2371,12 +2371,18 @@ Property | Type | Description
 ### v-ka-api Model Samples
 
 ```html
-<!-- Submit to a estimate generation endpoint, and on success, run a calculation on the client side passing in iRefreshAfterEstimate = 1 -->
+<!-- 
+Submit to a estimate generation endpoint, and on success, run a calculation on 
+the client side passing in iRefreshAfterEstimate = 1 
+-->
 <a v-ka-api="{ endpoint: 'generate/estimate', calculateOnSuccess: { iRefreshAfterEstimate: '1' } }">Submit
 ```
 
 ```html
-<!-- Submit to a estimate generation endpoint, and on success, run a calculation on the client side passing in iRefreshAfterEstimate = 1 -->
+<!-- 
+Submit to a estimate generation endpoint, and on success, run a calculation on 
+the client side passing in iRefreshAfterEstimate = 1 
+-->
 <a v-ka-api="{ 
     endpoint: 'generate/estimate', 
     then: ( response, application ) => console.log(`Estimate was successful and responded with ${response}`) 
