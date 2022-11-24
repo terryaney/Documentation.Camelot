@@ -1665,10 +1665,21 @@ Property | Type | Description
 `template` | string | The template ID if a [template](#html-content-template-elements) will be used to render markup with the scope.
 `type`<sup>1</sup> | string | Set the [type](#https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#input_types) of the associated `HTMLInputElement` when the `tagName=INPUT` (vs `SELECT` or `TEXTAREA`).
 `value` | string | Provide a default value for the input.  The value can also be provided via the `rbl-defaults.value` or the `rbl-input.value` RBLe Framework calculation value.
+
+
 `label` | string | Provide a display label for the input.  The value can also be provided via the `rbl-value[@id=='l' + name].value` or the `rbl-input.label` RBLe Framework calculation value.
 `placeHolder` | string | Provide a [placeholder](#https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#placeholder) for the input.  The value can also be provided via the `rbl-input.placeholder` RBLe Framework calculation value.
 `hideLabel` | boolean | Provide a value determining whether the display label should be hidden. The value can also be provided via a RBLe Framework calculation value. If `rbl-input.label == '-1'`, the label will be hidden.
 `iconHtml` | HTML | Provide additional HTML Markup that could be rendered next to other icons that perform actions.  For example, a `range` input may have an additional icon that should open up a 'worksheet' or [v-ka-modal](#v-ka-modal).
+`list` | `Array<{ key: string; text: string; }>` | Provide a `list` for the input if it renders a list (i.e. `SELECT`, `type="radio"`, etc.) when building the control.  The value can also be provided via the `rbl-listcontrol.table` or `rbl-input.list` RBLe Framework calculation value which points to a table containing columns of `key` an `text`.
+`prefix` | string | Provide a `prefix` for the input that could be displayed before the actual input (i.e. with Bootstrap [input-group](#https://getbootstrap.com/docs/5.0/forms/input-group/) markup).  The value can also be provided via the `rbl-input.prefix` RBLe Framework calculation value.
+`suffix` | string | Provide a `suffix` for the input that could be displayed after the actual input (i.e. with Bootstrap [input-group](#https://getbootstrap.com/docs/5.0/forms/input-group/) markup). The value can also be provided via the `rbl-input.suffix` RBLe Framework calculation value.
+`maxLength` | number | Provide a `maxLength` for the input that could be used to limit the length of textual inputs. The value can also be provided via the `rbl-input.max-length` RBLe Framework calculation value.
+`displayFormat`<sup>2</sup> | string | Provide a `displayFormat` for the input that could be used to format a value before displaying it. This is currently used when the input type is `range`.
+`min` | number, string | Provide a `min` value for the input that could be used to limit the minimum allowed value on `date` or `range` inputs.  The value can also be provided via the `rbl-input.min` RBLe Framework calculation value.
+`max` | number, string | Provide a `max` value for the input that could be used to limit the maximum allowed value on `date` or `range` inputs.  The value can also be provided via the `rbl-input.max` RBLe Framework calculation value.
+`step` | number | Provide a `step` increment value for the input that could be used to control the value increments for `range` inputs.  The value can also be provided via the `rbl-input.step` RBLe Framework calculation value.
+`mask`<sup>3</sup> | string | Provide an input `mask` to apply during user input for text inputs.  The value can also be provided via the `rbl-input.mask` RBLe Framework calculation value.
 
 
 \1. In addition to events that trigger RBLe Framework calculations, if the `HTMLInputElement.type` is of type `range`, the KatApp Framework adds a few more events to enable displaying the `range` value for the benefit of the user.  To enable this feature, the Kaml View developers have to take advantage of the [Template Refs](#https://vuejs.org/guide/essentials/template-refs.html#template-refs) feature of Vue and provide the following `ref` assignments, all of which are optional if the Kaml View does not desire the functionality.
