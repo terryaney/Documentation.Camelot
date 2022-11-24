@@ -1168,7 +1168,10 @@ You can provide an array of multiple (prefixed) values to a style property and V
 value in the array which the browser supports. 
 -->
 <div :style="{ display: ['-webkit-box', '-ms-flexbox', 'flex'] }"></div>
-<!-- Renders `display: flex` for browsers that support the unprefixed version of `flexbox`.  This gets around the limitation of no support for 'auto-prefixing'. -->
+<!-- 
+Renders `display: flex` for browsers that support the unprefixed version of `flexbox`.  
+This gets around the limitation of no support for 'auto-prefixing'. 
+-->
 <div style="display: flex;"></div>
 ```
 
@@ -1393,17 +1396,20 @@ These events can be used in Kaml Views manually if needed. To use the elements y
 <div v-if="rbl.boolean('showElectionForm')" @vue:mounted="handlers.paymentOptionsMounted">
     <ul class="nav nav-tabs" id="eHSAContribution" role="tablist">
         <li v-if="rbl.boolean('enableHsaPPP')" class="nav-item" role="presentation">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#perPayPeriod" type="button" role="tab" aria-controls="perPayPeriod" aria-selected="true" value="perPay">Change per-pay-period contribution</button>
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#perPayPeriod" 
+                type="button" role="tab" aria-controls="perPayPeriod" aria-selected="true" 
+                value="perPay">Change per-pay-period contribution</button>
         </li>
         <li v-if="rbl.boolean('enableHsaOneTime')" class="nav-item" role="presentation">
-            <button @click="handlers.togglePaymentOption" class="nav-link" data-bs-toggle="tab" data-bs-target="#iOneTime" type="button" role="tab" aria-controls="iOneTime" aria-selected="false" value="oneTime">Make a one-time contribution</button>
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#iOneTime" 
+                type="button" role="tab" aria-controls="iOneTime" aria-selected="false" value="oneTime"
+                @click="handlers.togglePaymentOption">Make a one-time contribution</button>
         </li>
     </ul>
 
     <!-- Omitting markup for the actual tab content -->
 </div>
 ```
-
 
 ## v-if / v-else / v-else-if
 
@@ -1496,14 +1502,26 @@ The `v-ka-value` directive has the same shorthand capabilities as `rbl.value()` 
 <div v-ka-value="custom-table.name-first.value2"></div>
 <!-- Return 'value2' column from 'rbl-value' table where 'key' column is "name-first". -->
 <div v-ka-value="custom-table.name-first.value2.key"></div>
-<!-- Return 'value' column from 'rbl-value' table where 'key' column is "name-first". NOTE: The 'empty' segment where returnValue is omitted -->
+<!-- 
+Return 'value' column from 'rbl-value' table where 'key' column is "name-first". 
+NOTE: The 'empty' segment where returnValue is omitted 
+-->
 <div v-ka-value="custom-table.name-first..key"></div>
 
-<!-- Return 'value' column from 'rbl-value' table where '@id' column is "name-first" from the BRD CalcEngine. NOTE: Empty segments. -->
+<!-- 
+Return 'value' column from 'rbl-value' table where '@id' column is "name-first" from the BRD CalcEngine. 
+NOTE: Empty segments. 
+-->
 <div v-ka-value="rbl-value.name-first...BRD"></div>
-<!-- Return 'value' column from 'rbl-value' table where '@id' column is "name-first" from the RBLResult2 tab in the default CalcEngine -->
+<!-- 
+Return 'value' column from 'rbl-value' table where '@id' column is "name-first" from the 
+RBLResult2 tab in the default CalcEngine
+-->
 <div v-ka-value="rbl-value.name-first....RBLResult2"></div>
-<!-- Return 'value2' column from 'rbl-value' table where 'key' column is "name-first" from the RBLResult2 tab in the BRD CalcEngine -->
+<!-- 
+Return 'value2' column from 'rbl-value' table where 'key' column is "name-first" from the
+RBLResult2 tab in the BRD CalcEngine 
+-->
 <div v-ka-value="custom-table.name-first.value2.key.BRD.RBLResult2"></div>
 ```
 
