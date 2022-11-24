@@ -477,21 +477,28 @@ Shorthand syntax of only one parameter is allowed, where the `table` parameter i
 ```javascript
 // Return 'value' column from 'rbl-value' table where '@id' column is "name-first".
 const name = application.state.rbl.value("rbl-value", "name-first");
+
 // Shorthand syntax for example above.
 const name = application.state.rbl.value("name-first");
+
 // Return 'value2' column from 'rbl-value' table where '@id' column is "name-first".
 const name = application.state.rbl.value("custom-table", "name-first", "value2");
+
 // Return 'value2' column from 'rbl-value' table where 'key' column is "name-first".
 const name = application.state.rbl.value("custom-table", "name-first", "value2", "key");
+
 // Return 'value' column from 'rbl-value' table where 'key' column is "name-first".
 const name = application.state.rbl.value("custom-table", "name-first", undefined, "key");
 
+
 // Return 'value' column from 'rbl-value' table where '@id' column is "name-first" from the BRD CalcEngine
 const name = application.state.rbl.value("rbl-value", "name-first", undefined, undefined, "BRD");
+
 // Return 'value' column from 'rbl-value' table where '@id' column is "name-first" 
 // from the RBLResult2 tab in the default CalcEngine
 const name = application.state.rbl.value("rbl-value", "name-first", 
                 undefined, undefined, undefined, "RBLResult2");
+
 // Return 'value2' column from 'rbl-value' table where 'key' column is "name-first" from the 
 // RBLResult2 tab in the BRD CalcEngine
 const name = application.state.rbl.value("custom-table", "name-first", "value2", "key", 
@@ -776,41 +783,45 @@ Below is an example of how to leverage the `$renderId` to allow for proper scopi
 	<script setup type="text/javascript">
 		function mounted(application) {
 			// Use {{ }} syntax to grab value and store it in string selector
-            const renderId = '.{{$renderId}}';
-			console.log(`setup templateMounted:, ${application.select(renderId).length} scoped items found`);
-			console.log(`setup templateMounted:, ${application.select(renderId).length} template-script-input items found`);
+			const renderId = '.{{$renderId}}';
+            const length = application.select(renderId).length;
+			console.log(`setup templateMounted:, ${length} scoped items found`);
 		}
 		function unmounted(application) {
 			const renderId = '.{{$renderId}}';
-			console.log(`setup templateUnmounted:, ${application.select(renderId).length} scoped items found`);
-			console.log(`setup templateUnmounted:, ${application.select(renderId).length} template-script-input items found`);
+            const length = application.select(renderId).length;
+			console.log(`setup templateUnmounted:, ${length} scoped items found`);
 		}
 	</script>
 	<script type="text/javascript">
 		function mounted(application) {
 			const renderId = '.{{$renderId}}';
-			console.log(`templateMounted:, ${application.select(renderId).length} scoped items found`);
-			console.log(`templateMounted:, ${application.select(".template-script-input").length} template-script-input items found`);
+            const scopeLength = application.select(renderId).length;
+            const templateLength = application.select(renderId).length;
+			console.log(`templateMounted:, ${scopeLength} scoped items found`);
+			console.log(`templateMounted:, ${templateLength} template-script-input items found`);
 		}
 		function unmounted(application) {
 			const renderId = '.{{$renderId}}';
-			console.log(`templateUnmounted:, ${application.select(".template-script-input").length} template-script-input items found`);
+            const templateLength = application.select(renderId).length;
+			console.log(`templateUnmounted:, ${templateLength} template-script-input items found`);
 		}
 	</script>
-	<input v-ka-input="{name: 'iTemplateInput' + name }" type="text" :class="['form-control template-script-input', $renderId]" />
+	<input v-ka-input="{name: 'iTemplateInput' + name }" type="text" 
+        :class="['template-script-input', $renderId]" />
 </template>
 
 <!-- Rendered HTML -->
 <div class="rbl-nocalc">
     <input name="iTemplateInputPension" 
         type="text" 
-        class="form-control template-script-input iTemplateInputPension templateWithScript_templateWithScript_ka1e46825c_1">
+        class="template-script-input iTemplateInputPension templateWithScript_templateWithScript_ka1e46825c_1">
     <input name="iTemplateInputLifeEvents" 
         type="text" 
-        class="form-control template-script-input iTemplateInputLifeEvents templateWithScript_templateWithScript_ka1e46825c_2">
+        class="template-script-input iTemplateInputLifeEvents templateWithScript_templateWithScript_ka1e46825c_2">
     <input name="iTemplateInputPension" 
         type="text" 
-        class="form-control template-script-input iTemplateInputSavings templateWithScript_templateWithScript_ka1e46825c_3">
+        class="template-script-input iTemplateInputSavings templateWithScript_templateWithScript_ka1e46825c_3">
 </div>
 ```
 
@@ -846,42 +857,46 @@ With the above example, you could expect the following in the console ouput (rem
 		function mounted(application) {
 			// Use {{ }} syntax to grab value and store it in string selector
             const renderId = '.{{$renderId}}';
-			console.log(`setup templateMounted:, ${application.select(renderId).length} scoped items found`);
-			console.log(`setup templateMounted:, ${application.select(renderId).length} template-script-input items found`);
+            const length = application.select(renderId).length;
+			console.log(`setup templateMounted:, ${length} scoped items found`);
 		}
 		function unmounted(application) {
 			const renderId = '.{{$renderId}}';
-			console.log(`setup templateUnmounted:, ${application.select(renderId).length} scoped items found`);
-			console.log(`setup templateUnmounted:, ${application.select(renderId).length} template-script-input items found`);
+            const length = application.select(renderId).length;
+			console.log(`setup templateUnmounted:, ${length} scoped items found`);
 		}
 	</script>
 	<script type="text/javascript">
 		function mounted(application) {
 			const renderId = '.{{$renderId}}';
-			console.log(`templateMounted:, ${application.select(renderId).length} scoped items found`);
-			console.log(`templateMounted:, ${application.select(".template-script-input").length} template-script-input items found`);
+            const scopeLength = application.select(renderId).length;
+            const templateLength = application.select(renderId).length;
+			console.log(`templateMounted:, ${scopeLength} scoped items found`);
+			console.log(`templateMounted:, ${templateLength} template-script-input items found`);
 		}
 		function unmounted(application) {
 			const renderId = '.{{$renderId}}';
-			console.log(`templateUnmounted:, ${application.select(".template-script-input").length} template-script-input items found`);
+            const templateLength = application.select(renderId).length;
+			console.log(`templateUnmounted:, ${templateLength} template-script-input items found`);
 		}
 	</script>
 
     <!-- Render items with v-for -->
-	<input v-for="(row, index) in rows" v-ka-input="{name: 'iTemplateInput' + row.name }" type="text" :class="['form-control template-script-input', $renderId]" />
+	<input v-for="(row, index) in rows" v-ka-input="{name: 'iTemplateInput' + row.name }" type="text" 
+        :class="['template-script-input', $renderId]" />
 </template>
 
 <!-- Rendered HTML (notice how the last segment of renderId is always 1 in this case) -->
 <div class="rbl-nocalc">
     <input name="iTemplateInputPension" 
         type="text" 
-        class="form-control template-script-input iTemplateInputPension templateWithScript_templateWithScript_ka1e46825c_1">
+        class="template-script-input iTemplateInputPension templateWithScript_templateWithScript_ka1e46825c_1">
     <input name="iTemplateInputLifeEvents" 
         type="text" 
-        class="form-control template-script-input iTemplateInputLifeEvents templateWithScript_templateWithScript_ka1e46825c_1">
+        class="template-script-input iTemplateInputLifeEvents templateWithScript_templateWithScript_ka1e46825c_1">
     <input name="iTemplateInputPension" 
         type="text" 
-        class="form-control template-script-input iTemplateInputSavings templateWithScript_templateWithScript_ka1e46825c_1">
+        class="template-script-input iTemplateInputSavings templateWithScript_templateWithScript_ka1e46825c_1">
 </div>
 ```
 
@@ -1130,7 +1145,8 @@ model: {
 <!-- 
 Expression of type IStringIndexer<string> 
 
-When expression is IStringIndexer<string> each style is applied and overrides any existing matching styles with last element in array taking precedence.
+When expression is IStringIndexer<string> each style is applied and overrides any existing matching styles with 
+last element in array taking precedence.
 -->
 <div :style="{ color: model.activeColor, fontSize: model.fontSize + 'px' }"></div>
 <!-- Renders.. -->
@@ -1140,13 +1156,16 @@ When expression is IStringIndexer<string> each style is applied and overrides an
 Expression of type Array<string, IStringIndexer<string>>
 Can mix and match string and IStringIndexer<string> in the array as well.
 -->
-<div style="border: 1px solid blue;" :style="['font-weight: bold', { color: model.activeColor, fontSize: model.fontSize + 'px' }, { font-weight: 'normal' }]"></div>
+<div style="border: 1px solid blue;" 
+    :style="['font-weight: bold', { color: model.activeColor, fontSize: model.fontSize + 'px' }, { font-weight: 'normal' }]">
+</div>
 <!-- Renders... -->
 <div style="border: 1px solid blue; color: red; fontSize: 30px; font-weight: normal;"></div>
 
 <!-- 
 Expression of type IStringIndexer<Array<string>>
-You can provide an array of multiple (prefixed) values to a style property and Vue will only render the last value in the array which the browser supports. 
+You can provide an array of multiple (prefixed) values to a style property and Vue will only render the last 
+value in the array which the browser supports. 
 -->
 <div :style="{ display: ['-webkit-box', '-ms-flexbox', 'flex'] }"></div>
 <!-- Renders `display: flex` for browsers that support the unprefixed version of `flexbox`.  This gets around the limitation of no support for 'auto-prefixing'. -->
