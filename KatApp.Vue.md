@@ -2081,7 +2081,12 @@ Sample two column 'textbox' input.  Illustrates how to access scope properties v
 <template id="input-textbox-2col" input>
     <div v-if="display(0)">
         <label :for="id(0)" class="form-label">
-            <span v-html="label(0)"></span> <a v-show="help(0).content" :data-bs-content-selector="'#' + id(0) + 'Help'" data-bs-toggle="popover" data-bs-trigger="click" data-bs-placement="top" role="button" tabindex="-1"><i class="fa-solid fa-circle-question text-blue"></i></a>
+            <span v-html="label(0)"></span> 
+            <a v-show="help(0).content" 
+                :data-bs-content-selector="'#' + id(0) + 'Help'" 
+                data-bs-toggle="popover" data-bs-trigger="click" data-bs-placement="top" role="button" tabindex="-1">
+                <i class="fa-solid fa-circle-question text-blue"></i>
+            </a>
         </label>
         <div class="d-none" v-if="help(0).content">
             <div :id="id(0) + 'HelpTitle'" v-html="help(0).title"></div>
@@ -2091,15 +2096,28 @@ Sample two column 'textbox' input.  Illustrates how to access scope properties v
             <div class="col-md-6">
                 <div v-if="inputs.iScenarios > 1" class="d-block d-sm-none scenario-header-mobile m-1">Scenario 1</div>
                 <div class="mb-3 tip-icon-wrapper">
-                    <input :value="value(0)" :name="name(0)" :id="id(0)" :type="type" :class="['form-control', name(0), css(0).input, { 'is-invalid': error(0), 'is-warning': warning(0) }]" :disabled="disabled(0)" />
-                    <span :class="['error-icon-hover-area', { 'd-none': !error(0) && !warning(0), 'error': error(0), 'warning': warning(0) }]" :data-bs-content="error(0) || warning(0) || 'Error content'" data-bs-toggle="tooltip" data-bs-placement="top"></span>
+                    <input :value="value(0)" :name="name(0)" :id="id(0)" :type="type" 
+                        :class="['form-control', name(0), css(0).input, { 'is-invalid': error(0), 'is-warning': warning(0) }]" 
+                        :disabled="disabled(0)" />
+                    <span 
+                        :class="['error-icon-hover-area', { 'd-none': !error(0) && !warning(0), 'error': error(0), 'warning': warning(0) }]" 
+                        :data-bs-content="error(0) || warning(0) || 'Error content'" data-bs-toggle="tooltip" data-bs-placement="top"></span>
                 </div>
             </div>
             <div class="col-md-6" v-if="inputs.iScenarios > 1">
-                <div class="d-block d-sm-none m-1 scenario-header-mobile">Scenario 2 <a href="#" @click.prevent="inputs.iScenarios = 1;  needsCalculation = true;" class="text-danger"><i class="fa-light fa-square-xmark"></i></a></div>
+                <div class="d-block d-sm-none m-1 scenario-header-mobile">
+                    <span>Scenario 2 </span>
+                    <a href="#" @click.prevent="inputs.iScenarios = 1;  needsCalculation = true;" class="text-danger">
+                        <i class="fa-light fa-square-xmark"></i>
+                    </a>
+                </div>
                 <div class="mb-3 tip-icon-wrapper">
-                    <input :value="value(1)" :name="name(1)" :id="id(1)" :type="type" :class="['form-control', name(1), css(1).input, { 'is-invalid': error(1), 'is-warning': warning(1) }]" :disabled="disabled(1)" />
-                    <span :class="['error-icon-hover-area', { 'd-none': !error(1) && !warning(1), 'error': error(1), 'warning': warning(1) }]" :data-bs-content="error(1) || warning(1) || 'Error content'" data-bs-toggle="tooltip" data-bs-placement="top"></span>
+                    <input :value="value(1)" :name="name(1)" :id="id(1)" :type="type" 
+                        :class="['form-control', name(1), css(1).input, { 'is-invalid': error(1), 'is-warning': warning(1) }]" 
+                        :disabled="disabled(1)" />
+                    <span 
+                        :class="['error-icon-hover-area', { 'd-none': !error(1) && !warning(1), 'error': error(1), 'warning': warning(1) }]" 
+                        :data-bs-content="error(1) || warning(1) || 'Error content'" data-bs-toggle="tooltip" data-bs-placement="top"></span>
                 </div>
             </div>
         </div>
