@@ -109,9 +109,9 @@ Entity | Description
 `calc-engine` | Element; If one or more CalcEngines are used in Kaml View, specify each one via a `calc-engine` element.
 `key` | Attribute; When more than one CalcEngine is provided (or if you need to access [Manual Results](#manualResults)), a CalcEngine is referenced by this key; usually via a `ce` property passed into a Vue directive.
 `name` | Attribute; The name of the CalcEngine.
-`input-tab` | Attribute; The name of the tab where KatApp framework should inject inputs. Default is `RBLInput`.
-`result-tabs` | Attribute; Comma delimitted list of result tabs to process during RBLe Calculation. When more than one result tab is provided, the tab is referenced by name; usually via a `tab` property passed into a Vue directive. Default is `RBLResult`.
-`configure-ui` | Attribute; Whether or not this CalcEngine should run during the Kaml View's original [Configure UI Calculation](#IKatApp.configureUICalculation). Default is `true`.
+`input&#x2011;tab` | Attribute; The name of the tab where KatApp framework should inject inputs. Default is `RBLInput`.
+`result&#x2011;tabs` | Attribute; Comma delimitted list of result tabs to process during RBLe Calculation. When more than one result tab is provided, the tab is referenced by name; usually via a `tab` property passed into a Vue directive. Default is `RBLResult`.
+`configure&#x2011;ui` | Attribute; Whether or not this CalcEngine should run during the Kaml View's original [Configure UI Calculation](#IKatApp.configureUICalculation). Default is `true`.
 `precalcs` | Attribute; Comma delimitted list of CalcEngines, i.e. `CalcEngine1,CalcEngineN` to use in a a [Precalc Pipeline](#Precalc Pipelines) for the current CalcEngine. .  By default, if only a CalcEngine name is provided, the input and the result tab with the *same* name as the tabs configured on the primary CalcEngine will be used.  To use different tabs, each PreCalc CalcEngine 'entity' becomes `CalcEngine|InputTab|ResultTab`.  
 
 # Kaml View Specifications
@@ -284,61 +284,81 @@ application.state object.
 const nameFirst = application.state.rbl.value("name-first");
 ```
 
-### IApplicationData.kaId
+### IApplicationData Properties
 
-Property Type: `string`  
-Current id of the running KatApp.  Typically only used in Template Files when a unique id is required.
+Property | Type | Description
+---|---|---
+`kaId` | `string` | Current id of the running KatApp.  Typically only used in Template Files when a unique id is required.
+`uiBlocked` | `boolean` | Returns `true` when a RBL Calculation or Api Endpoint is being processed.  See [`IKatApp.blockUI`](#IKatApp.blockUI) and [`IKatApp.unblockUI`](#IKatApp.unblockUI) for more information. Typically used to show a 'blocker' on the rendered HTML to prevent the user from clicking anywhere.
+`needsCalculation` | `boolean` | Returns `true` when input that will trigger a calculation has been edited but has not triggered a calculation yet.  Typically used with [`v-ka-needs-calc`](#v-ka-needs-calc) directive which toggles 'submit button' state to indicate to the user that a calculation is needed before they can submit the current form.
+`model` | `any` | Kaml Views can pass in 'custom models' that hold state but are not built from Calculation Results. See [`IKatApp.update`](#IKatApp.update) for more information.
+`handlers` | `IStringAnyIndexer` | Kaml Views can pass in event handlers that can be bound via @event syntax (i.e. `@click="handlers.foo"`). See [`IKatApp.update`](#IKatApp.update) for more information.
+`components` | `IStringIndexer<IStringAnyIndexer>` | Kaml Views can pass in petite-vue components that can used in v-scope directives (i.e. v-scope="components.inputComponent({})"). See [`IKatApp.update`](#IKatApp.update) for more information.
+`inputs` | [`ICalculationInputs`](#icalculationinputs) | Inputs to pass along to each calculation during life span of KatApp
+`errors` | [`Array<IValidation>`](#ivalidation) | Error array populated from the `error` calculation result table, API validation issues, unhandled exceptions in KatApp Framework or manually via `push` Kaml View javascript.  Typically they are bound to a validation summary template and input templates.
+`warnings` | [`Array<IValidation>`](#ivalidation) | Warning array populated from the `warning` calculation result table or manually via `push` Kaml View javascript.  Typically they are bound to a validation summary template and input templates.
+`rbl` | [`IRbl`](#irbl) | Helper object used to access RBLe Framework Calculation results.
 
-### IApplicationData.uiBlocked
 
-Property Type: `boolean`  
-Returns `true` when a RBL Calculation or Api Endpoint is being processed.  See [`IKatApp.blockUI`](#IKatApp.blockUI) and [`IKatApp.unblockUI`](#IKatApp.unblockUI) for more information. Typically used to show a 'blocker' on the rendered HTML to prevent the user from clicking anywhere.
+### IApplicationData Methods
 
-### IApplicationData.needsCalculation
+Name | Description
+---|---
+[`onAll`](#iapplicationdataonall) | Returns `true` if **all** values passed in evaluate to `true` using same conditions described in [`rbl.boolean()`](#irblboolean)
+[`onAny`](#iapplicationdataonany) | Returns `true` if **any** values passed in evaluate to `true` using same conditions described in [`rbl.boolean()`](#irblboolean)
+[`pushTo`](#iapplicationdatapushto) | Allows Kaml Views to manually push 'additional result rows' into a calculation result table.
 
-Property Type: `boolean`  
-Returns `true` when input that will trigger a calculation has been edited but has not triggered a calculation yet.  Typically used with [`v-ka-needs-calc`](#v-ka-needs-calc) directive which toggles 'submit button' state to indicate to the user that a calculation is needed before they can submit the current form.
+#### IApplicationData.onAll
 
-### IApplicationData.model
 
-Property Type: `any`  
-Kaml Views can pass in 'custom models' that hold state but are not built from Calculation Results. See [`IKatApp.update`](#IKatApp.update) for more information.
+**`onAll(...values: any[]) => boolean`**
 
-### IApplicationData.handlers
+Returns `true` if **all** values passed in evaluate to `true` using same conditions described in `rbl.boolean()`.
 
-Property Type: `IStringAnyIndexer`  
-Kaml Views can pass in event handlers that can be bound via @event syntax (i.e. `@click="handlers.foo"`). See [`IKatApp.update`](#IKatApp.update) for more information.
+#### IApplicationData.onAny
 
-### IApplicationData.components
+**`onAny(...values: any[]) => boolean`**
 
-Property Type: `IStringIndexer<IStringAnyIndexer>`  
-Kaml Views can pass in petite-vue components that can used in v-scope directives (i.e. v-scope="components.inputComponent({})"). See [`IKatApp.update`](#IKatApp.update) for more information.
+Returns `true` if **any** value passed in evaluates to `true` using same conditions described in `rbl.boolean()`.
 
-### IApplicationData.inputs
+#### IApplicationData.pushTo
 
-Property Type: `ICalculationInputs`  
-Inputs to pass along to each calculation during life span of KatApp
+**`pushTo(tabDef: ITabDef, table: string, rows: ITabDefRow | Array<ITabDefRow>, calcEngine?: string, tab?: string) => void`**
 
-### IApplicationData.errors
+Allows Kaml Views to manually push 'additional result rows' into a calculation result table.  Typically used in [IKatApp.resultsProcessing](#ikatapponresultsprocessing) event handlers to inject rows before they are [processed into the application state](#rbl-framework-result-processing-in-katapp-state).
 
-Property Type: `Array<IValidation>`  
-Error array populated from the `error` calculation result table, API validation issues, unhandled exceptions in KatApp Framework or manually via `push` Kaml View javascript.  Typically they are bound to a validation summary template and input templates.
+```javascript
+application.on("resultsProcessing.ka", (event, results, inputs) => {
+    // Push 'core' inputs into rbl-value for every CalcEngine if they exist
+    // in this global handler instead of requiring *every* CalcEngine to return these.
+    application.state.rbl.pushTo(results[0], "rbl-value",
+        [
+            { "@id": "currentPage", "value": inputs.iCurrentPage || "" },
+            { "@id": "parentPage", "value": inputs.iParentPage || "" },
+            { "@id": "referrerPage", "value": inputs.iReferrer || "" },
+            { "@id": "isModal", "value": inputs.iModalApplication || "0" },
+            { "@id": "isNested", "value": inputs.iNestedApplication || "0" }
+        ]
+    );
+});
+```
 
-### IApplicationData.warnings
 
-Property Type: `Array<IValidation>`  
-Warning array populated from the `warning` calculation result table or manually via `push` Kaml View javascript.  Typically they are bound to a validation summary template and input templates.
+## IRbl
 
-### IApplicationData.rbl.results
+Helper object used to access RBLe Framework Calculation results.
 
-Property Type: `IStringIndexer<IStringIndexer<Array<ITabDefRow>>>`  
-JSON object containing results of all assocatied CalcEngines.  Typically not used by Kaml developers.  Instead, use other methods of IRblApplicationData to grab results.  The `string` key to results is the concatenation of `CalcEngineKey.TabName`.
+### IRbl Properties
 
-See [RBLe Framework Result Processing in KatApp State](#rbl-framework-result-processing-in-katapp-state) to understand how RBLe Framework result managed in KatApp state to ensure proper `reactivity` after each calculation.
+Property | Type | Description
+`results`<sup>1</sup> | `IStringIndexer<IStringIndexer<Array<ITabDefRow>>>` | JSON object containing results of all assocatied CalcEngines.  Typically not used by Kaml developers.  Instead, use other methods of `IRbl` to grab results.  The `string` key to results is the concatenation of `CalcEngineKey.TabName`.
+`options`<sup>2</sup> | `{ calcEngine?: string, tab?: string }` | Default configuration settings to be applied when working with the `IApplicationData.rbl` object and its methods.  The CalcEngine key and/or the `ITabDef` name to use as the default source when the CalcEngine key is not provided in methods that access RBLe Framework results.  If not provided, the *first* CalcEngine key and its *first* result tab defined in the [`<rbl-config>`](#configuring-calcengines-and-template-files) element in the Kaml View will be used when accessing results.
+
+<sup>1</sup> The `results` object can be visualized as below (See [RBLe Framework Result Processing in KatApp State](#rble-framework-result-processing-in-katapp-state) to understand how RBLe Framework result managed in KatApp state to ensure proper `reactivity` after each calculation):
 
 ```javascript
 // The object can be visualized as follows
-state: {
+rbl: {
     results: {
         "Home.RBLResult": {
             "rbl-value": [
@@ -360,7 +380,40 @@ state: {
 }
 ```
 
-### IApplicationData.rbl.source
+<sup>2</sup> Given the following configuration for multiple CalcEngines and tabs, the `rbl.options` object can be used in the following scenarios.  Note, that when `options.calcEngine` or `options.tab` are set, all KatApp directives (`v-ka-value`, `v-ka-template`, `v-ka-table`, `v-ka-highchart`, etc.) that access RBLe Results will also obey the settings.
+
+```html
+<rbl-config templates="Standard_Templates,LAW:Law_Templates">
+    <calc-engine key="default" name="LAW_Wealth_CE" input-tab="RBLInput" result-tabs="RBLResult"></calc-engine>
+    <calc-engine key="shared" name="LAW_Shared_CE" input-tab="RBLInput" result-tabs="RBLResult,RBLHelpers"></calc-engine>
+</rbl-config>
+```
+
+```javascript
+// Start: application.state.rbl.options.calcEngine is 'undefined'
+application.state.rbl.value("firstName"); // return rbl-value.firstName from LAW_Wealth_CE, RBLResult tab
+
+application.state.rbl.options.calcEngine = "shared";
+application.state.rbl.value("firstName"); // return rbl-value.firstName from LAW_Shared_CE, RBLResult tab
+
+application.state.rbl.options.calcEngine = "default";
+application.state.rbl.value("firstName"); // return rbl-value.firstName from LAW_Wealth_CE, RBLResult tab
+
+application.state.rbl.options.calcEngine = "shared";
+application.state.rbl.options.tab = "RBLHelpers";
+application.state.rbl.value("firstName"); // return rbl-value.firstName from LAW_Shared_CE, RBLHelpers tab
+```
+
+### IRbl Methods
+
+Name | Description
+---|---
+[`source`](#irblsource) | Returns table rows from `results`.
+[`exists`](#irblexists) | Check for existence of table row(s).
+[`value`](#irblvalue) | Return a single value (`undefined` if not present) from `results`.
+[`boolean`](#irblboolean) | Return whether or not a single row.column value is truthy.
+
+#### IRbl.source
 
 **`source(table: string, calcEngine?: string, tab?: string, predicate?: (row: ITabDefRow) => boolean) => Array<ITabDefRow>`**
 
@@ -391,48 +444,8 @@ application.state.rbl.source("resultTable", , "RBLSecondTab");
 application.state.rbl.source("brdResultTable", "BRD", r => r.topic == 'head');
 ```
 
-### IApplicationData.rbl.options
 
-Default configuration settings to be applied when working with the `IApplicationData.rbl` object and its methods.
-
-#### IApplicationData.rbl.options.calcEngine
-
-Property Type: `string`; Optional  
-The CalcEngine key to use as the default source when the CalcEngine key is not provided in methods that access RBLe Framework results.  If not provided, the *first* CalcEngine key defined in the [`<rbl-config>`](#configuring-calcengines-and-template-files) element in the Kaml View will be used when accessing results.
-
-#### IApplicationData.rbl.options.tab
-
-Property Type: `string`; Optional  
-The `ITabDef` name to use as the default source when not the tab name is not provided in methods that access RBLe Framework results.  If not provided, the *first* result tab for the *default* CalcEngine defined in the [`<rbl-config>`](#configuring-calcengines-and-template-files) element in the Kaml View will be used when accessing results.
-
-#### IApplicationData.rbl.options Samples
-
-Given the following configuration for multiple CalcEngines and tabs, the `rbl.options` object can be used in the following scenarios.  Note, that when `options.calcEngine` or `options.tab` are set, all KatApp directives (`v-ka-value`, `v-ka-template`, `v-ka-table`, `v-ka-highchart`, etc.) that access RBLe Results will also obey the settings.
-
-```html
-<rbl-config templates="Standard_Templates,LAW:Law_Templates">
-    <calc-engine key="default" name="LAW_Wealth_CE" input-tab="RBLInput" result-tabs="RBLResult"></calc-engine>
-    <calc-engine key="shared" name="LAW_Shared_CE" input-tab="RBLInput" result-tabs="RBLResult,RBLHelpers"></calc-engine>
-</rbl-config>
-```
-
-```javascript
-// Start: application.state.rbl.options.calcEngine is 'undefined'
-application.state.rbl.value("firstName"); // return rbl-value.firstName from LAW_Wealth_CE, RBLResult tab
-
-application.state.rbl.options.calcEngine = "shared";
-application.state.rbl.value("firstName"); // return rbl-value.firstName from LAW_Shared_CE, RBLResult tab
-
-application.state.rbl.options.calcEngine = "default";
-application.state.rbl.value("firstName"); // return rbl-value.firstName from LAW_Wealth_CE, RBLResult tab
-
-application.state.rbl.options.calcEngine = "shared";
-application.state.rbl.options.tab = "RBLHelpers";
-application.state.rbl.value("firstName"); // return rbl-value.firstName from LAW_Shared_CE, RBLHelpers tab
-```
-
-
-### IApplicationData.rbl.exists
+#### IRbl.exists
 
 **`exists(table: string, calcEngine?: string, tab?: string, predicate?: (row: ITabDefRow) => boolean ) => boolean`**
 
@@ -451,7 +464,7 @@ A `predicate` can be passed to filter rows before checking for existence.
 </div>
 ```
 
-### IApplicationData.rbl.value
+#### IRbl.value
 
 **`value(table: string, keyValue: string, returnField?: string, keyField?: string, calcEngine?: string, tab?: string) => string | undefined`**
 
@@ -481,11 +494,11 @@ const name = application.state.rbl.value("rbl-value", "name-first", undefined, u
 const name = application.state.rbl.value("custom-table", "name-first", "value2", "key", "BRD", "RBLResult2");
 ```
 
-### IApplicationData.rbl.boolean
+#### IRbl.boolean
 
 **`boolean(table: string, keyValue: string, returnField?: string, keyField?: string, calcEngine?: string, tab?: string, valueWhenMissing?: boolean) => boolean`**
 
-Returns `true` if the value returned (with same function signature as `rbl.value`) if value is `undefined` (currently not present in results) or value is string and lower case is not in ['false', '0', 'n', 'no'] or value converted to a boolean is `true`.  Typically used in `v-if` and `v-show` directives.
+Returns `true` if the value returned (with same function signature as `rbl.value`) is `undefined` (currently not present in results) or value is string and lower case is not in ['false', '0', 'n', 'no'] or value converted to a boolean is `true`.  Typically used in `v-if` and `v-show` directives.
 
 Shorthand syntax of only one parameter is allowed, where the parameter is assumed to be the `keyValue` parameter, and then **multiple** tables are checked returning first existing match.  The tables checked (based on priority) are: `rbl-value`, `rbl-display`, `rbl-disabled`, and `rbl-skip`.
 
@@ -536,39 +549,6 @@ since 'undefined' will be treated as 'false' in rbl.boolean() because valueWhenM
 <a href="#" :disabled="rbl.value('rbl-disabled', 'allowLink', false)">Click Here</a>
 ```
 
-### IApplicationData.rbl.onAll
-
-**`onAll(...values: any[]) => boolean`**
-
-Returns `true` if **all** values passed in evaluate to `true` using same conditions described in `rbl.boolean()`.
-
-### IApplicationData.rbl.onAny
-
-**`onAny(...values: any[]) => boolean`**
-
-Returns `true` if **any** value passed in evaluates to `true` using same conditions described in `rbl.boolean()`.
-
-### IApplicationData.pushTo
-
-**`pushTo(tabDef: ITabDef, table: string, rows: ITabDefRow | Array<ITabDefRow>, calcEngine?: string, tab?: string) => void`**
-
-Allows Kaml Views to manually push 'additional result rows' into a calculation result table.  Typically used in [IKatApp.resultsProcessing](#ikatapponresultsprocessing) event handlers to inject rows before they are [processed into the application state](#rbl-framework-result-processing-in-katapp-state).
-
-```javascript
-application.on("resultsProcessing.ka", (event, results, inputs) => {
-    // Push 'core' inputs into rbl-value for every CalcEngine if they exist
-    // in this global handler instead of requiring *every* CalcEngine to return these.
-    application.state.rbl.pushTo(results[0], "rbl-value",
-        [
-            { "@id": "currentPage", "value": inputs.iCurrentPage || "" },
-            { "@id": "parentPage", "value": inputs.iParentPage || "" },
-            { "@id": "referrerPage", "value": inputs.iReferrer || "" },
-            { "@id": "isModal", "value": inputs.iModalApplication || "0" },
-            { "@id": "isNested", "value": inputs.iNestedApplication || "0" }
-        ]
-    );
-});
-```
 
 ## RBLe Framework Result Processing in KatApp State
 
