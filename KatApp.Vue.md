@@ -1818,13 +1818,22 @@ The following uses all the scope properties except for list, maxLength, min, max
 The following template uses same properties as above, but additionally uses the list property.
 -->
 <template id="input-dropdown-nexgen" input>
-    <div :class="['tip-icon-wrapper', css.container ?? 'mb-3', { 'form-floating': !hideLabel, 'has-help': help.content }]" v-if="display">
-        <select :name="name" :id="id" :class="['form-select', name, css.input, { 'is-invalid': error, 'is-warning': warning }]" :disabled="disabled" :aria-label="label">
+    <div 
+        :class="['tip-icon-wrapper', css.container ?? 'mb-3', { 'form-floating': !hideLabel, 'has-help': help.content }]" 
+        v-if="display">
+        <select :name="name" :id="id" :disabled="disabled" :aria-label="label"
+            :class="['form-select', name, css.input, { 'is-invalid': error, 'is-warning': warning }]">
             <option v-if="placeHolder != ''" value="">{{placeHolder || 'Select a value'}}</option>
             <option v-for="item in list" :key="item.key" :value="item.key" :selected="value == item.key">{{item.text}}</option>
         </select>
-        <span :class="['error-icon-hover-area', { 'd-none': !error && !warning, 'error': error, 'warning': warning }]" :data-bs-content="error || warning || 'Error content'" data-bs-toggle="tooltip" data-bs-placement="top"></span>
-        <span :class="['help-icon-hover-area', { 'd-none': !help.content }]" :data-bs-content-selector="'#' + id + 'Help'" data-bs-toggle="popover" data-bs-trigger="click" data-bs-placement="top"></span>
+        <span 
+            :class="['error-icon-hover-area', { 'd-none': !error && !warning, 'error': error, 'warning': warning }]" 
+            :data-bs-content="error || warning || 'Error content'" 
+            data-bs-toggle="tooltip" data-bs-placement="top"></span>
+        <span 
+            :class="['help-icon-hover-area', { 'd-none': !help.content }]" 
+            :data-bs-content-selector="'#' + id + 'Help'" 
+            data-bs-toggle="popover" data-bs-trigger="click" data-bs-placement="top"></span>
         <label v-if="!hideLabel" :for="id" v-html="label"></label>
         <div class="d-none" v-if="help.content">
             <div :id="id + 'HelpTitle'" v-html="help.title"></div>
@@ -1841,16 +1850,22 @@ The following template uses most of the previous properties and additionally use
         <div class="row">
             <div class="col fs-sm fw-bolder">
                 <span v-html="label"></span>
-                <span style="color: blue;" :class="['fa fa-regular fa-circle-question', { 'd-none': !help.content }]" :data-bs-width="help.width" :data-bs-content-selector="'#' + id + 'Help'" data-bs-toggle="popover" data-bs-trigger="click" data-bs-placement="top"></span>
-                <template v-html="iconHtml" v-ka-inline>
-                </template>
-                <span :class="['fa fa-regular', { 'd-none': !error && !warning, 'error text-danger fa-circle-exclamation': error, 'warning text-warning fa-triangle-exclamation': warning }]" :data-bs-content="error || warning || 'Error content'" data-bs-toggle="tooltip" data-bs-placement="top"></span>
+                <span style="color: blue;" 
+                    :class="['fa fa-regular fa-circle-question', { 'd-none': !help.content }]" 
+                    :data-bs-width="help.width" :data-bs-content-selector="'#' + id + 'Help'" 
+                    data-bs-toggle="popover" data-bs-trigger="click" data-bs-placement="top"></span>
+                <template v-html="iconHtml" v-ka-inline></template>
+                <span 
+                    :class="['fa fa-regular', { 'd-none': !error && !warning, 'error text-danger fa-circle-exclamation': error, 'warning text-warning fa-triangle-exclamation': warning }]" 
+                    :data-bs-content="error || warning || 'Error content'" 
+                    data-bs-toggle="tooltip" data-bs-placement="top"></span>
             </div>
             <div ref="display" class="col-auto fs-sm fw-bolder text-end"></div>
         </div>
         <div class="pt-7 range-slider-wrap">
             <div ref="bubble" class="range-slider-bubble"><span ref="bubbleValue"></span></div>
-            <input type="range" :class="['col range-slider', name, { 'is-invalid': error, 'is-warning': warning }]" :name="name" :id="id" :min="min" :max="max" :step="step" :value="value">
+            <input type="range" :class="['col range-slider', name, { 'is-invalid': error, 'is-warning': warning }]" 
+                :name="name" :id="id" :min="min" :max="max" :step="step" :value="value">
         </div>
         <div class="d-none" v-if="help.content">
             <div :id="id + 'HelpTitle'" v-html="help.title"></div>
