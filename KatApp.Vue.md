@@ -2905,7 +2905,8 @@ To aleviate this issue, the Kaml Views can decorate 'submit buttons' with a `v-k
 After KatApp Framework has created the required directives and elements, when a user is on a form and 'edits' an input, but has not triggered a `change` event yet, the `needsCalculation` property will be true, so the original 'submit button' will be removed, while the cloned element (that is just a place holder to hint to the user to click so that a calculation is run) is displayed.  Given the label says `Refresh` it is more apparent to the user that they will trigger a calculation and review the results before clicking submit.
 
 ```html
-<a v-ka-needs-calc="Click to Refresh" href="#" class="btn btn-primary btn-sm" @click.prevent="console.log('save inputs')">Save Inputs</a>
+<a v-ka-needs-calc="Click to Refresh" href="#" class="btn btn-primary btn-sm" 
+    @click.prevent="console.log('save inputs')">Save Inputs</a>
 
 <!-- When a value is provided in the directive, that text is used as the label of the button -->
 <a v-if="!needsCalculation" href="#" class="btn btn-primary btn-sm" @click.prevent="console.log('save inputs')">Save Inputs</a>
@@ -3370,7 +3371,8 @@ application.on("modalAppInitialized.ka", (e, modalApplication) => {
     irpApplication = modalApplication;
 });
 
-const response = await application.showModalAsync({ view: 'DST.IRP' }); // This will trigger modalAppInitialized before showing the modal
+// This will trigger modalAppInitialized before showing the modal
+const response = await application.showModalAsync({ view: 'DST.IRP' }); 
 
 if (response.confirmed) {
     // If we made it this far, irpApplication will have been successfully assigned, grab a reference to its inputs
@@ -4460,7 +4462,9 @@ Configure two CalcEngines with different tabs to run in the pipeline before the 
 
 ```html
 <rbl-config templates="Standard_Templates,LAW:Law_Templates">
-    <calc-engine key="default" name="LAW_Wealth_CE" input-tab="RBLInput" result-tabs="RBLResult" precalcs="LAW_Wealth_Helper1_CE|RBLInput|RBLHelperResults,LAW_Wealth_Helper2_CE"></calc-engine>
+    <calc-engine 
+        key="default" name="LAW_Wealth_CE" input-tab="RBLInput" result-tabs="RBLResult" 
+        precalcs="LAW_Wealth_Helper1_CE|RBLInput|RBLHelperResults,LAW_Wealth_Helper2_CE"></calc-engine>
 </rbl-config>
 ```
 
