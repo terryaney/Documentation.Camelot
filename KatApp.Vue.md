@@ -1622,35 +1622,9 @@ Property | Type | Description
 ---|---|---
 `id` | string | Gets the unique, generated `id` for the current input. This value *should* be used if an `id` attribute needs to be rendered on an `HTMLInputElement`.
 `name` | string | Gets the `name` to use for the current input.
-`type` | string | Gets the [`type`](#https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#input_types) to use if the associated `HTMLInputElement` is an `INPUT` (vs `SELECT` or `TEXTAREA`).<br/><br/>The value can by provided by the model or a RBLe Framework calculation value.<br/><br/>Returns value based on following precedence:<br/>1. `rbl-input.type` RBLe Framework calculation value<br/>1. `model.type` property<br/>1. `text` if no value provided.
-
-#### IKaInputScope.value
-
-Property Type: `string`;  
-Gets the default value to use for the input.
-
-The value can by provided by the model or a RBLe Framework calculation value.
-
-Returns value based on following precedence:
-
-1. `rbl-input.value` RBLe Framework calculation value
-1. `rbl-defaults.value` RBLe Framework calculation value
-1. `model.value` property
-1. `""` if no value provided.
-
-#### IKaInputScope.disabled
-
-Property Type: `boolean`;  
-Gets a value indicating the disabled state of the current input.
-
-The value can by provided by the model or a RBLe Framework calculation value.
-
-Returns value based on following precedence:
-
-1. `model.isDisabled` delegate property
-1. `rbl-input.disabled` RBLe Framework calculation value (if value is `1`)
-1. `rbl-disabled.value` RBLe Framework calculation value (if value is `1`)
-1. `false` if no value provided.
+`type` | string | Gets the [`type`](#https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#input_types) to use if the associated `HTMLInputElement` is an `INPUT` (vs `SELECT` or `TEXTAREA`).  The value can by provided by the model or a RBLe Framework calculation value.<br/><br/>Returns value based on following precedence:<br/><br/>1. `rbl-input.type` RBLe Framework calculation value<br/>2. `model.type` property<br/>3. `text` if no value provided.
+`value` | string | Gets the default value to use for the input.  The value can by provided by the model or a RBLe Framework calculation value.<br/><br/>Returns value based on following precedence:<br/><br/>1. `rbl-input.value` RBLe Framework calculation value<br/>2. `rbl-defaults.value` RBLe Framework calculation value<br/>3. `model.value` property<br/>4. `""` if no value provided.
+`disabled` | boolean | Gets a value indicating the disabled state of the current input.  The value can by provided by the model or a RBLe Framework calculation value.<br/><br/>Returns value based on following precedence:<br/><br/>1. `model.isDisabled` delegate property<br/>2. `rbl-input.disabled` RBLe Framework calculation value (if value is `1`)<br/>3. `rbl-disabled.value` RBLe Framework calculation value (if value is `1`)<br/>4. `false` if no value provided.
 
 #### IKaInputScope.display
 
