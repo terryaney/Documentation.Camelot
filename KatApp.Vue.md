@@ -105,14 +105,14 @@ When multiple CalcEngines or result tabs are used, additional information can be
 
 Entity | Description
 ---|---
-`templates` | Attribute; Comma delimitted list of Kaml Template Files required by this Kaml View.  Each template is specified in Folder:FileName syntax.
-`calc-engine` | Element; If one or more CalcEngines are used in Kaml View, specify each one via a `calc-engine` element.
-`key` | Attribute; When more than one CalcEngine is provided (or if you need to access [Manual Results](#manualResults)), a CalcEngine is referenced by this key; usually via a `ce` property passed into a Vue directive.
-`name` | Attribute; The name of the CalcEngine.
-`input&#x2011;tab` | Attribute; The name of the tab where KatApp framework should inject inputs. Default is `RBLInput`.
-`result&#x2011;tabs` | Attribute; Comma delimitted list of result tabs to process during RBLe Calculation. When more than one result tab is provided, the tab is referenced by name; usually via a `tab` property passed into a Vue directive. Default is `RBLResult`.
-`configure&#x2011;ui` | Attribute; Whether or not this CalcEngine should run during the Kaml View's original [Configure UI Calculation](#IKatApp.configureUICalculation). Default is `true`.
-`precalcs` | Attribute; Comma delimitted list of CalcEngines, i.e. `CalcEngine1,CalcEngineN` to use in a a [Precalc Pipeline](#Precalc Pipelines) for the current CalcEngine. .  By default, if only a CalcEngine name is provided, the input and the result tab with the *same* name as the tabs configured on the primary CalcEngine will be used.  To use different tabs, each PreCalc CalcEngine 'entity' becomes `CalcEngine|InputTab|ResultTab`.  
+templates | Attribute; Comma delimitted list of Kaml Template Files required by this Kaml View.  Each template is specified in Folder:FileName syntax.
+calc&#x2011;engine | Element; If one or more CalcEngines are used in Kaml View, specify each one via a `calc-engine` element.
+key | Attribute; When more than one CalcEngine is provided (or if you need to access [Manual Results](#manualResults)), a CalcEngine is referenced by this key; usually via a `ce` property passed into a Vue directive.
+name | Attribute; The name of the CalcEngine.
+input&#x2011;tab | Attribute; The name of the tab where KatApp framework should inject inputs. Default is `RBLInput`.
+result&#x2011;tabs | Attribute; Comma delimitted list of result tabs to process during RBLe Calculation. When more than one result tab is provided, the tab is referenced by name; usually via a `tab` property passed into a Vue directive. Default is `RBLResult`.
+configure&#x2011;ui | Attribute; Whether or not this CalcEngine should run during the Kaml View's original [Configure UI Calculation](#IKatApp.configureUICalculation). Default is `true`.
+precalcs | Attribute; Comma delimitted list of CalcEngines, i.e. `CalcEngine1,CalcEngineN` to use in a a [Precalc Pipeline](#Precalc Pipelines) for the current CalcEngine. .  By default, if only a CalcEngine name is provided, the input and the result tab with the *same* name as the tabs configured on the primary CalcEngine will be used.  To use different tabs, each PreCalc CalcEngine 'entity' becomes `CalcEngine|InputTab|ResultTab`.  
 
 # Kaml View Specifications
 
