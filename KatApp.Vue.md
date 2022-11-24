@@ -1659,30 +1659,19 @@ The `v-ka-input` directive *does* have a `string` shorthand syntax that allows f
 <input v-ka-input="{ name: 'iNameFirst' }" type="text"></input>
 ```
 
-<table class="table">
-    <thead>
-        <tr>
-            <th style="border:0">Property</th>
-            <th style="border:0">Type</th>
-            <th style="border:0">Default</th>
-            <th style="border:0">Description</th>
-        </tr>
-    </thead>
-    <tbody style="border-bottom: 2px solid Black;">
-        <tr>
-            <td style="border:0">`name`</td>
-            <td style="border:0">string</td>
-            <td style="border:0"></td>
-            <td style="border:0">The name of the input.  In RBLe Framework, input names start with lower case `i` and then the remaing part(s) is/are [Pascal Case](#https://www.codingem.com/what-is-pascal-case/) (i.e. `iFirstName`).</td>
-        </tr>
-    </tbody>
-</table>
-
 Property | Type | Default | Description
 ---|---|---|---
 `name` | string || The name of the input.  In RBLe Framework, input names start with lower case `i` and then the remaing part(s) is/are [Pascal Case](#https://www.codingem.com/what-is-pascal-case/) (i.e. `iFirstName`).
 `template` | string | `''` | The template ID if a [template](#html-content-template-elements) will be used to render markup with the scope.
-`type` | string | `text` | Set the [type](#https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#input_types) of the associated `HTMLInputElement` when the `tagName=INPUT` (vs `SELECT` or `TEXTAREA`).
+`type`* | string | `text` | Set the [type](#https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#input_types) of the associated `HTMLInputElement` when the `tagName=INPUT` (vs `SELECT` or `TEXTAREA`).
+
+* In addition to events that trigger RBLe Framework calculations, if the `HTMLInputElement.type` is of type `range`, the KatApp Framework adds a few more events to enable displaying the `range` value for the benefit of the user.  To enable this feature, the Kaml View developers have to take advantage of the [Template Refs](#https://vuejs.org/guide/essentials/template-refs.html#template-refs) feature of Vue and provide the following `ref` assignments, all of which are optional if the Kaml View does not desire the functionality.
+
+1. `ref="display"` - This is an `HTMLElement` whose `innerHTML` will be set to the value of the `range` every time the value changes.
+1. `ref="bubble"` - This is an `HTMLElement` that will have a CSS class of `active` toggled on and off.  It will be on while the user is moving the slider or hovering over the slider, and turned off when the user's mouse no longer is over the `range` input.
+1. `ref="bubbleValue" - This is an `HTMLElement` whose `innerHTML` will be set to the value of the `range` every time the value changes.
+
+
 #### IKaInputModel.name
 
 Property Type: `string`; Required  
