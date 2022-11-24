@@ -488,10 +488,14 @@ const name = application.state.rbl.value("custom-table", "name-first", undefined
 
 // Return 'value' column from 'rbl-value' table where '@id' column is "name-first" from the BRD CalcEngine
 const name = application.state.rbl.value("rbl-value", "name-first", undefined, undefined, "BRD");
-// Return 'value' column from 'rbl-value' table where '@id' column is "name-first" from the RBLResult2 tab in the default CalcEngine
-const name = application.state.rbl.value("rbl-value", "name-first", undefined, undefined, undefined, "RBLResult2");
-// Return 'value2' column from 'rbl-value' table where 'key' column is "name-first" from the RBLResult2 tab in the BRD CalcEngine
-const name = application.state.rbl.value("custom-table", "name-first", "value2", "key", "BRD", "RBLResult2");
+// Return 'value' column from 'rbl-value' table where '@id' column is "name-first" 
+// from the RBLResult2 tab in the default CalcEngine
+const name = application.state.rbl.value("rbl-value", "name-first", 
+                undefined, undefined, undefined, "RBLResult2");
+// Return 'value2' column from 'rbl-value' table where 'key' column is "name-first" from the 
+// RBLResult2 tab in the BRD CalcEngine
+const name = application.state.rbl.value("custom-table", "name-first", "value2", "key", 
+                "BRD", "RBLResult2");
 ```
 
 #### IRbl.boolean
