@@ -812,14 +812,14 @@ Below is an example of how to leverage the `$renderId` to allow for proper scopi
 
 With the above example, you could expect the following in the console ouput (remembering that all rendering completes before `mounted` is called):
 
-> templateWithScript setup templateMounted:, 1 scoped items found
-> templateWithScript setup templateMounted:, 3 template-script-input items found
-> templateWithScript templateMounted:, 1 scoped items found
-> templateWithScript templateMounted:, 3 template-script-input items found
-> templateWithScript templateMounted:, 1 scoped items found
-> templateWithScript templateMounted:, 3 template-script-input items found
-> templateWithScript templateMounted:, 1 scoped items found
-> templateWithScript templateMounted:, 3 template-script-input items found
+> templateWithScript setup templateMounted:, 1 scoped items found  
+> templateWithScript setup templateMounted:, 3 template-script-input items found  
+> templateWithScript templateMounted:, 1 scoped items found  
+> templateWithScript templateMounted:, 3 template-script-input items found  
+> templateWithScript templateMounted:, 1 scoped items found  
+> templateWithScript templateMounted:, 3 template-script-input items found  
+> templateWithScript templateMounted:, 1 scoped items found  
+> templateWithScript templateMounted:, 3 template-script-input items found  
 
 ```html
 <script>
