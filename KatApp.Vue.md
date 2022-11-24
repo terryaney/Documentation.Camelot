@@ -1856,7 +1856,11 @@ The following template uses most of the previous properties and additionally use
                     data-bs-toggle="popover" data-bs-trigger="click" data-bs-placement="top"></span>
                 <template v-html="iconHtml" v-ka-inline></template>
                 <span 
-                    :class="['fa fa-regular', { 'd-none': !error && !warning, 'error text-danger fa-circle-exclamation': error, 'warning text-warning fa-triangle-exclamation': warning }]" 
+                    :class="['fa fa-regular', { 
+                        'd-none': !error && !warning, 
+                        'error text-danger fa-circle-exclamation': error, 
+                        'warning text-warning fa-triangle-exclamation': warning 
+                    }]" 
                     :data-bs-content="error || warning || 'Error content'" 
                     data-bs-toggle="tooltip" data-bs-placement="top"></span>
             </div>
