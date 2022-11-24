@@ -1660,13 +1660,11 @@ The `v-ka-input` directive *does* have a `string` shorthand syntax that allows f
 ```
 
 Property | Type | Description
----|---|---|---
+---|---|---
 `name` | string || **Required;** The name of the input.  In RBLe Framework, input names start with lower case `i` and then the remaing part(s) is/are [Pascal Case](#https://www.codingem.com/what-is-pascal-case/) (i.e. `iFirstName`).
 `template` | string | The template ID if a [template](#html-content-template-elements) will be used to render markup with the scope.
 `type`<sup>1</sup> | string | Set the [type](#https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#input_types) of the associated `HTMLInputElement` when the `tagName=INPUT` (vs `SELECT` or `TEXTAREA`).
 `value` | string | Provide a default value for the input.  The value can also be provided via the `rbl-defaults.value` or the `rbl-input.value` RBLe Framework calculation value.
-
-
 `label` | string | Provide a display label for the input.  The value can also be provided via the `rbl-value[@id=='l' + name].value` or the `rbl-input.label` RBLe Framework calculation value.
 `placeHolder` | string | Provide a [placeholder](#https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#placeholder) for the input.  The value can also be provided via the `rbl-input.placeholder` RBLe Framework calculation value.
 `hideLabel` | boolean | Provide a value determining whether the display label should be hidden. The value can also be provided via a RBLe Framework calculation value. If `rbl-input.label == '-1'`, the label will be hidden.
