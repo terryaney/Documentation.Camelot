@@ -1619,7 +1619,7 @@ The value can also be provided via the combination of `rbl-sliders.format` and `
 The `IKaInputScope` represents the type containing the properties and methods available to inputs and templates that use the `v-ka-input` directive. For the most part, it is a 'read only' version of the [`v-ka-input` model](#v-ka-input-model) object, with default functionality provided from RBLe Framework calculation results when needed.  Additionally, there are helper properties and methods available as well.
 
 Property | Type | Description
----|---|---|---
+---|---|---
 `id` | string | Gets the unique, generated `id` for the current input. This value *should* be used if an `id` attribute needs to be rendered on an `HTMLInputElement`.
 `name` | string | Gets the `name` to use for the current input.
 `type` | string | Gets the [`type`](#https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#input_types) to use if the associated `HTMLInputElement` is an `INPUT` (vs `SELECT` or `TEXTAREA`).<br/><br/>The value can by provided by the model or a RBLe Framework calculation value.<br/><br/>Returns value based on following precedence:<br/>1. `rbl-input.type` RBLe Framework calculation value<br/>1. `model.type` property<br/>1. `text` if no value provided.
