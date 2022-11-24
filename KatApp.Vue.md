@@ -1721,7 +1721,8 @@ Render an upload control and corresponding comment control.
 
 1. iComment and iUpload are rendered with templates
 2. iComment has max length of 250 and keyup handler to display remaining characters
-3. iUpload is provided uploadEndpoint and template renders a button called iUploadUpload that leverages IKaInputScope.uploadAsync
+3. iUpload is provided uploadEndpoint and template renders a button called iUploadUpload 
+    that leverages IKaInputScope.uploadAsync
 -->
 <script>
     application.update({
@@ -1746,7 +1747,9 @@ Render an upload control and corresponding comment control.
         uploadEndpoint: 'document-center/upload' 
     }"></div>
     <div class="mt-2">
-        <a href="#" @click.prevent="handlers.processUpload" class='btn btn-primary'><i class="fa-solid fa-upload"></i> Upload</a>
+        <a href="#" @click.prevent="handlers.processUpload" class='btn btn-primary'>
+            <i class="fa-solid fa-upload"></i> Upload
+        </a>
     </div>
 </div>
 ```
@@ -1758,12 +1761,21 @@ Render an upload control and corresponding comment control.
 The following uses all the scope properties except for list, maxLength, min, max, step, iconHtml and uploadAsync
 -->
 <template id="input-textbox-nexgen" input>
-    <div v-if="display && !prefix && !suffix" :class="['tip-icon-wrapper', css.container ?? 'mb-3', { 'form-floating': !hideLabel, 'has-help': help.content }]">
+    <div v-if="display && !prefix && !suffix" 
+        :class="['mb-3', css.container, { 'form-floating': !hideLabel, 'has-help': help.content }]">
 
-        <input :value="value" :name="name" :id="id" :type="type" :class="['form-control', name, css.input, { 'is-invalid': error, 'is-warning': warning }]" :disabled="disabled" :placeholder="hideLabel ? '' : 'Fill'">
+        <input :value="value" :name="name" :id="id" :type="type" 
+            :class="['form-control', name, css.input, { 'is-invalid': error, 'is-warning': warning }]" 
+            :disabled="disabled" :placeholder="hideLabel ? '' : 'Fill'">
 
-        <span :class="['error-icon-hover-area', { 'd-none': !error && !warning, 'error': error, 'warning': warning }]" :data-bs-content="error || warning || 'Error content'" data-bs-toggle="tooltip" data-bs-placement="top"></span>
-        <span :class="['help-icon-hover-area', { 'd-none': !help.content }]" :data-bs-width="help.width" :data-bs-content-selector="'#' + id + 'Help'" data-bs-toggle="popover" data-bs-trigger="click" data-bs-placement="top"></span>
+        <span 
+            :class="['error-icon-hover-area', { 'd-none': !error && !warning, 'error': error, 'warning': warning }]" 
+            :data-bs-content="error || warning || 'Error content'" 
+            data-bs-toggle="tooltip" data-bs-placement="top"></span>
+        <span 
+            :class="['help-icon-hover-area', { 'd-none': !help.content }]" 
+            :data-bs-width="help.width" :data-bs-content-selector="'#' + id + 'Help'" 
+            data-bs-toggle="popover" data-bs-trigger="click" data-bs-placement="top"></span>
 
         <label v-if="!hideLabel" :for="id" v-html="label"></label>
 
@@ -1779,9 +1791,16 @@ The following uses all the scope properties except for list, maxLength, min, max
             <span v-if="prefix" class="input-group-text">{{prefix}}</span>
 
             <div :class="hideLabel ? 'no-label' : 'form-floating'">
-                <input :value="value" :name="name" :id="id" :type="type" :class="['form-control', name, css.input, { 'is-invalid': error, 'is-warning': warning }]" :disabled="disabled" :placeholder="!hideLabel ? 'Fill' : ''">
-                <span :class="['error-icon-hover-area', { 'd-none': !error && !warning, 'error': error, 'warning': warning }]" :data-bs-content="error || warning || 'Error content'" data-bs-toggle="tooltip" data-bs-placement="top"></span>
-                <span :class="['help-icon-hover-area', { 'd-none': !help.content }]" :data-bs-width="help.width" :data-bs-content-selector="'#' + id + 'Help'" data-bs-toggle="popover" data-bs-trigger="click" data-bs-placement="top"></span>
+                <input :value="value" :name="name" :id="id" :type="type" 
+                    :class="['form-control', name, css.input, { 'is-invalid': error, 'is-warning': warning }]" 
+                    :disabled="disabled" :placeholder="!hideLabel ? 'Fill' : ''">
+                <span 
+                    :class="['error-icon-hover-area', { 'd-none': !error && !warning, 'error': error, 'warning': warning }]" 
+                    :data-bs-content="error || warning || 'Error content'" data-bs-toggle="tooltip" data-bs-placement="top"></span>
+                <span 
+                    :class="['help-icon-hover-area', { 'd-none': !help.content }]" 
+                    :data-bs-width="help.width" :data-bs-content-selector="'#' + id + 'Help'" 
+                    data-bs-toggle="popover" data-bs-trigger="click" data-bs-placement="top"></span>
                 <label v-if="!hideLabel" :for="id" v-html="label"></label>
             </div>
 
