@@ -1674,8 +1674,8 @@ Property | Type | Description
 `suffix` | string | Provide a `suffix` for the input that could be displayed after the actual input (i.e. with Bootstrap [input-group](#https://getbootstrap.com/docs/5.0/forms/input-group/) markup). The value can also be provided via the `rbl-input.suffix` RBLe Framework calculation value.
 `maxLength` | number | Provide a `maxLength` for the input that could be used to limit the length of textual inputs. The value can also be provided via the `rbl-input.max-length` RBLe Framework calculation value.
 `displayFormat`<sup>2</sup> | string | Provide a `displayFormat` for the input that could be used to format a value before displaying it. This is currently used when the input type is `range`.
-`min` | number \| string | Provide a `min` value for the input that could be used to limit the minimum allowed value on `date` or `range` inputs.  The value can also be provided via the `rbl-input.min` RBLe Framework calculation value.
-`max` | number \| string | Provide a `max` value for the input that could be used to limit the maximum allowed value on `date` or `range` inputs.  The value can also be provided via the `rbl-input.max` RBLe Framework calculation value.
+`min` | number, string | Provide a `min` value for the input that could be used to limit the minimum allowed value on `date` or `range` inputs.  The value can also be provided via the `rbl-input.min` RBLe Framework calculation value.
+`max` | number, string | Provide a `max` value for the input that could be used to limit the maximum allowed value on `date` or `range` inputs.  The value can also be provided via the `rbl-input.max` RBLe Framework calculation value.
 `step` | number | Provide a `step` increment value for the input that could be used to control the value increments for `range` inputs.  The value can also be provided via the `rbl-input.step` RBLe Framework calculation value.
 `mask`<sup>3</sup> | string | Provide an input `mask` to apply during user input for text inputs.  The value can also be provided via the `rbl-input.mask` RBLe Framework calculation value.
 
