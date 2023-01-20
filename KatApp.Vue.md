@@ -3183,9 +3183,9 @@ The `off` method is a pass through to the [JQuery.off](#https://api.jquery.com/o
 
 #### IKatApp.navigateAsync
 
-**`navigateAsync(navigationId: string, options?: INavigationOptions[INavigationOptions](#inavigationoptions)): Promise<void>;`**
+**`navigateAsync(navigationId: string, options?: INavigationOptions): Promise<void>;`**
 
-Manually trigger a navigation.  The options allow for passing (and optionally persisting) inputs to be passed to the next application.
+Manually trigger a navigation.  The [INavigationOptions](#inavigationoptions) object allows for passing (and optionally persisting) inputs to be passed to the next application.
 
 #### IKatApp.calculateAsync
 
