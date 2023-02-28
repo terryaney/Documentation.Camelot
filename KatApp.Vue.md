@@ -3354,6 +3354,8 @@ The `configure` method can only be called one time and must be called before the
 
 Allows for the Kaml View to add additional event handlers to an application via the `events` parameter.  This is similar to the original `configure()` method call and assigning specific events, but is allowed to be called at any time during the application life cycle.
 
+See [`IKatAppEventsConfiguration`](#ikatappeventsconfiguration) for more information.
+
 #### IKatApp.navigateAsync
 
 **`navigateAsync(navigationId: string, options?: INavigationOptions): Promise<void>;`**
@@ -3585,7 +3587,13 @@ When a submission to an api endpiont is initiated via [`v-ka-api`](#v-ka-api) or
 
 ### IKatApp Events
 
-The KatApp framework raises events throughout the stages of different [lifecycles](#ikatapp-lifecycles) allowing Kaml View developers to catch and respond to these events as needed. All event handlers are registered on the application itself via the [`on` method](#ikatappon). When using events, it is best practice to use the `.ka` namespace.  It is not required when using the `on` because the method automatically ensures each event type processed has the `.ka` namespace, but explicitly using the namespace makes auditing Kaml View code bases much easier.
+The KatApp framework raises events throughout the stages of different [lifecycles](#ikatapp-lifecycles) allowing Kaml View developers to catch and respond to these events as needed. All event handlers are registered on the application itself via the [`configure` method](#ikatappconfigure) or [`handleEvents` method](#ikatapphandleevents).
+
+#### IKatAppEventsConfiguration
+
+The `IKatAppEventsConfiguration` interface describes all events that are raised by the KatApp framework and are available to be handled via delegates assigned in `configure` or `handleEvents`.
+
+**Note:** When examining the signatures of the functions, due to the javascript language processing, when creating the appropriate delegates, all/any parameters are optional and only required if you plan to use them.  If a delegate had 4 parameters, and you only needed the 4th parameter, then, you would need to include all parameters.  You can only skip unused, trailing parameters.
 
 Name | Description
 ---|---
@@ -3606,17 +3614,18 @@ Name | Description
 [`apiStart`](#ikatappapistart) | Triggered at the start of an API submission (via [`apiAsync`](#ikatappapiasync)).
 [`apiComplete`](#ikatappapicomplete) | Triggered at the *successful* completion of an API submission that is *not* an file download endpoint.
 [`apiFailed`](#ikatappapifailed) | Triggered when an exception is thrown during an API submission.
+[`notification`](#ikatappnotification) | Triggered whenever a KatApp input has been updated.
 [`input`](#ikatappinput) | Triggered whenever a KatApp input has been updated.
 
 #### IKatApp.initialized
 
-**`initialized(event: Event, application: IKatApp )`**
+**`initialized(application: IKatApp )`**
 
 Triggered after KatApp Framework has finished injecting the Kaml View and any designated template files.  `initialized` can be used to call api endpoints to retrieve/initialize data that has not been obtained by default in the Host Environment.
 
 #### IKatApp.modalAppInitialized
 
-**`modalAppInitialized(event: Event, modalApplication: IKatApp, hostApplication: IKatApp )`**
+**`modalAppInitialized(modalApplication: IKatApp, hostApplication: IKatApp )`**
 
 This event is triggered after a modal application has been initialized. It allows for a host application to assign events to the modal application if needed or retain a reference to the modalApplication for later use.
 
@@ -3625,8 +3634,10 @@ This event is triggered after a modal application has been initialized. It allow
 
 var irpApplication = undefined;
 
-application.on("modalAppInitialized.ka", (e, modalApplication) => {
-    irpApplication = modalApplication;
+application.handleEvents( events => {
+	events.modalAppInitialized = modalApplication => {
+	    irpApplication = modalApplication;
+	};
 });
 
 // This will trigger modalAppInitialized before showing the modal
@@ -3644,7 +3655,7 @@ if (response.confirmed) {
 
 #### IKatApp.nestedAppInitialized
 
-**`nestedAppInitialized(event: Event, nestedApplication: IKatApp, hostApplication: IKatApp )`**
+**`nestedAppInitialized(nestedApplication: IKatApp, hostApplication: IKatApp )`**
 
 This event is triggered after a nested application has been initialized. It allows for a host application to assign events to the nested application if needed or retain a reference to the nestedApplication for later use.
 
@@ -3658,120 +3669,132 @@ This event is triggered after a nested application has been initialized. It allo
 </rbl-config>
 
 <script>
-application.on("nestedAppInitialized.ka", (e, nestedApplication) => {
-    nestedApplication.on("configureUICalculation", async () => {
-        await application.apiAsync( "common/qna", { calculationInputs: { iAction: "get-credit-card-info" } } );
-        await application.calculateAsync({ iConfigureUI: "1", iDataBind: "1" });
-    });
+application.handleEvents(events => {
+	events.nestedAppInitialized = nestedApplication => {
+		nestedApplication.handleEvents(nestedEvents => {
+			nestedEvents.configureUICalculation = async () => {
+				await application.apiAsync( "common/qna", { calculationInputs: { iAction: "get-credit-card-info" } } );
+				await application.calculateAsync({ iConfigureUI: "1", iDataBind: "1" });
+			};
+		});
+	};
 });
 </script>
 ```
 
 #### IKatApp.rendered
 
-**`rendered(event: Event, errors: IValidation[] | undefined, application: IKatApp )`**
+**`rendered(initializationErrors: IValidation[] | undefined, application: IKatApp )`**
 
-Triggered after Kaml View has been made visible to the user (will wait for CSS transitions to complete).  If any errors occurred during the `initialized` event, they will be passed through via the `errors` parameter.
+Triggered after Kaml View has been made visible to the user (will wait for CSS transitions to complete).  If any errors occurred during the `initialized` event, they will be passed through via the `initializationErrors` parameter.
 
 #### IKatApp.nestedAppRendered
 
-**`nestedAppRendered(event: Event, nestedApplication: IKatApp, errors: IValidation[] | undefined, hostApplication: IKatApp )`**
+**`nestedAppRendered(nestedApplication: IKatApp, initializationErrors: IValidation[] | undefined, hostApplication: IKatApp )`**
 
-This event is triggered after a nested application has been rendered. It for host application to remove any UI blockers that might have been in place during initialization.  If any errors occurred during the nested application's `initialized` event, they will be passed through via the `errors` parameter.
+This event is triggered after a nested application has been rendered. It for host application to remove any UI blockers that might have been in place during initialization.  If any errors occurred during the nested application's `initialized` event, they will be passed through via the `initializationErrors` parameter.
 
 ```html
 <script>
-application.on("nestedAppRendered.ka", () => {
-    application.select(".nestedApp.ui-blocker").remove();
+application.handleEvents( events => {
+	events.nestedAppRendered = () => {
+	    application.select(".nestedApp.ui-blocker").remove();
+	};
 });
 </script>
 ```
 
 #### IKatApp.updateApiOptions
 
-**`updateApiOptions( event: Event, submitApiOptions: ISubmitApiOptions, endpoint: string, application: IKatApp )`**
+**`updateApiOptions( submitApiOptions: ISubmitApiOptions, endpoint: string, application: IKatApp )`**
 
 This event is triggered during RBLe Framework calculations immediately before submission to RBLe Framework and/or during api endpoint submission immediately before submitting to the Host Environment.  It allows Kaml Views to massage the [`ISubmitApiOptions.configuration`](#ISubmitApiOptionsconfiguration) or the [`ISubmitApiOptions.inputs`](#icalculationinputs) before being submitted.  Use this method to add custom inputs/tables to the submission that wouldn't normally be processed by the KatApp Framework.
 
 The `endpoint` parameter will contain the endpoint the KatApp Framework is going to submit to.  When processing a RBLe Framework calculation, the url will be the same as [`options.calculationUrl`](#ikatappoptions.calculationurl).
 
 ```javascript
-application.on("updateApiOptions.ka", (event, submitOptions) => {
-    // Create custom coverage table
-    var coverageTable = {
-        name: "coverage",
-        rows: []
-    };
+application.handleEvents( events => {
+	events.updateApiOptions = submitApiOptions => {
+		// Create custom coverage table
+		var coverageTable = {
+			name: "coverage",
+			rows: []
+		};
 
-    // Loop all inputs that start with iCoverageA- and process them.
-    // data-inputname is in form of iCoverageA-id
-    // For each input, create a row with id/covered properties
-    var inputControlData = application.select("div[data-inputname^=iCoverageA-]");
-    inputControlData.each(function (index, element) {
-        var id = $(element).data("inputname").split("-")[1];
-        var v = $(element).hasClass("active") ? 1 : 0;
-        var row = { "id": id, covered: v };
-        coverageTable.rows.push(row);
-    });
-	submitOptions.inputs.tables.push(coverageTable);
+		// Loop all inputs that start with iCoverageA- and process them.
+		// data-inputname is in form of iCoverageA-id
+		// For each input, create a row with id/covered properties
+		var inputControlData = application.select("div[data-inputname^=iCoverageA-]");
+		inputControlData.each(function (index, element) {
+			var id = $(element).data("inputname").split("-")[1];
+			var v = $(element).hasClass("active") ? 1 : 0;
+			var row = { "id": id, covered: v };
+			coverageTable.rows.push(row);
+		});
+		submitApiOptions.inputs.tables.push(coverageTable);
 
-    submitOptions.inputs.iCustomKamlInput = "custom-value";
+		submitApiOptions.inputs.iCustomKamlInput = "custom-value";
 
-    var refreshKeys = [];
-    refreshKeys.push("hwCoverages", "hwCoveredDependents");
+		// Any other custom properties can be assigned to configuration object that the host environment
+		// might be processing (below, Nexgen framework handles cacheRefreshKeys).
+		var refreshKeys = [];
+		refreshKeys.push("hwCoverages", "hwCoveredDependents");
 
-    if (submitOptions.inputs.iConfigureUI == "1") {
-        //run once.
-        refreshKeys.push("hwEventHistory");
-    }
+		if (submitApiOptions.inputs.iConfigureUI == "1") {
+			//run once.
+			refreshKeys.push("hwEventHistory");
+		}
 
-    submitOptions.configuration.cacheRefreshKeys = refreshKeys;
+		submitApiOptions.configuration.cacheRefreshKeys = refreshKeys;
+	};
 });
 ```
 
 #### IKatApp.calculateStart
 
-**`calculateStart( event: Event, submitApiOptions: ISubmitApiOptions, application: IKatApp ) => boolean`**
+**`calculateStart( submitApiOptions: ISubmitApiOptions, application: IKatApp ) => boolean`**
 
 This event is triggered at the start of a RBLe Framework calculation after the `updateApiOptions` has been triggered.  Use this event to perform any actions that need to occur before the calculation is submitted (i.e. custom processing of UI blockers or enabled state of inputs).  If the handler returns `false` or calls `e.preventDefault()`, then the calculation is immediately cancelled and only the `calculateEnd` event will be triggered.
 
 #### IKatApp.inputsCached
 
-**`inputsCached( event: Event, cachedInputs: ICalculationInputs, application: IKatApp )`**
+**`inputsCached( cachedInputs: ICalculationInputs, application: IKatApp )`**
 
 This event is triggered immediately before inputs are cached to `sessionStorage` (if `options.inputCaching == true`).  It allows Kaml Views to massage the inputs before being cached if needed.
 
 #### IKatApp.resultsProcessing
 
-**`resultsProcessing( event: Event, results: Array<ITabDef>, inputs: ICalculationInputs, submitApiOptions: ISubmitApiOptions, application: IKatApp )`**
+**`resultsProcessing( results: Array<ITabDef>, inputs: ICalculationInputs, submitApiOptions: ISubmitApiOptions, application: IKatApp )`**
 
 This event is triggered during a RBLe Framework calculation _after a successful calculation_ from the RBLe Framework and _before [KatApp Framework result processing](#rbl-framework-result-processing-in-katapp-state)_.  This handler allows Kaml Views to manually push 'additional result rows' into a calculation result table.
 
 ```javascript
-application.on("resultsProcessing.ka", (event, results, inputs) => {
-    // Push 'core' inputs into rbl-value for every CalcEngine if they exist
-    // in this global handler instead of requiring *every* CalcEngine to return these.
-    application.state.rbl.pushTo(results[0], "rbl-value",
-        [
-            { "@id": "currentPage", "value": inputs.iCurrentPage || "" },
-            { "@id": "parentPage", "value": inputs.iParentPage || "" },
-            { "@id": "referrerPage", "value": inputs.iReferrer || "" },
-            { "@id": "isModal", "value": inputs.iModalApplication || "0" },
-            { "@id": "isNested", "value": inputs.iNestedApplication || "0" }
-        ]
-    );
+application.configure((config, rbl) => {
+	config.events.resultsProcessing = (results, inputs) => {
+		// Push 'core' inputs into rbl-value for every CalcEngine if they exist
+		// in this global handler instead of requiring *every* CalcEngine to return these.
+		rbl.pushTo(results[0], "rbl-value",
+			[
+				{ "@id": "currentPage", "value": inputs.iCurrentPage || "" },
+				{ "@id": "parentPage", "value": inputs.iParentPage || "" },
+				{ "@id": "referrerPage", "value": inputs.iReferrer || "" },
+				{ "@id": "isModal", "value": inputs.iModalApplication || "0" },
+				{ "@id": "isNested", "value": inputs.iNestedApplication || "0" }
+			]
+		);
+	};
 });
 ```
 
 #### IKatApp.configureUICalculation
 
-**`configureUICalculation( event: Event, lastCalculation: ILastCalculation, application: IKatApp )`**
+**`configureUICalculation( lastCalculation: ILastCalculation, application: IKatApp )`**
 
 This event is triggered during RBLe Framework calculation _after a successful calculation and result processing_ and _only_ for a calculation where `iConfigureUI == "1"`.  The `configureUICalculation` event is a one time calculation event and can be used to finish setting up Kaml View UI where logic is dependent upon the first calculation results being processed.
 
 #### IKatApp.calculation
 
-**`calculation( event: Event, lastCalculation: ILastCalculation, application: IKatApp )`**
+**`calculation( lastCalculation: ILastCalculation, application: IKatApp )`**
 
 This event is triggered during RBLe Framework calculation _after a successful calculation and result processing_ (even if the calculation has `iConfigureUI == "1"`).  Use this handler to process any additional requirements that may be dependent on calculation results.
 
@@ -3779,7 +3802,7 @@ Note: If calculation contains 'jwt data updating' instructions all the standard 
 
 #### IKatApp.calculationErrors
 
-**`calculationErrors( event: Event, key: string, exception: Error | undefined, application: IKatApp )`**
+**`calculationErrors( key: string, exception: Error | undefined, application: IKatApp )`**
 
 This event is triggered during RBLe Framework calculation if an exception happens.  Use this handler to clean up an UI components that may need processing when calculation results are not available.
 
@@ -3789,19 +3812,19 @@ Note: If calculation contains 'jwt data updating' instructions and an exception 
 
 #### IKatApp.calculateEnd
 
-**`calculateEnd( event: Event, application: IKatApp )`**
+**`calculateEnd( application: IKatApp )`**
 
 This event is triggered to signal the 'end' of a RBLe Framework calculation regardless of whether the calculation succeeds, fails, or is cancelled.  Use this event to perform any actions that need to occur after a calculation is completely finished (i.e. UI blockers, processing indicators, etc.).
 
 #### IKatApp.domUpdated
 
-**`domUpdated( event: Event, elements: Array<HTMLElement>, application: IKatApp )`**
+**`domUpdated( elements: Array<HTMLElement>, application: IKatApp )`**
 
 This event is triggered to signal the 'end' of a DOM manipulation due to reactivity ([`v-if`](#v-if--v-else--v-else-if) or [`v-for`](#v-for) processed) or after the inital rendering of a KatApp.  Use this event to perform any DOM processing after Vue and the KatApp framework has finished all rendering/manipulations (i.e. attaching events to rendered objects, updating DOM elements that are *not* decorated with @vue:mounted events, etc.).
 
 #### IKatApp.apiStart
 
-**`apiStart( event: Event, endpoint: string, submitData: ISubmitApiData, trigger: JQuery<HTMLElement> | undefined, apiOptions: IApiOptions, application: IKatApp ) => boolean`**
+**`apiStart( endpoint: string, submitData: ISubmitApiData, trigger: JQuery<HTMLElement> | undefined, apiOptions: IApiOptions, application: IKatApp ) => boolean`**
 
 This event is triggered immediately before submitting the to an api endpoint.  This handler could be used to modify the `submitData` if required.  If the handler returns `false` or calls `e.preventDefault()`, then the api endpoint submission is immediately cancelled.
 
@@ -3820,36 +3843,74 @@ interface ISubmitApiData {
 
 #### IKatApp.apiComplete
 
-**`apiComplete( event: Event, endpoint: string, successResponse: IStringAnyIndexer | undefined, trigger: JQuery<HTMLElement> | undefined, apiOptions: IApiOptions, application: IKatApp )`**
+**`apiComplete( endpoint: string, successResponse: IStringAnyIndexer | undefined, trigger: JQuery<HTMLElement> | undefined, apiOptions: IApiOptions, application: IKatApp )`**
 
 This event is triggered upon successful submission and response from the api endpoint that **is not** an endpoint that generates 'file download'.
 
 ```javascript
-application.on("apiComplete.ka", async () => {
-    // Recalculate after data has been updated on server, and show the action button to submit CC payment
-    await application.calculateAsync();
-    application.select(".credit-card-action-button").removeClass("d-none");
+application.handleEvents(events => {
+	events.apiComplete = async () => {
+		// Recalculate after data has been updated on server, and show the action button to submit CC payment
+		await application.calculateAsync();
+		application.select(".credit-card-action-button").removeClass("d-none");
+	};
 });
 ```
 
 #### IKatApp.apiFailed
 
-**`apiFailed( event: Event, endpoint: string, errorResponse: IApiErrorResponse, trigger: JQuery<HTMLElement> | undefined, apiOptions: IApiOptions, application: IKatApp )`**
+**`apiFailed( endpoint: string, errorResponse: IApiErrorResponse, trigger: JQuery<HTMLElement> | undefined, apiOptions: IApiOptions, application: IKatApp )`**
 
 This event is triggered when submission to an api endpoint fails.  The `errorResponse` object will have a `Validations` property that can be examined for more details about the cause of the exception. See [IKatApp.apiAsync](#ikatappapiasync) for more information on the `IApiErrorResponse` interface.
 
 ```javascript
-application.on("apiFailed.ka", (event, endpoint) => {
-    // Show a save error message if jwt update instructions failed
-	if (endpoint == "rble/jwtupdate") {
-		application.select(".saveError").show(500).delay(3000).hide(500);
-	}
+application.handleEvents(events => {
+	events.apiFailed = endpoint => {
+		// Show a save error message if jwt update instructions failed
+		if (endpoint == "rble/jwtupdate") {
+			application.select(".saveError").show(500).delay(3000).hide(500);
+		}
+	};
+});
+```
+
+#### IKatApp.notification
+
+**`notification: (name: string, information: IStringAnyIndexer | undefined, from: IKatApp)`**
+
+The 'notification' delegate is invoked when another KatApp wants to notify this application via the [`notifyAsync`](#ikatappnotifyasync) method.  Usually this is used as a mechanism for nested or modal applications to communicate back to their host application.
+
+**Nested Application Configuration**
+```javascript
+/** @type {IKatApp} */
+var application = KatApp.get('{id}');
+application.configure(config => {
+	config.handlers.cancel = () => {
+		application.options.hostApplication.notifyAsync(
+			application,
+			"NestedCancelled",
+			{ ExtraInfo: "Value" }
+		);
+	};
+});
+```
+
+**Host Application Configuration**
+```javascript
+/** @type {IKatApp} */
+var application = KatApp.get('{id}');
+application.configure(config => {
+	config.events.notification = (name, information) => {
+		if ( name == "NestedCancelled" ) {
+			console.log(information["ExtraInfo"]);
+		}
+	};
 });
 ```
 
 #### IKatApp.input
 
-**`input( event: Event, name: string, calculate: boolean, input: HTMLElement, scope: IKaInputScope | IKaInputGroupScope )`**
+**`input( name: string, calculate: boolean, input: HTMLElement, scope: IKaInputScope | IKaInputGroupScope )`**
 
 This event is triggered whenever a KatApp input has been updated.  It is a 'catch all' event that allows an application to bind a single event handler on the KatApp when all (or almost all inputs) on the page will use the same event handler.  The same goal could be accomplished via a [`IKaInputModel.events.input` delgate](#v-ka-input-model).
 
