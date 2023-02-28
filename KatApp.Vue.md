@@ -129,22 +129,33 @@ The standard Kaml View file will have the following structure.
 <script>
 	// Immediately Invoked Function Expression (IIFE) to allow for javascript scoped to this Kaml View
 	(function () {
+        /** @type {IKatApp} */
 		var application = KatApp.get('{id}');
 
-		// Optionally update the KatApp options and state.
-		application.update({ 
-			model: {
-			},
-			options: {
-			},
-			directives: {
-			},
-			components: {
-			}
-		});
+		// Optionally update the KatApp options and state.  The configAction delegate passes in
+        // references to the rbl, model, inputs, and handlers properties from its state.
+		application.configure((config, rbl, model, inputs, handlers) => { 
+			config.model = {
+			};
 
-		// Optionally bind Application Events
-		application.on("applicationEvent", () => console.log( 'handled' ) );
+			config.options = {
+			}
+			
+            config.directives = {
+			};
+
+			config.components = {
+			};
+
+            config.events.initialized = () => {
+                // Optionally bind Application Events
+                console.log( 'handled' );
+
+                // Can use the current applications state properties via delegate parameters.
+                console.log( rbl.value("nameFirst" ) );
+                // 'rbl' is equivalent to 'application.state.rbl'.
+            };
+		});
 
 		// Any 'element' selection should use application.select()
 		application.select(".warning-items").css("background-color", "red");
@@ -3487,6 +3498,8 @@ var nameLabel application.closest(name, "label");
 // Assume this code is inside a nested application and it has a reference to its 'hostApplication'
 await hostApplication.notifyAsync(application, "myNotificationName", { moreData: "dataValue" });
 ```
+
+For an application to receive this notification, it must have a `IKatAppEventsConfiguration.notification` delegate provided.
 
 #### IKatApp.debugNext
 
