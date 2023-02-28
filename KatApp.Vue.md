@@ -3177,6 +3177,7 @@ Name | Description
 ---|---
 [`createAppAsync`](#katappcreateappasync) | Asyncronous method to create a new KatApp bound to an `HTMLElement` selected via `selector`.
 [`get`](#katappget) | Get access to an existing KatApp.
+[`handleEvents`](#katapphandleasync) | Similar to [`IKatApp.handleEvents`](#ikatapphandleevents) and allows for events to be attached to applications.  Used generic javascript libraries that want to attach events to an application, but is have direct access to an application or the application may not be created/available at the time the library wants to register the events.
 
 ### KatApp.createAppAsync
 
@@ -3214,6 +3215,29 @@ This method is the way Kaml Views get access to the currently running KatApp.
 ```
 
 Note: This is also the method used to investigate a KatApp during debug sessions in browser developer tools.
+
+### KatApp.handleEvents
+
+`handleEvents(selector: string, configAction: (config: IKatAppEventsConfiguration) => void): void`
+
+Attach events to an application given a known JQuery selector string.  Can be called at any time during the life cycle of a KatApp application, *even before the application has been created and/or mounted*.
+
+When using this method to bind events, *almost always*, the last parameter, `application`, of any given event will be required since these event handlers are often generic and don't necessarily know 'which' application is being handled.
+
+```javascript
+(function () {
+	// Sample that hooks up global logging for a katapp selector from the host framework's library code.
+	// So the host framework *knows* what the main application selector is (.katapp).
+	KatApp.handleEvents(".katapp", events => {
+		events.calculation = (lastCalculation, application) => {
+			const logTitle = lastCalculation?.configuration.CurrentPage ?? application.options.currentPage;
+			console.group(logTitle + " KatApp calculation");
+
+			console.log(lastCalculation != undefined && lastCalculation.results.length > 0 ? lastCalculation.results[0] : application.options.manualResults[0]);
+		};
+	});
+)();
+```
 
 ## IKatAppOptions
 
