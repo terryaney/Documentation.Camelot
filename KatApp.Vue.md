@@ -3207,8 +3207,9 @@ This method is the way Kaml Views get access to the currently running KatApp.
 
 ```javascript
 (function () {
-    var application = KatApp.get('{id}');
-    // ... additional code
+	/** @type {IKatApp} */
+	var application = KatApp.get('{id}');
+	// ... additional code
 )();
 ```
 
@@ -3322,9 +3323,8 @@ Property | Type | Description
 
 Name | Description
 ---|---
-[`update`](#ikatappupdate) | Allows for the Kaml View to update options provided in the [`IUpdateApplicationOptions`](#iupdateapplicationoptions).
-[`on`](#ikatappon) | Allows for the Kaml View to listen to KatApp events.
-[`off`](#ikatappoff) | Allows for the Kaml View to stop listening to KatApp events.
+[`configure`](#ikatappconfigure) | Allows for the Kaml View to configure the application by augmenting the original application options, providing a custom model, adding event handlers, etc.
+[`handleEvents`](#ikatapphandleevents) | Allows for the Kaml View to add additional event handlers to an application.
 [`navigateAsync`](#ikatappnavigateasync) | Manually trigger a navigation.
 [`calculateAsync`](#ikatappcalculateasync) | Manually call a RBLe Framework calculation.
 [`apiAsync`](#ikatappapiasync) | Use an [`IApiOptions`](#iapioptions) and [`ISubmitApiOptions`](#ISubmitApiOptions) object to submit a payload to an api endpoint.
@@ -3342,23 +3342,17 @@ Name | Description
 [`getTemplateContent`](#ikatappgettemplatecontent) | Returns the 'content' of a requested template.
 [`getLocalizedString`](#ikatappgetlocalizedstring) | Returns the localized string of a requested key.
 
-#### IKatApp.update
+#### IKatApp.configure
 
-**`update(options: IUpdateApplicationOptions): IKatApp`**
+**`configure(configAction: (config: IConfigureOptions, rbl: IRblApplicationData, model: IStringAnyIndexer | undefined, inputs: ICalculationInputs, handlers: IHandlers | undefined) => void): IKatApp`**
 
-The `update` method can only be called one time and must be called before the Kaml View is 'mounted' by Vue. Allows for the Kaml View to update options provided in the [`IUpdateApplicationOptions`](#iupdateapplicationoptions).
+The `configure` method can only be called one time and must be called before the Kaml View is 'mounted' by Vue. Allows for the Kaml View to update application options by modifying the `config` parameter.  See [`IConfigureOptions`](#iconfigureoptions) for more information.
 
-#### IKatApp.on
+#### IKatApp.handleEvents
 
-**`on<TType extends string>(events: TType, handler: JQuery.TypeEventHandler<HTMLElement, undefined, HTMLElement, HTMLElement, TType> | false): KatApp;`**
+**`handleEvents(configAction: (events: IKatAppEventsConfiguration, rbl: IRblApplicationData, model: IStringAnyIndexer | undefined, inputs: ICalculationInputs, handlers: IHandlers | undefined) => void): IKatApp`**
 
-The `on` method is a pass through to the [JQuery.on](#https://api.jquery.com/on/) method with the benefit of ensuring that the `.ka` namespace is automatically added if needed and the method is based off of the `IKatApp` which helps provide a fluent api for calling the `update` and `on` methods.
-
-#### IKatApp.off
-
-**`off<TType extends string>(events: TType): KatApp;`**
-
-The `off` method is a pass through to the [JQuery.off](#https://api.jquery.com/off/) method with the benefit of ensuring that the `.ka` namespace is automatically added if needed and the method is based off of the `IKatApp` which helps provide a fluent api for calling the `update` and `off` methods.
+Allows for the Kaml View to add additional event handlers to an application via the `events` parameter.  This is similar to the original `configure()` method call and assigning specific events, but is allowed to be called at any time during the application life cycle.
 
 #### IKatApp.navigateAsync
 
