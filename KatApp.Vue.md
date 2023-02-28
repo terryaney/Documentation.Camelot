@@ -4043,27 +4043,45 @@ Optional: `string`; The name to use for this result tab.  If `manualResults` has
 
 If not provided, a name will be generated with the tab position concatenated with `RBLResult`, i.e. `'RBLResult1'`, `'RBLResult2'`, etc.
 
-### IUpdateApplicationOptions
+### IConfigureOptions
 
 Property | Type | Description
 ---|---|---
 `model` | `any` | Kaml Views can pass in 'custom models' that hold state but are not built from Calculation Results.
 `options` | [`IKatAppOptions`](#ikatappoptions) | Kaml Views can provide partial updates to the [`IKatApp.options`](#ikatappoptions) object.  Typically, only inputs or modal templates are updated.
-`handlers` | `IStringAnyIndexer` | Provide an object where each property is a function delegate that can be used with [`v-on`](#v-on) directives.
+`handlers` | `IHandlers` | Provide an object where each property is a function delegate that can be used with [`v-on`](#v-on) directives.
 `components` | `IStringAnyIndexer` | Provide an object where each property is a Vue component that can be used with [`v-scope`](#v-scope) directives.
 `directives` | `IStringIndexer<(ctx: DirectiveContext<Element>) => (() => void) \| void>` | Provide an object where each property name is the directive tag name (i.e. `v-*`) and the value is a function delegate that returns a [custom directive](#custom-katapp-directives) that can be used in the Kaml View markup.
+`events` | [`IKatAppEventsConfiguration`](#ikatappeventsconfiguration) | A `IKatAppEventsConfiguration` object that can have event handler delegates assigned for each supported KatApp event.
 
 
 ```javascript
-application.update({
-    options: {
+application.configure(config => {
+    config.options = {
         inputs: {
             iApplicationInput: "value1"
         },
         modalAppOptions: {
             headerTemplate: "header"
         }
-    }
+    };
+
+	config.inputs = {
+		iAdditionalInput: "Value"
+	};
+
+	config.handlers = {
+		cancel: () => {
+			console.log("cancelled");
+		},
+		saveAsync: async () => {
+			await application.apiAsync( /* ... */ );
+		}
+	};
+
+	config.events.initialized = () => {
+		console.log("initialized");
+	}
 });
 ```
 
