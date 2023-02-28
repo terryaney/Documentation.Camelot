@@ -4022,9 +4022,14 @@ Generally speaking, `ICalculationInputs` is a [IStringIndexer&lt;string>](#istri
     ]
     // The rest of the inputs present on page are added as IStringIndexer<string> properties
     "iPageInput1": "64",
-    "iPageInputN": "Conduent"
+    "iPageInputN": "Conduent",
+	
+	// KatApp Framework timestamp
+	"haveChanged:" 123456789
 }
 ```
+
+**Note**: The `haveChanged` property on the `inputs` object is automatically maintained by the KatApp framework.  Everytime *any* input changes (changing a dropdown, typing a character in text input, etc.), this value is updated with a timestamp.  The benefit of this property is if the Kaml wanted to have a 'reactive' hook based on the condition when any input has changed.
 
 ### ITabDef
 
