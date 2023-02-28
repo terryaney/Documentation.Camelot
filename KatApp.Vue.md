@@ -3372,6 +3372,30 @@ Name | Description
 
 The `configure` method can only be called one time and must be called before the Kaml View is 'mounted' by Vue. Allows for the Kaml View to update application options by modifying the `config` parameter.  See [`IConfigureOptions`](#iconfigureoptions) for more information.
 
+This pattern follows a similar configuration action delegate used in .NET Core application setup.
+
+The `rbl`, `model`, `inputs`, and `handlers` parameters are optional, but are passed in to allow access to the application's state properties in a shorthand syntax.
+
+```javascript
+/** @type {IKatApp} */
+var application = KatApp.get('{id}');
+application.configure((config, rbl, model) => {
+
+	// In the rendered event below, we access 'model' and 'rbl' in the handler.
+	// Even though 'configure' is called immediately at application start and 'rbl' and
+	// 'model' are empty at the time of the 'configure' call...by the time the rendered event
+	// is raised, the references for `rbl` and `model` are up to date and will have appropriate 
+	// values.
+
+	config.events.rendered = () => {
+		// using 'model' is equivalent to 'application.state.model'
+		// using 'rbl' is equivalent to 'application.state.rbl'
+		model.eventMessageHeader = rbl.value("eventMessageHeader");
+		model.eventMessage = rbl.value("eventMessage");
+	}
+});
+```
+
 #### IKatApp.handleEvents
 
 **`handleEvents(configAction: (events: IKatAppEventsConfiguration, rbl: IRblApplicationData, model: IStringAnyIndexer | undefined, inputs: ICalculationInputs, handlers: IHandlers | undefined) => void): IKatApp`**
