@@ -154,7 +154,7 @@ The standard Kaml View file will have the following structure.
 			    // Can use the current applications state properties via delegate parameters.
 			    console.log( rbl.value("nameFirst" ) );
 			    // 'rbl' is equivalent to 'application.state.rbl'.
-            };
+			};
 		});
 
 		// Any 'element' selection should use application.select()
@@ -789,11 +789,12 @@ Below is an example of how to leverage the `$renderId` to allow for proper scopi
 <script>
 // Create a model we can use in markup
 (function () {
+	/** @type {IKatApp} */
 	var application = KatApp.get('{id}');
-	application.update({
-		model: {
+	application.configure( config => {
+		config.model = {
 			list: ["Pension", "LifeEvents", "Savings"]
-		}
+		};
     });
 )();
 </script>
@@ -864,11 +865,12 @@ With the above example, you could expect the following in the console ouput (rem
 <script>
 // Create a model we can use in markup
 (function () {
+    /** @type {IKatApp} */
 	var application = KatApp.get('{id}');
-	application.update({
-		model: {
+	application.configure( config => {
+		config.model = {
 			list: ["Pension", "LifeEvents", "Savings"]
-		}
+		};
     });
 )();
 </script>
@@ -1412,13 +1414,15 @@ These events can be used in Kaml Views manually if needed. To use the elements y
 ```html
 <!-- Use vue:mounted to show appropriate bootstrap tab when shown -->
 <script>
-    application.update({
-        handlers: {
+    /** @type {IKatApp} */
+    var application = KatApp.get('{id}');    
+    application.configure( (config, rbl, model, inputs) => {
+        config.handlers = {
             paymentOptionsMounted: () => {
-                application.state.inputs.iHsaOption = application.select('#eHSAContribution button:first').attr("value");
+                inputs.iHsaOption = application.select('#eHSAContribution button:first').attr("value");
                 new bootstrap.Tab(application.select('#eHSAContribution button:first')[0]).show();
             }
-        }
+        };
     })
 </script>
 
@@ -3189,7 +3193,7 @@ $(document).ready(function () {
         ).catch(ex => {
             console.log({ex});
         });
-	})();
+    })();
 });
 ```
 
