@@ -3188,12 +3188,12 @@ Asyncronous method to create a new KatApp bound to an `HTMLElement` selected via
 $(document).ready(function () {
 	(async () => {
 		await KatApp.createAppAsync(
-            '.katapp', 
-            { /* options */ } 
-        ).catch(ex => {
-            console.log({ex});
-        });
-    })();
+			'.katapp', 
+			{ /* options */ } 
+		).catch(ex => {
+			console.log({ex});
+		});
+	})();
 });
 ```
 
