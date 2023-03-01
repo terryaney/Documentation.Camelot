@@ -43,7 +43,7 @@
     - [Temp Query Processing](#Temp-Query-Processing)
         - [Temp Query Lifespan](#Temp-Query-Lifespan)
         - [Temp Query MergeMode](#Temp-Query-MergeMode)
-    - [Refreshing API Data On Demand](#Refreshing-API-Data-On-Demand)
+    - [Refreshing API Data On Demand / cacheRefreshKeys](#refreshing-api-data-on-demand--cacherefreshkeys)
         - [Refreshing API Data Before Client Side Calculations](#Refreshing-API-Data-Before-Client-Side-Calculations)
         - [Refreshing API Data Before Command Processing](#Refreshing-API-Data-Before-Command-Processing)
         - [Refreshing API Data During Command Processing](#Refreshing-API-Data-During-Command-Processing)
@@ -183,7 +183,7 @@ Column | Description
 {today} | This token is always replaced with the date value of today in the format of yyyy-mm-dd.
 {Profile.field} | Select any field from the `Profile` data.  For example, to select a field called `sharkfinDbAge`, use a token of `{Profile.sharkfinDbAge}`.
 {table.index.field} | Select a field from a specific history row.  For example, `{dbCalculationID.PROJECT.calcID}` would select the `calcID` field from the `dbCalculationID` table where the index is `PROJECT`.
-{QS.param} | Select any value that will be provided via a querystring parameter.  Useful when the KatApp/javascript or [command processing calculation](#Command-Processing) is going to know the value and it is not stored in the xDS Profile.  For example, an apiDataSource `dbCalculationsDetailsDynamic` with an endpoint of `/businessapi-service-db/db/calc/v1/{legalIdentifier}/{QS.calcID}/calc-details-dynamic` would expect to be invoked via `dbCalculationsDetailsDynamic?calcID=11111` using [CacheRefreshKeys](#Refreshing-API-Data-On-Demand) or during [command processing calculations](#Command-Processing).  Note that, when this feature is used, the API result will always be treated as a [temporary query](#Temp-Query-Processing) if the `{QS.param}` is specified as a 'query string'.  It will be a 'normal' query if the `{QS.param}` is part of the endpoint 'route'.
+{QS.param} | Select any value that will be provided via a querystring parameter.  Useful when the KatApp/javascript or [command processing calculation](#Command-Processing) is going to know the value and it is not stored in the xDS Profile.  For example, an apiDataSource `dbCalculationsDetailsDynamic` with an endpoint of `/businessapi-service-db/db/calc/v1/{legalIdentifier}/{QS.calcID}/calc-details-dynamic` would expect to be invoked via `dbCalculationsDetailsDynamic?calcID=11111` using [CacheRefreshKeys](refreshing-api-data-on-demand--cacherefreshkeys) or during [command processing calculations](#Command-Processing).  Note that, when this feature is used, the API result will always be treated as a [temporary query](#Temp-Query-Processing) if the `{QS.param}` is specified as a 'query string'.  It will be a 'normal' query if the `{QS.param}` is part of the endpoint 'route'.
 {{resultCommandId.jsonSelector}} | Select a field from a previous command result which was run within the current 'command processing' context.  This feature is usually used in conjunction with the `{QS.param}` feature.  See [Accessing Previous Command Result Values](#Accessing-Previous-Command-Result-Values) for more information.
 
 ##### apiDataSourceMappings Layout
@@ -1881,7 +1881,7 @@ After all specified APIs are called, they are merged together to create the xDS 
 
 ## Temp Query Processing
 
-When API results are turned into xDS Format, all the rules from the [apiDataSourceMappings table](#apiDataSourceMappings-Layout) are followed.  However, if a query string parameter is provided while using [CacheRefreshKeys](#Refreshing-API-Data-On-Demand) or during [command processing calculations](#Command-Processing), the results are treated as 'temporary query' results.  The same mapping rules will be used, however, since a query string parameter was provided, it indicates that that KatApp is 'querying' a *subset* of the data and is only valid during the life cycle of that KatApp.  To accomplish this, all the mappings are massaged slightly, and thus references to 'xDS Data' in CalcEngine input tabs need to make the same changes.
+When API results are turned into xDS Format, all the rules from the [apiDataSourceMappings table](#apiDataSourceMappings-Layout) are followed.  However, if a query string parameter is provided while using [CacheRefreshKeys](refreshing-api-data-on-demand--cacherefreshkeys) or during [command processing calculations](#Command-Processing), the results are treated as 'temporary query' results.  The same mapping rules will be used, however, since a query string parameter was provided, it indicates that that KatApp is 'querying' a *subset* of the data and is only valid during the life cycle of that KatApp.  To accomplish this, all the mappings are massaged slightly, and thus references to 'xDS Data' in CalcEngine input tabs need to make the same changes.
 
 All history table mappings are renamed by appending `Query` as a suffix.  So if a mapping specified that historical data should be placed in an `addresses` table, the temporary query will put results in an `addressesQuery` historical table.  
 
@@ -1897,22 +1897,24 @@ When temp queries are processed, the `mergeMode` is set to `Replace` by default 
 
 Temp queries can be instructed to Merge instead of Replace processing.  To force a Merge during [command processing calculations](#command-Layout), add in a `.MERGE` segment when using the `.KEY` syntax to specify a command.  If `.MERGE` segment is present, it'll instruct temp query results to merge with existing results.  Normally, a normal `ID.KEY` command would be issues as well, so that previous data is cleared, and a second `ID.MERGE.KEY` command would be issued in conjunction to merge results with the `ID.KEY` results (i.e. estimate saved details when multiple scenarios are present).
 
-Similarly, when [refreshing API data On demand](#Refreshing-API-Data-On-Demand), a `:MERGE` flag following the key can be used to indicate that results should be merged. 
+Similarly, when [refreshing API data On demand](refreshing-api-data-on-demand--cacherefreshkeys), a `.MERGE` flag following the key can be used to indicate that results should be merged. 
 
 ```javascript
 // Both apis map to same xDS history tables, so instruct the dbSavedCalc2Details to MERGE with
 // the results returned from the dbSavedCalcDetails call.
-view.on("onCalculationOptions.RBLe", function (event, submitOptions, application) {
-    submitOptions.Configuration.CacheRefreshKeys = [ 
-        "dbSavedCalcDetails?calcID=123",
-        "dbSavedCalc2Details:MERGE?calcID=321"
-    ];
+application.configure(config => {
+	config.updateApiOptions = submitApiOptions => {
+		submitApiOptions.configuration.cacheRefreshKeys = [ 
+			"dbSavedCalcDetails?calcID=123",
+			"dbSavedCalc2Details.MERGE?calcID=321"
+		];
+	};
 });
 ```
 
-## Refreshing API Data On Demand
+## Refreshing API Data On Demand / cacheRefreshKeys
 
-There are situations where KatApps want to refresh API data on demand before running a calculation.  This is accomplished by using the `CacheRefreshKeys` feature.  Before any client side calculation is ran, you can set this property and the specified API will be called and the current user's data model will be refreshed.  This is done using the `onCalculationOptions` event handler and setting the `submitOptions.Configuration.CacheRefreshKeys` to an array of [apiDataSource IDs](#apiDataSource-Layout) to refresh before the next calculation is processed.
+There are situations where KatApps want to refresh API data on demand before running a calculation.  This is accomplished by using the `cacheRefreshKeys` feature.  Before any client side calculation is ran, you can set this property and the specified API will be called and the current user's data model will be refreshed.  This is done using the [`updateApiOptions`](#https://github.com/terryaney/nexgen-documentation/blob/main/KatApp.Vue.md#ikatappupdateapioptions) event handler and setting the `submitApiOptions.configuration.cacheRefreshKeys` to an array of [apiDataSource IDs](#apiDataSource-Layout) to refresh before the next calculation is processed.
 
 ### Refreshing API Data Before Client Side Calculations
 
@@ -1920,57 +1922,64 @@ Below are several different examples/scenarios that are possible to use to refre
 
 ```javascript
 // Refresh hwBeneficiaries before *every* calculation
-view.on("onCalculationOptions.RBLe", function (event, submitOptions, application) {
-    submitOptions.Configuration.CacheRefreshKeys = [ "hwBeneficiaries" ];
+application.configure(config => {
+	config.updateApiOptions = submitApiOptions => {
+		submitApiOptions.configuration.cacheRefreshKeys = [ "hwBeneficiaries" ];
+	};
 });
 
 // Refresh hwBeneficiaries before *every* calculation but treat results as a temporary query by appending an 'unused' querystring value
-view.on("onCalculationOptions.RBLe", function (event, submitOptions, application) {
-    submitOptions.Configuration.CacheRefreshKeys = [ "hwBeneficiaries?isTemp=true" ];
+application.configure(config => {
+	config.updateApiOptions = submitApiOptions => {
+		submitApiOptions.configuration.cacheRefreshKeys = [ "hwBeneficiaries?isTemp=true" ];
+	};
 });
 
 // Refresh hwBeneficiaries before *every* calculation and if current template rendering is 
 // 'hw-open-existing-event' also refresh the hwLifeEvents API.
-view.on("onCalculationOptions.RBLe", function (event, submitOptions, application) {
-    var refreshKeys = [ "hwBeneficiaries" ];
+application.configure((config, rbl, model, inputs) => {
+	config.updateApiOptions = submitApiOptions => {
+		var refreshKeys = [ "hwBeneficiaries" ];
 
-    switch (application.state.manualInputs.iTemplate) {
-        case "hw-open-existing-event": {
-            refreshKeys.push("hwLifeEvents");
-            break;
-        };
-    }
-
-    submitOptions.Configuration.CacheRefreshKeys = refreshKeys;
+		switch (inputs.iTemplate) {
+			case "hw-open-existing-event": {
+				refreshKeys.push("hwLifeEvents");
+				break;
+			};
+		}
+		
+		submitApiOptions.configuration.cacheRefreshKeys = refreshKeys;
+	};
 });
 
 // Refresh hwBeneficiaries before *every* calculation
 // If current template rendering is 'hw-open-existing-event' refresh the hwLifeEvents API
 // If current template rendering is 'hw-benefit-select-type-hsa' refresh the hwHsaEligiblity API using the buildApiGET helper
-view.on("onCalculationOptions.RBLe", function (event, submitOptions, application) {
-    var refreshKeys = [ "hwBeneficiaries" ];
+application.configure((config, rbl, model, inputs) => {
+	config.updateApiOptions = submitApiOptions => {
+		var refreshKeys = [ "hwBeneficiaries" ];
 
-    switch (application.state.manualInputs.iTemplate) {
-        case "hw-open-existing-event": {
-            refreshKeys.push("hwLifeEvents");
-            break;
-        };
-        case "hw-benefit-select-type-hsa": {
-            // buildApiGET takes a JSON object and turns it into a query string, so below would result in
-            // hwHsaEligibility?benefitType=HSA&eventDate=2022-01-01&eventID=01&eventType=32.  buildApiGET
-            // is simply a helper to avoid string concatenation coding in javascript.
-            var qd = {
-                benefitType: application.state.manualInputs.iBenefitType, // HSA
-                eventDate: application.state.manualInputs.iEventDate, // 2022-01-01
-                eventID: application.state.manualInputs.iEventId, // 01
-                eventType: application.state.manualInputs.iEventType // 32
-            };
-            refreshKeys.push(buildApiGET("hwHsaEligibility", qd));
-            break;
-        };
-    }
-
-    submitOptions.Configuration.CacheRefreshKeys = refreshKeys;
+		switch (inputs.iTemplate) {
+			case "hw-open-existing-event": {
+				refreshKeys.push("hwLifeEvents");
+				break;
+			};
+			case "hw-benefit-select-type-hsa": {
+				// buildApiGET takes a JSON object and turns it into a query string, so below would result in
+				// hwHsaEligibility?benefitType=HSA&eventDate=2022-01-01&eventID=01&eventType=32.  buildApiGET
+				// is simply a helper to avoid string concatenation coding in javascript.
+				var qd = {
+					benefitType: inputs.iBenefitType, // HSA
+					eventDate: inputs.iEventDate, // 2022-01-01
+					eventID: inputs.iEventId, // 01
+					eventType: inputs.iEventType // 32
+				};
+				refreshKeys.push(camelot.katapp.buildApiGET("hwHsaEligibility", qd));
+				break;
+			};
+		}
+		submitApiOptions.configuration.cacheRefreshKeys = refreshKeys;
+	};
 });
 ```
 
@@ -1978,25 +1987,37 @@ view.on("onCalculationOptions.RBLe", function (event, submitOptions, application
 
 When endpoints are processed, a validation calculation (`iValidate=1`) is the first action taken to produce the `command` rows to process.  See [command processing calculations](#Command-Processing) for more information.
 
-To refresh API responses before the `iValidate` calculation occurs, the `onActionStart` event handler must be used.
+To refresh API responses before the `iValidate` calculation occurs, the same `updateApiOptions` event handler must be used.
 
 ```javascript
-view.on("onActionStart.RBLe", function (e, endPoint, submitData, _application, currentOptions, actionLink) {
-    switch (endPoint) {
-        case "hw/life-event":
-            // Sample: setting refresh keys before a rbl-action-link endpoint is called
-            if (application.state.hwApiUpdated == undefined) {
-                currentOptions.Configuration.CacheRefreshKeys = [ "hwLifeEvents" ];
-                application.state.hwApiUpdated = false;
-            }
-            break;
-    }
+application.configure((config, rbl, model) => {
+	config.updateApiOptions = (submitApiOptions, endpoint) => {
+		var refreshKeys = [];
+
+		switch (endPoint) {
+			case "hw/life-event":
+				// Sample: setting refresh keys before a rbl-action-link endpoint is called
+				// NOTE: This could also 
+				if (model.hwApiUpdated == undefined) {
+					submitApiOptions.configuration.cacheRefreshKeys = [ "hwLifeEvents" ];
+					model.hwApiUpdated = false;
+				}
+				break;
+		}
+		
+		submitApiOptions.configuration.cacheRefreshKeys = refreshKeys;
+	};
 });
 ```
 
-### Refreshing API Data During Command Processing
+### apiDataSource ID Advanced Segments
 
-When endpoints are processed, the validation calculation (`iValidate=1`) produces the `command` rows to process.  For each `GET` command processed, the associated API response will be updated.  See [command processing calculations](#Command-Processing) for more information.
+Normally just a list of apiDataSource IDs (with option query string parameters) are provided in the `cacheRefreshKeys` property.  There are two 'segments' that can be used to augment the processing logic.
+
+Segment | Description
+---|---
+`.MERGE` | By default, [temp query processing](#Temp-Query-Processing) has its `mergeMode` set to `Replace`.  There are times when it is desired to have a temp query merge into existing rows without removing all existing rows beforehand (i.e. if you run two different temp queries that map to the same history table and you want both results available at the end of the process).  To accomplish this, you can use the `.MERGE` segment after the apiDataSource ID but before the query string (i.e. `apiId.MERGE?some=value`).
+`.FORCE` | By default, APIs are only ran if they haven't been run already (during login or by another KatApp).  If you want to force an Api to run, you can use the `.FORCE` segment after the apiDataSource ID but before the query string (i.e. `apiId.FORCE?some=value`).<br/><br/>**NOTE**: If you use `.FORCE` with and ID that is *not* using a query string, it will refresh the api data and bust *all* RBLe cache results for all pages.  If an api with a querystring is re-ran, the RBLe caches will not be destroyed.
 
 # NexGen CalcEngines
 
@@ -2196,7 +2217,7 @@ To help with performance, a small caching algorithm has been implemented to cach
 1. Only results from client side calculations will be considered for caching (i.e. calculations called during endpoint processing or other server side code are **never** cached).
 1. The cache 'key' to uniquely identify a calculation is the combination of inputs, CalcEngine specifications (name, tabs, etc.), and other KatApp/calculation configuration options (such as current page, test or live CalcEngine, etc.).
 1. Cached calculations are invalidated when 'data is updated' based on following:
-  1. Results for *all pages* are invalidated when new API data is requested via a `GET` and **no** query string value during [Command Processing](#Command-Processing) or [Refreshing API Data On Demand](#Refreshing-API-Data-On-Demand).
+  1. Results for *all pages* are invalidated when new API data is requested via a `GET` and **no** query string value during [Command Processing](#Command-Processing) or [Refreshing API Data On Demand](refreshing-api-data-on-demand--cacherefreshkeys).
   1. Results for the *current view* will be invalidated when a [temporary API data](#Temp-Query-Processing) is requested _during endpoint processing_ via a `GET` and query string **is provided**.  'Current view' is the name of the Kaml file, so if it is used in multiple locations from the site menu, all pages will have caches invalidated.
   1. Cached results are **not** invalidated when temporary API data is requested via javascript in the KatApp via 'Refreshing API Data On Demand'.  It is assumed that once the data has been requested once, it will remain unchanged (i.e. calculation cache is valid) until server side API processing issues a normal or temporary `GET` (usually during endpoint processing).
 1. If a debug CalcEngine is being generated, the calculation will not be considered for caching.
@@ -2229,7 +2250,7 @@ See [QnA Processing](#QnA-Processing) for a detailed description on how xDS data
 
 ### Refreshing Conduent_Nexgen_QnA_SE API Data On Demand
 
-Similar to the CalcEngine, the QnA KatApp has been built generically and therefore can not have specific javascript in the KatApp to refresh specific QnA API data.  To accomplish this, there is an `iCacheRefreshKeys` input that can be passed in with the value being in the same format as the [CacheRefreshKeys configuration property](#Refreshing-API-Data-On-Demand).
+Similar to the CalcEngine, the QnA KatApp has been built generically and therefore can not have specific javascript in the KatApp to refresh specific QnA API data.  To accomplish this, there is an `iCacheRefreshKeys` input that can be passed in with the value being in the same format as the [CacheRefreshKeys configuration property](refreshing-api-data-on-demand--cacherefreshkeys).
 
 When a value is passed in, the `refreshData` command will be turned on during endpoint calculations and provide the [apiDataSource](#apiDataSource-Layout) IDs to refresh.
 
