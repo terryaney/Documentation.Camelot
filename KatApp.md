@@ -1,4 +1,4 @@
-# KatApp Framework
+﻿# KatApp Framework
 
 The KatApp framework is an orchestrator of two other well established frameworks; RBLe framework and [Vue.js](https://vuejs.org/).  The primary function of the KatApp framework is to marshall inputs into a RBLe framework calculation, take the calculation results and turn them into a 'reactive' model that is then used for rendering HTML markup via Vue.  One caveat is that instead of standard Vue, KatApp framework is leveraging [petite-vue](https://github.com/vuejs/petite-vue).  
 
@@ -5001,9 +5001,8 @@ Configure two CalcEngines with different tabs to run in the pipeline before the 
 </rbl-config>
 ```
 
-
 # Upcoming Documentation
-
+1. Test hook 1,2,3,4,5
 1. Document custom 'view model' and how it is passed in...sample with doc center 'showDownload'
 1. Original Docs: See [calculate With Different CalcEngine](#calculate-With-Different-CalcEngine) for information about running secondary calculations via javascript and without requiring configuration up front.
 1. Comment about how errors/warnings are cleared out everytime there is a 'normal calculation' or apiAsync call
