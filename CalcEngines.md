@@ -1030,7 +1030,7 @@ In all the supported features described, a sample json resopnse that will be use
 
 Resopnse properties that are not part of an object within an array property (`[]`) are **automatically mapped to the xDS Profile**, there is no need to provide a `apiDataSourceMapping` row.  For any response array property that you want to be converted into xDS history rows, you *must* provide a `apiDataSourceMapping` row.
 
-In the JSON response, the `response` property is renamed to `profile` before processing, so any mapping instructions against the root object, should use `profile` (i.e. [Namespacing Fields](#Namespacing-Fields) or [TBD] link to turning profile to history).
+In the JSON response, the `response` property is renamed to `profile` before processing, so any mapping instructions against the root object, should use `profile` (i.e. [Namespacing Fields](#Namespacing-Fields) or [Mapping Containers to History](#mapping-response-containers-to-history)).
 
 ```json
 {
