@@ -1167,6 +1167,7 @@ In the JSON response, the `response` property is renamed to `profile` before pro
 
 1. [Default Profile Mapping](#Default-Profile-Mapping)
 1. [Default Array Processing](#Default-Array-Processing)
+1. [Query String Processing](#Query-String-Processing)
 1. [Index Formatting](#Index-Formatting)
 1. [Nested Array Processing](#Nested-Array-Processing)
 1. [Simple Array Processing](#Simple-Array-Processing)
@@ -1600,9 +1601,8 @@ sampleAPI|electedCoverages.pending|pendingCoverages|{id}
 
 There are times when an array row from an API response can not be uniquely identified simply using one field.  To generate a unique index, a mapping can specify that multiple fields should be used in conjunction to form the index.  To use this feature, provide a period delimitted list of field names that should be concatenated together using a `-` as the seperator.
 
-**Notes:** 
-1. When multiple fields form an index, their raw properties **are not** excluded in the resulting history row as happens when only one field is provided.
-1. When using an [incremental index](#Incremental-Index) (`{id}`) while concatenating fields, it *must* be the last field specified.
+**Note:** When multiple fields form an index, their raw properties **are not** excluded in the resulting history row as happens when only one field is provided.
+
 
 dataSource|apiTable|xdsTable|indexField|manualFields
 ---|---|---|---|---
