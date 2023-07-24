@@ -12,6 +12,8 @@
                 - [Transaction History Details Processing](#Transaction-History-Details-Processing)
                 - [Dynamic Calc Details Processing](#Dynamic-Calc-Details-Processing)
                 - [Eligibility Group Processing](#Eligibility-Group-Processing)
+                - [Life Events Processing](#Life-Events-Processing)
+                - [Beneficiary Processing](#Beneficiary-Processing)
             - [Supported Mapping Features](#Supported-Mapping-Features)
                 - [Default Profile Mapping](#Default-Profile-Mapping)
                 - [Default Array Processing](#Default-Array-Processing)
@@ -1023,6 +1025,269 @@ The updated response:
 }
 ```
 
+
+##### Life Events Processing
+
+If the API endpoint ran ends with `/life-events`, it is recognized as a Life Events custom processing response.
+
+###### Life Events Original Response
+
+The original response has: 
+
+1. Array properties of `openEvents` and `eligEvents` at the root.
+
+```json
+{
+	"response": {
+		"openEvents": [
+			{
+				"eventType": "BIRTH",
+				"description": "Birth/Adoption",
+				"eventCode": "BIRTH",
+				"eventDate": "2023-07-07",
+				"eventStatus": "COMPLETED",
+				"isCompleted": true,
+				"isPriority": false,
+				"isPreviewPeriod": false,
+				"isEnrollmentPeriod": false,
+				"isCorrectionPeriod": false,
+				"isReviewPeriod": false,
+				"isPaymentRequired": false,
+				"canDelete": false,
+				"planID": "LE,21",
+				"eventID": "268803",
+				"eventCutoffDate": "2023-08-07T03:59:59.000Z",
+				"eventStatusDate": "2023-07-21T12:49:46.616Z",
+				"canMakeChanges": true
+			}
+		],
+		"eligEvents": [
+			{
+				"eventType": "RETINT",
+				"description": "Retiree Enrollment",
+				"eventCode": "RETINT",
+				"minEventDate": "2023-07-22",
+				"maxEventDate": "2023-07-23",
+				"maxModelDate": "2024-12-31",
+				"canReport": false,
+				"canModel": true,
+				"planID": "LE,21"
+			}
+		]
+	}
+}
+```
+
+###### Life Events Updated Response
+
+The updated response before mapping processing:
+
+1. Create a `pendingBenefits` array property.
+1. For each `openEvents` row with `eventStatus == COMPLETED` and `eventDate > Today`, run `/coverages?asOfDate=` with each `eventDate`
+	1. For each `coverages` row where `pending` object is present
+		1. Inject the `optionName`, `coverageLevelName`, `eeCostPreTax`, and `eeCostPostTax` from the `coverages` row into the child `pending` object with a `nonPended` prefix (i.e. `nonPendedOptionName`).
+		1. Inject the `pending` object into the `pendingBenefits` array property
+1. Process mappings as normal
+
+**Sample 'response' with injected `pendingBenefits`**
+
+```json
+{
+	"response": {
+		"openEvents": [
+			{
+				"eventType": "BIRTH",
+				"description": "Birth/Adoption",
+				"eventCode": "BIRTH",
+				"eventDate": "2023-07-07",
+				"eventStatus": "COMPLETED",
+				"isCompleted": true,
+				"isPriority": false,
+				"isPreviewPeriod": false,
+				"isEnrollmentPeriod": false,
+				"isCorrectionPeriod": false,
+				"isReviewPeriod": false,
+				"isPaymentRequired": false,
+				"canDelete": false,
+				"planID": "LE,21",
+				"eventID": "268803",
+				"eventCutoffDate": "2023-08-07T03:59:59.000Z",
+				"eventStatusDate": "2023-07-21T12:49:46.616Z",
+				"canMakeChanges": true
+			}
+		],
+		"eligEvents": [
+			{
+				"eventType": "RETINT",
+				"description": "Retiree Enrollment",
+				"eventCode": "RETINT",
+				"minEventDate": "2023-07-22",
+				"maxEventDate": "2023-07-23",
+				"maxModelDate": "2024-12-31",
+				"canReport": false,
+				"canModel": true,
+				"planID": "LE,21"
+			}
+		],
+		"pendingBenefits": [
+			{
+				"benefitType": "SUPPLIFE",
+				"benefitName": "Supplemental Employee Life Insurance",
+				"optionName": "5x Pay",
+				"coverageLevel": "02",
+				"coverageLevelName": "Smoker",
+				"electionAmt": 0.0,
+				"electionChildAmt": 0.0,
+				"imputedAmt": 0.0,
+				"premiumAmt": 0.0,
+				"pendingReason": "EOI",
+				"eoiVendor": "MetLife",
+				"eoiDeadline": "2023-09-11",
+				"eoiSSOAvailable": true,
+				"eventType": "OPENENR",
+				"eventDate": "2024-01-01",
+				"effDate": "2024-01-01T05:00:00Z",
+				"expDate": "2025-01-01T04:59:59Z",
+				"optionID": "05",
+				"eeCostPreTax": 0.0,
+				"eeCostPostTax": 0.0,
+				"erCostPreTax": 0.0,
+				"erCostPostTax": 0.0,
+				"electionSpouseAmt": 0.0,
+				"isPtpCovered": true,
+				"eventID": "251721",
+				"nonPendedOptionName": "Waive Coverage",
+				"nonPendedCoverageLevelName": "NA",
+				"nonPendedEeCostPreTax": 0.0,
+				"nonPendedEeCostPostTax": 0.0
+			}
+		]
+	}
+}
+```
+
+##### Beneficiary Processing
+
+If the API endpoint ran ends with `/beneficiaries` and contains `/common/participant/`, it is recognized as a Beneficiary custom processing response.
+
+###### Beneficiary Original Response
+
+The original response has: 
+
+1. Each row of `beneficiaries` can have nested array properties of `beneficiaryDetails/designations`.
+1. Each row of `designations` can have multiple designations for each `planType`, but only one row will be 'effective' (no `expDate` present).
+
+```json
+{
+  "beneficiaries": [
+    {
+      "beneficiaryDetails": {
+        "ssn": "811550202",
+        "birthDate": "2019-02-02",
+        "genderCode": "FEMALE",
+        "name": {
+          "nameLast": "Adopted",
+          "nameFirst": "Annie"
+        },
+        "communication": {
+          "addresses": [
+            {
+              "addressType": "MAILING",
+              "country": "UNKNOWN"
+            }
+          ]
+        },
+        "relationshipCode": "C",
+        "relationship": "Child",
+        "isSpouse": false,
+        "isBeneHidden": false,
+        "designations": [
+			{
+				"planType": "HW",
+				"planID": "21",
+				"benefitType": "ADD",
+				"beneDesignationType": "Contingent",
+				"beneID": 17,
+				"designatedPercent": 33.0,
+				"isEquallyDistributed": false,
+				"effDate": "2023-05-17T04:00:00.000Z",
+				"expDate": "2023-05-22T03:59:59.000Z",
+				"beneStatus": "Confirmed",
+				"isIrrevocable": false
+			},
+			{
+				"planType": "HW",
+				"planID": "21",
+				"benefitType": "ADD",
+				"beneDesignationType": "Contingent",
+				"beneID": 17,
+				"designatedPercent": 25.0,
+				"isEquallyDistributed": false,
+				"effDate": "2023-06-22T04:00:00.000Z",
+				"beneStatus": "Confirmed",
+				"isIrrevocable": false
+			}
+		]
+      },
+      "ID": 17,
+      "beneType": "PERSON"
+    }
+  ]
+}
+```
+
+###### Beneficiary Updated Response
+
+The updated response:
+
+1. For each row in `beneficiaries/beneficiaryDetails/designations`, remove all rows that have an `expDate` property present.
+1. Final result will have at most a one `designations` row per `planType`.
+
+```json
+{
+  "beneficiaries": [
+    {
+      "beneficiaryDetails": {
+        "ssn": "811550202",
+        "birthDate": "2019-02-02",
+        "genderCode": "FEMALE",
+        "name": {
+          "nameLast": "Adopted",
+          "nameFirst": "Annie"
+        },
+        "communication": {
+          "addresses": [
+            {
+              "addressType": "MAILING",
+              "country": "UNKNOWN"
+            }
+          ]
+        },
+        "relationshipCode": "C",
+        "relationship": "Child",
+        "isSpouse": false,
+        "isBeneHidden": false,
+        "designations": [
+			{
+				"planType": "HW",
+				"planID": "21",
+				"benefitType": "ADD",
+				"beneDesignationType": "Contingent",
+				"beneID": 17,
+				"designatedPercent": 25.0,
+				"isEquallyDistributed": false,
+				"effDate": "2023-06-22T04:00:00.000Z",
+				"beneStatus": "Confirmed",
+				"isIrrevocable": false
+			}
+		]
+      },
+      "ID": 17,
+      "beneType": "PERSON"
+    }
+  ]
+}
+```
 
 #### Supported Mapping Features
 
