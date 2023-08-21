@@ -3490,6 +3490,7 @@ Optional debugging options that can be used during the development of a KatApp's
 Property | Type | Description
 ---|---|---
 `traceVerbosity`<sup>1</sup> | `TraceVerbosity` | Control the trace output level to display for the current KatApp by assigning desired enum value.  The default value is `TraceVerbosity.None`.
+`refreshCalcEngine` | `boolean` | Whether or not the RBLe Framework should check for an updated CalcEngine every single calculation.  By default, the RBLe Framework only checks every 5 minutes.  A `boolean` value can be passed in or using the querystring of `expireCE=1` will enable the settings.  The default value is `false`.
 `useTestCalcEngine` | `boolean` | Whether or not the RBLe Framework should the test version of the specified CalcEngine.  A `boolean` value can be passed in or using the querystring of `test=1` will enable the settings.  The default value is `false`.
 `useTestView` | `boolean` | Whether or not the KatApp Framework should use the test versions of any requested Kaml Views or Kaml Template Files that are hosted in the KAT CMS instead of by the Host Environment.  A `boolean` value can be passed in or using the querystring of `testview=1` will enable the settings. The default value is `false`.
 `showInspector` | `boolean` | Whether or not the KatApp Framework should show diagnostic information for all Vue directives.  When enabled, pressing `CTRL+SHIFT` together will toggle visual cues for each 'Vue enabled' element.  Then you can use the browser 'inspect tool' to view an HTML comment about the element.  A `boolean` value can be passed in or using the querystring of `showinspector=1` will enable the settings.  The default value is `false`.
@@ -4534,25 +4535,17 @@ Property | Type | Description
 ---|---|---
 `Token` | `string` | If the data used in RBLe Framework calculations was 'registered' with the RBLe Framework web service, this is the token returned uniquely identifying the user's transaction package.
 `TestCE` | `boolean` | Whether or not the RBLe Framework should use the 'test' CalcEngine when running the calculation.
+`TraceEnabled` | `number` | Whether or not the RBLe Framework should provide diagnostic trace for the next calculation. A value of `1` will trace and `0` will not.
+`SaveCE` | `string` | A `\|` delimitted list of secure file location folders to save a debug copy of the CalcEngine(s) used during the calculation.
 `AuthID` | `string | Used in non-session version, when options has a 'data' property of json formatted xDS Data.
 `Client` | `string` | A `string` value representing a 'client name' used during the calculation for logging purposes.
 `AdminAuthID` | `string` | If an admin user is impersonating a normal user during the execution of the Kaml View, this value should contain the ID of the admin user to indicate to CalcEngine(s) that an admin user is initiating the calculation.
+`RefreshCalcEngine` | `boolean` | Whether or not the RBLe Framework should check for an updated CalcEngine the next calculation. This value is determined from the [`options.debug.refreshCalcEngine'](#ikatappoptionsdebugrefreshcalcengine) property.
 `CurrentPage` | `string` | The name of the current page as it is known in the Host Environment. This value is determined from the [`options.currentPage'](#ikatappoptionscurrentpage) property.
 `RequestIP` | `string` | The IP address of the browser running the current KatApp. This value is determined from the [`options.requestIP'](#ikatappoptionsrequestip) property.
 `CurrentUICulture` | `string` | The current culture as it is known in the Host Environment. This value is determined from the [`options.currentUICulture'](#ikatappoptionscurrentuiculture) property.
 `Environment` | `string` | The name of the current environment as it is known in the Host Environment. This value is determined from the [`options.environment'](#ikatappoptionsenvironment) property.
-`NextCalculation` | `INextCalculation` | Whether or not the RBLe Framework should provide diagnostic trace, list of secure file location folders to save a debug copy of the CalcEngine(s) used during the calculation, or force CalcEngine cache to expire.  See [INextCalculation](#inextcalculation) for more information.
 `Framework` | `string` | The name of the current 'framework' submitting to the RBLe Framework. This value is set to `"KatApp"`.
-
-### INextCalculation
-
-The `INextCalculation` interface represents the information that enables developer diagnostics to occur.  The properties can be set via [debugNext()](#ikatappdebugnext).
-
-Property | Type | Description
----|---|---
-`expireCache` | `boolean` | Whether or not to expire CalcEngine cache and check KAT Data Store for new version.
-`trace` | `boolean` | Whether or not to generate diagnostic trace during the next calculation.
-`saveLocations` | `{ location: string, serverSideOnly: boolean }[]` | The locations to save debug CalcEngines to used during the next Calculation.  `serverSideOnly` will only save CalcEngines processed during an API endpoint call.
 
 ### ISubmitApiOptions
 
