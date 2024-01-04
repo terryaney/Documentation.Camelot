@@ -2359,6 +2359,7 @@ Column | Description
 id | The name of the command which is then referenced in the `command-inputs` table (additionally it is sometimes used during [custom processing of API responses](#QnA-Processing) as well).
 verb | The Http Verb to use when sending the reqeust (`GET`, `POST`, `DELETE`, `PUT`). 
 endpoint | The url endpoint to process.  See [command Verb Segments](#command-Verb-Segments) about using the preferred `.KEY` segement and API key pattern.
+canContinue | (Optional) If the command has mapping processing, a valid XPath selector can be provided to run against to results to indicate whether command processing should stop gracefully (if the selector returns `null`).  This is similar to [apiDataSource.eligibility](#apidatasource-layout) syntax/processing.  If the selector returns `null` all subsequent commands provided by the CalcEngine will be ignored and if the API endpoint had a custom return type generated, the `getResponseContent` delegate will *not* be called.  This is helpful to avoid multiple calculation calls since the CalcEngine can access the results for verification without a subsequent calculation passing in the results.
 order | (Optional) Only used by the CalcEngine via the `command/sort-field:order` table name and flag to aid in ordering the API calls in the proper manner to successfully complete a transaction when a command is used in more than one scenario. This column is *not* used by the Nexgen site.
 
 #### command Verb Segments
