@@ -1620,31 +1620,77 @@ The `v-ka-resource` directive is responsible for assigning element HTML content 
 - [v-ka-resource Model](#v-ka-resource-model) - Discusses the properties that can be passed in to configure the `v-ka-resource` directive.
 - [v-ka-resource Samples](#v-ka-resource-samples) - Various use examples of how to use `v-ka-resource`.
 
+**Note**: Several other KatApp features and directives already support automatic localization.  When those features are used, it is not necessary to use `v-ka-resource` or [application.getLocalizedString](#ikatappgetlocalizedstring).  The following features already support automatic localization:
+
+1. `rbl.text(...)` (instead of `rbl.value(...)`)
+1. Validation errors returned from [IKatApp.apiAsync](#ikatappapiasync) calls.
+1. [v-ka-input Model](#v-ka-input-model) properties: label, placeholder, help, help title, list item text
+1. [v-ka-highchart](#v-ka-highchart) options: if the option value that start with `resource:`.
+1. [v-ka-value](#v-ka-value) directives.
+1. [v-ka-table](#v-ka-table) directives.
+1. [v-ka-modal Model](#v-ka-modal-model) label properties.
+
 ### v-ka-resource Model
 
-The model used to configure how a `v-ka-resource` will find the appropriate translated string has a `key` property and optional properties that can be used via the `String.formatTokens` method.  If the `key` property is not provided, the HTML element's inner HTML is assumed to be the key.
+The model used to configure how a `v-ka-resource` will return the appropriate translated string is described below.  If the `key` used to lookup the localized string is not found, the `key` is returned as the result of the localized lookup.
 
-**Note**: If the token format values can changed due to reactivity, a [javascript getter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get) must be used.
 
-```javascript
-// Simple model specifying a key
-{ 'key': 'Good.Morning' }
+Property | Type | Description
+---|---|---
+`key` | `string` | **Required;** The key to use to lookup the localized string.
+`templateArguments` | `Array<string>` | Optional; The the localized string has template replacements (i.e. `{0}`, `{1}`, .. `{N}`), an array of strings can be provided in traditional _C# string.Format()_ style.  If any of the template replacements have a format specified (i.e. `{0:0.00}`), the a string representation of the value (either a number or date) should be provided in a manner that supports parsing with an invariant culture.
+`tokenProperty` | `string` | Optional; If the localized string has token replacements (i.e. `{{name}}`, `{{dob}}`, etc. **note the double {{ }}**), a property can be provided to use for each token replacement.  If a token is present in the localized string and no matching property is found, the resulting string will still contain ``{{token}}`.  **Note**: If the token format values can changed due to reactivity, a [javascript getter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get) must be used for each property that can change (i.e. `{ 'key': 'Retirement.Summary', 'name': 'Fred', get savings() { return rbl.value('total-savings'); } }`).
 
-// Simple model specifying a key and name/dob tokens
-{ 'key': 'Good.Morning', 'name': 'Fred', 'dob': '5/9/73' }
 
-// Model specifying a key and reactive calculation value
-{ 'key': 'Retirement.Summary', 'name': 'Fred', get savings() { return rbl.value('total-savings'); } }
+The `v-ka-resource` directive has a couple shorthand capabilities which allows for more terse markup:
+
+```html
+<!-- 
+    All three of the following samples assign the 'key=sample.string'
+    The second two are just terse/shorthand ways of providing a localization string when no format tokens are needed via:
+
+    1. v-ka-resource string literal value
+    2. The content of the element decorated with the v-ka-resource directive.
+-->
+<div v-ka-resource="{ key: 'sample.string' }"></div>
+<div v-ka-resource="sample.string"></div>
+<div v-ka-resource>sample.string</div>
+
+<!-- 
+	Since key is not a property in the model passed to v-ka-resource it uses shorthand mechanism 
+	to grab key from element content, the resulting model would look like this:
+		{ key: 'Good.Morning', name: 'Terry' }
+-->
+<div v-ka-resource="{ name: 'Terry' }">Good.Morning</div>
 ```
-See [application.getLocalizedString](#ikatappgetlocalizedstring) for documentation explaining language selection priority.
 
-The `v-ka-resource` directive has a couple shorthand capabilities which allows for more terse markup, see samples below for supported markup.
+**Client Side Kaml Substituion Considerations Using templateArguments**  
 
-**Note**: 'key' can also be a complete model (or json string representation of the model) if needed.  When the 'entire model' is passed into the `key` parameter, there **must** be a `key` property on the model.  This is helpful when parameter substitution is needed and it is created from a RBL . A `string` can be generated to represent the entire model and passed in.  See below for examples.
+If a resource string contains template replacements `{#}` versus token replacements `{{token}}` and the `key` or one or more template arguments are provide via a CalcEngine value, but some arguments are generated client side, `templateArguments` can be used (ensuring that it support reactivity via javascript getters).
+
+```html
+<!--
+	Assume Common.MakePayment.ConvenienceFeeMsg:
+	You're paying your total due of {0:c} plus the {1:C} convenience fee.
+-->
+<div v-ka-resource="{ get templateArguments() { return [ model.paymentAmount, rbl.value( 'convenienceFee') ]; } }">Common.MakePayment.ConvenienceFeeMsg</div>
+```
+
+**CalcEngine Substituion Considerations**  
+
+When using results from a CalcEngine, the `key` is assigned to an expression coming from a CalcEngine, usually in a `v-for` loop and accessing a properties (i.e. `<div v-ka-resource="{ key: row.message }"></div>`).  When there are substitutions that must occur, there are a few options for the CalcEngine developers to consider when creating the 'key value' returned from the `message` column in this example.
+
+1. Similar to `templateArguments`, the CalcEngine has a shorthand mechanism to pass a `key` along with the arguments all in one string.  It is in the format of `messageTemplateKey^arg1^arg2^...^argN`.
+1. Another mechanism, which is more verbose and cumbersome, is to provide the complete model (a json string representation of the model) if needed.  When the 'entire model' is passed into the `key` parameter, there **must** be a `key` property on the model.  This is helpful when token substitution is needed.
+1. The final mechanism is the use `calcEngines` column of the `resourceStrings` table found in the 'content CalcEngine'.  A comma delimitted list of `CalcEngine.ResultTab` entries can be provided for resource strings that should be passed to the CalcEngine when a calculation starts.  This will be injected into a `resourceStrings` 'input table' and CalcEngine developers can do a lookup into the table to find and use the appropriate resource string.
+
+**Debugging Suggestions**  
+
+There are two undocumented properties on `IKatApp` that provide helpful debugging information.  `missingResources` lists every resource key that did not find a localized string regardless of how it was requested (i.e. `v-ka-resource`, `rbl.text()`, etc.).  Similarily, `missingLanguageResources` lists every resource key that did not find a localized string for the *requested* language but found a result in the fallback languages of `en-US` or `en`.  
 
 ### v-ka-resource Samples
 
-All the markup samples will assume the following [IKatAppOptions.resourceStrings](#ikatappoptions) object is available:
+All the markup samples will assume the following [IKatAppOptions.resourceStrings](#ikatappoptions) is available and the `CurrentUICulture` is set to `es-es`.  Additonally, the recommend syntax for `v-ka-resource` will be used (i.e. `<div v-ka-resource>key</div>` when no tokens used or `<div v-ka-resource="{ arg1: 'Terry' }">key</div>` when token properties are needed).
 
 ```javascript
 {
@@ -1680,67 +1726,50 @@ All the markup samples will assume the following [IKatAppOptions.resourceStrings
 }
 ```
 
+The following samples demonstrate culture/region precedence when returning localized.  See [application.getLocalizedString](#ikatappgetlocalizedstring) for full documentation explaining selection priority.
+
 ```html
-<!-- Assuming CurrentCultureUI is es-es -->
-
-<!-- 
-    All three of the following samples return: 'en' default language. 
-    The second two are just terse/shorthand ways of providing a localization string when no format tokens are needed via:
-
-    1. v-ka-resource string literal value
-    2. The content of the element decorated with the v-ka-resource directive.
--->
-<div v-ka-resource="{ key: 'defaultLanguageOnly' }"></div>
-<div v-ka-resource="defaultLanguageOnly"></div>
+<!-- Returns: 'en' default language.  -->
 <div v-ka-resource>defaultLanguageOnly</div>
-
 <!-- Returns: 'en-us' default region. -->
-<div v-ka-resource="defaultRegionOnly"></div>
-
+<div v-ka-resource>defaultRegionOnly</div>
 <!-- Returns: 'es' culture language. -->
-<div v-ka-resource="cultureLanguageOnly"></div>
-
+<div v-ka-resource>cultureLanguageOnly</div>
 <!-- Returns: 'es-es' culture region. -->
-<div v-ka-resource="cultureRegionOnly"></div>
+<div v-ka-resource>cultureRegionOnly</div>
 
 <!-- 
     Returns: 'en-us' default region override.
     Ignores 'en' language value since 'en-us' is more specific. 
 -->
-<div v-ka-resource="defaultRegionOverride"></div>
+<div v-ka-resource>defaultRegionOverride</div>
 
 <!-- 
     Returns: 'es' culture language override.
     Ignores 'en' and 'en-us' language values since 'es' is more specific. 
 -->
-<div v-ka-resource="cultureLanguageOverride"></div>
+<div v-ka-resource>cultureLanguageOverride</div>
 
 <!-- 
     Returns: 'es-es' culture region.
     Ignores 'en', 'en-us', and 'es' language values since 'es-es' is more specific. 
 -->
-<div v-ka-resource="cultureRegionOverride"></div>
+<div v-ka-resource>cultureRegionOverride</div>
 
-<!-- 
-    Returns: Missing.Key
-    Since no languages provide a translation for this key.
--->
-<div v-ka-resource="{ key: 'Missing.Key' }"></div>
-<div v-ka-resource="Missing.Key"></div>
+<!-- Nno languages contain 'Missing.Key', so returns Missing.Key. -->
 <div v-ka-resource>Missing.Key</div>
 
 <!-- 
     Returns: ¿Buenas dias Terry, cómo estás?
     Ignores 'en' language value since 'es' is more specific. 
 -->
-<div v-ka-resource="{ key: 'Good.Morning', name: 'Terry' }"></div>
 <div v-ka-resource="{ name: 'Terry' }">Good.Morning</div>
 
 <!-- 
     Returns: Good night name, sleep well.
     Only 'en' has a localized string, and since 'name' token wasn't provided, it just uses the value of the token.
 -->
-<div v-ka-resource="Good.Night"></div>
+<div v-ka-resource>Good.Night</div>
 
 
 <!--
@@ -3446,7 +3475,8 @@ Property | Type | Description
 `userIdHash` | `string` | If the Kaml View is running in the context of a logged in user, a `userIdHash` can be passed in.  This value is used during caching operations that use browser sessionStorage.
 `environment` | `string` | The name of the current environment as it is known in the Host Environment. This can be used in Kaml View javascript or a CalcEngine if different functionality needs to occur based on which environment (i.e. DEV, QA, PROD) a Kaml View is running<br/><br/>This value is passed into the RBLe Framework calculations via the `iEnvironment` input.
 `requestIP` | `string` | The IP address of the browser running the current KatApp.
-`currentUICulture` | `string` | The current culture as it is known in the Host Environment.  This enables culture specific number and date formatting and is in the format of `languagecode2-country/regioncode2`.  The default value is `en-US`.<br/><br/>This value is passed into the RBLe Framework calculations via the `iCurrentUICulture` input.
+`currentCulture` | `string` | The current culture as it is known in the Host Environment.  This enables culture specific number and date formatting and is in the format of `languagecode2-country/regioncode2`.  The default value is `en-US`.<br/><br/>This value is passed into the RBLe Framework calculations via the `iCurrentCulture` input.  This controls default number and date formatting.
+`currentUICulture` | `string` | The current culture as it is known in the Host Environment.  This enables culture specific number and date formatting and is in the format of `languagecode2-country/regioncode2`.  The default value is `en-US`.<br/><br/>This value is passed into the RBLe Framework calculations via the `iCurrentUICulture` input.  This is primarily regarding the UI localization/translation part of the app.
 `inputs` | [`ICalculationInputs`](#icalculationinputs) | The Host Environment can pass in inputs that serve as the default values to inputs rendered in the Kaml View or simply as 'fixed' inputs (if no matching rendered inputs are present that would update them) that will be passed to every RBLe Framework calculation.  This value becomes the initial value for [`IState.inputs`](#istateinputs-icalculationinputs) when the KatApp is created.
 `inputCaching` | `boolean` | Whether or not the page inputs are cached after each calculation.  This allows the user to leave a page and come back and the inputs would automatically be retored.  The default is `false`.
 `manualResults`<sup>1</sup> | [`Array<IManualTabDef>`](#imanualtabdef) | The Host Environment can pass in 'manual results'.  These are results that are usually generated one time on the server and cached as needed.  Passing manual results to a KatApp removes the overhead needed to perform a RBLe Framework calculation.  
@@ -3498,7 +3528,7 @@ Property | Type | Description
 `traceVerbosity`<sup>1</sup> | `TraceVerbosity` | Control the trace output level to display for the current KatApp by assigning desired enum value.  The default value is `TraceVerbosity.None`.
 `useTestCalcEngine` | `boolean` | Whether or not the RBLe Framework should the test version of the specified CalcEngine.  A `boolean` value can be passed in or using the querystring of `test=1` will enable the settings.  The default value is `false`.
 `useTestView` | `boolean` | Whether or not the KatApp Framework should use the test versions of any requested Kaml Views or Kaml Template Files that are hosted in the KAT CMS instead of by the Host Environment.  A `boolean` value can be passed in or using the querystring of `testview=1` will enable the settings. The default value is `false`.
-`showInspector` | `boolean` | Whether or not the KatApp Framework should show diagnostic information for all Vue directives.  When enabled, pressing `CTRL+SHIFT` together will toggle visual cues for each 'Vue enabled' element.  Then you can use the browser 'inspect tool' to view an HTML comment about the element.  A `boolean` value can be passed in or using the querystring of `showinspector=1` will enable the settings.  The default value is `false`.
+`showInspector` | `string` | The KatApp Framework can show diagnostic information about Vue directives since Vue processing removes all directives from the markup making it difficult at times to debug and find the original Kaml directives.  To enable, set the value to `1` or a comma delimitted list of the directive types you are most interested in.  Blank or `0` will disable.  When enabled, pressing `CTRL+SHIFT` together will toggle visual cues for each 'Vue enabled' element of the desired types.  Then use the browser 'inspect tool' to view an HTML comment about the Vue element.  A querystring of `showinspector=1` defaults to showing visual cues on the `resource,value,modal,template,html,text` settings or set the `showinspector` querystring to the desired settings you wish to inspect.  The default value off `0`.<br/><br/>The settings available are simply the name of the directive *without* `v-ka-` or `v-`.  The only exceptions are `v-ka-rbl-no-calc` -> `no-calc`, `v-ka-rbl-exclude` -> `exclude`, and `v-ka-unmount-clears-inputs` -> `unmount`.
 `debugResourcesDomain` | `string` | Whether or not the KatApp Framework should attempt to find requested Kaml Views or Kaml Template Files from the 'domain' passed in before checking the KAT CMS or Host Environment.  A `string` value providing a local web server address can be provided via `"debugResourcesDomain": "localhost:8887"` to enable the feature.  The default value is `undefined`.<br/><br/>KAT Evolution and Camelot frameworks enable this feature using a `localserver` querystring parameter.  For example, `https://hosted.site.domain/?localserver=localhost:5500` will enable the feature and attempt to find files at `http://localhost:5500/` before checking the KAT CMS or Host Environment.  Kaml files can be partitioned into view.kaml, view.kaml.js, view.kaml.css, and view.kaml.templates to promote single responsibility principle.<br/><br/>Using `debugResourcesDomain` supports this as well, however it makes individual requests for each file if the original Kaml file does not have a `<script/>` or `<style/>` section present.  If additional files are required to create the Kaml package, the `local-kaml-package` attribute must be set on the `<rbl-config/>` element.  See [Configuring CalcEngines and Template Files](#configuring-calcengines-and-template-files) for more information.
 
 <sup>1</sup> `TraceVerbosity` is defined as the following.
