@@ -1,0 +1,16 @@
+# BTRAddYears Function
+
+Returns a target date after adding specified years.
+
+## Syntax
+
+```excel
+=BTRAddYears(target, years)
+```
+
+Parameter | Type | Description
+---|---|---
+`target` | DateTime | The target date.
+`years` | Int32 | Number of years to add.
+
+[Back to Date Helpers](RBLeDateHelpers.md)

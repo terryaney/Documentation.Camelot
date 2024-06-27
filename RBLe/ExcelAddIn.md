@@ -6,7 +6,9 @@ The original documentation (and it will continue to be updated) was leveraging '
 
 ## Exporting Data for xDS Framework
 
-## Other Features
+## Load xDS Data into Input Tab
+
+## Miscellaneous Features
 
 **TODO** Document other features and how to use them
 

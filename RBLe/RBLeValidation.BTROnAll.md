@@ -1,0 +1,15 @@
+# BTROnAll Function
+
+Returns 1 if all parameters provided evaluate to not 'false' (#error, 0, FALSE, '') or 0 if any parameter provided is 'false'.
+
+## Syntax
+
+```excel
+=BTROnAll(parameters)
+```
+
+Parameter | Type | Description
+---|---|---
+`parameters` | Object[] | The parameters to evaluate falsy conditions.
+
+[Back to Validation](RBLeValidation.md)

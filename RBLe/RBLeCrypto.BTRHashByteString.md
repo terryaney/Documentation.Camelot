@@ -1,0 +1,16 @@
+# BTRHashByteString Function
+
+Hashes a hex string using the specified hash type.
+
+## Syntax
+
+```excel
+=BTRHashByteString(byteString, hashType)
+```
+
+Parameter | Type | Description
+---|---|---
+`byteString` | String | The value to hash.
+`hashType` | Object | Optional.  The hash implementation to use (i.e. Sha256).
+
+[Back to Crypto](RBLeCrypto.md)
