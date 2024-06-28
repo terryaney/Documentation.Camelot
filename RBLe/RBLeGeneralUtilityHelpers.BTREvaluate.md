@@ -16,4 +16,4 @@ Parameter | Type | Description
 `columnToSearch` | Object | Optional. Column name to search.  First column is default.
 `caseSensitive` | Object | Optional.  Whether or not search is case sensitive. false is the default.
 
-[Back to General Utility Helpers](RBLeGeneralUtilityHelpers.md)
+[Back to General Utility Helpers](RBLeGeneralUtilityHelpers.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

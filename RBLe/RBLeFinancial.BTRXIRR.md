@@ -16,4 +16,4 @@ Parameter | Type | Description
 `maxRate` | Object | Optional. The default is 5.0.
 `truncateTime` | Object | Optional. The default is true.
 
-[Back to Financial](RBLeFinancial.md)
+[Back to Financial](RBLeFinancial.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

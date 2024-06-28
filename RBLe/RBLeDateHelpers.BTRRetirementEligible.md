@@ -18,4 +18,4 @@ Parameter | Type | Description
 `dateParticipation` | DateTime | TODO: Document this parameter.
 `range` | Object[,] | TODO: Document this parameter.
 
-[Back to Date Helpers](RBLeDateHelpers.md)
+[Back to Date Helpers](RBLeDateHelpers.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

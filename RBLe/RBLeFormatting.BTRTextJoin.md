@@ -14,4 +14,4 @@ Parameter | Type | Description
 `ignoreEmptyCells` | Object | Optional. Whether or not to ignore empty cells.  Default is true
 `ranges` | Object[] | 1 to 252 text strings or ranges to be joined.
 
-[Back to Formatting](RBLeFormatting.md)
+[Back to Formatting](RBLeFormatting.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

@@ -13,4 +13,4 @@ Parameter | Type | Description
 `dob` | DateTime | The date of birth.
 `target` | DateTime | The target date.
 
-[Back to Date Helpers](RBLeDateHelpers.md)
+[Back to Date Helpers](RBLeDateHelpers.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

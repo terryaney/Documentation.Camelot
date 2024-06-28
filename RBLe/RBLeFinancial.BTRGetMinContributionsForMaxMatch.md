@@ -15,4 +15,4 @@ Parameter | Type | Description
 `payPeriod` | Object | Optional.  Number of Pay period in a year.  Default is 1.
 `currPayPeriod` | Object | Optional.  Current Pay Period.  Default is 1.
 
-[Back to Financial](RBLeFinancial.md)
+[Back to Financial](RBLeFinancial.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

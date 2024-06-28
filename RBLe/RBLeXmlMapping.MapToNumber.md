@@ -13,4 +13,4 @@ Parameter | Type | Description
 `value` | Object | The value to attempt to convert to a number.
 `defaultValue` | Object | Value to return to make coding specification formulas easier.
 
-[Back to Xml Mapping](RBLeXmlMapping.md)
+[Back to Xml Mapping](RBLeXmlMapping.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

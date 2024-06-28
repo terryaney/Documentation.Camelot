@@ -16,4 +16,4 @@ Parameter | Type | Description
 `additionalRows` | Int32 | The number of rows (positive, negative, or 0 (zero)) by which the range is to be resized. Positive values grow downward, and negative values shrink upward. The default value is 0.
 `additionalColumns` | Int32 | The number of columns (positive, negative, or 0 (zero)) by which the range is to be resized. Positive values grow to the right, and negative values shrink to the left. The default value is 0.
 
-[Back to RBLe Macro](RBLeRBLeMacro.md)
+[Back to RBLe Macro](RBLeRBLeMacro.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

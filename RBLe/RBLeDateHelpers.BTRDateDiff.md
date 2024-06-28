@@ -15,4 +15,4 @@ Parameter | Type | Description
 `interval` | Object | Optional.  1 for Years, 2 for Months, 3 for FullMonths and 4 for Days.  Default is 1.
 `inclusive` | Object | Optional.  Whether or not to include the last day as part of the calculation.  Default is false.
 
-[Back to Date Helpers](RBLeDateHelpers.md)
+[Back to Date Helpers](RBLeDateHelpers.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

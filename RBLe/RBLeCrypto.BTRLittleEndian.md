@@ -12,4 +12,4 @@ Parameter | Type | Description
 ---|---|---
 `hexValue` | String | The value to compute.
 
-[Back to Crypto](RBLeCrypto.md)
+[Back to Crypto](RBLeCrypto.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

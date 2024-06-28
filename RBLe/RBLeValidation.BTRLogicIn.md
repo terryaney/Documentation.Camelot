@@ -14,4 +14,4 @@ Parameter | Type | Description
 `table` | Object[,] | Table containing values to search.
 `caseSensitive` | Object | Whether or not a case sensitive search is performed. Default is false.
 
-[Back to Validation](RBLeValidation.md)
+[Back to Validation](RBLeValidation.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

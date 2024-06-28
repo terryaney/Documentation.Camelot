@@ -22,4 +22,20 @@ Parameter | Type | Description
 `format` | String | The C# string format to apply.  View the function's help for more detail on possible values.
 `culture` | Object | Optional.  The culture name in the format languagecode2-country/regioncode2.  See 'National Language Support (NLS) API Reference' for available names.
 
-[Back to Formatting](RBLeFormatting.md)
+## Example
+
+This sample shows how to format a date value to 'short date' format with a single format string but changes based on culture.
+
+```
+// Assume this comes from the iCurrentCulture input.
+string culture = "en-US";
+// Assume this comes from a calculated result.
+DateTime value = new DateTime( 1973, 5, 9 );
+// dateValue would have "5/9/1973" for a value.
+string dateValue = BTRDateFormat( value, "d", culture );
+// If culture was French...
+culture = "fr-FR";
+// dateValue would have "09/05/1973" for a value.
+dateValue = BTRDateFormat( value, "d", culture );
+```
+[Back to Formatting](RBLeFormatting.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

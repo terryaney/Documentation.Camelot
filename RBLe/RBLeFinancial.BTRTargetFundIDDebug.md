@@ -14,4 +14,4 @@ Parameter | Type | Description
 `yearRetirement` | Int32 | Year of retirement.
 `targetFundGroup` | Int32 | Target fund group ID.
 
-[Back to Financial](RBLeFinancial.md)
+[Back to Financial](RBLeFinancial.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

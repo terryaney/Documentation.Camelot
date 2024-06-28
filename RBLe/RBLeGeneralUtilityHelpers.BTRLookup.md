@@ -17,4 +17,4 @@ Parameter | Type | Description
 `fallback` | Object | Optional.  Value to return if a match is not found.  #N/A is the default.
 `caseSensitive` | Object | Optional.  Whether or not search is case sensitive. false is the default.
 
-[Back to General Utility Helpers](RBLeGeneralUtilityHelpers.md)
+[Back to General Utility Helpers](RBLeGeneralUtilityHelpers.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

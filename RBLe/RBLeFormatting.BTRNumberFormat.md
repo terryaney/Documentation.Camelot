@@ -22,4 +22,20 @@ Parameter | Type | Description
 `format` | String | The C# string format to apply.  View the function's help for more detail on possible values.
 `culture` | Object | Optional.  The culture name in the format languagecode2-country/regioncode2 (default of `en-US`).  See 'National Language Support (NLS) API Reference' for available names.
 
-[Back to Formatting](RBLeFormatting.md)
+## Example
+
+This sample shows how to format a numeric value to currency format with a single format string but changes based on culture.
+
+```
+// Assume this comes from the iCurrentCulture input.
+string culture = "en-US";
+// Assume this comes from a calculated result.
+double value = 10.5;
+// currencyValue would have "$10.50" for a value.
+string currencyValue = BTRNumberFormat( value, "c", culture );
+// If culture was French...
+culture = "fr-FR";
+// currencyValue would have "10,50 €" for a value.
+currencyValue = BTRNumberFormat( value, "c", culture );
+```
+[Back to Formatting](RBLeFormatting.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

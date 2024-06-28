@@ -21,4 +21,4 @@ Parameter | Type | Description
 `pmtsPerYr` | Object | The frequency of payments per year (positive for beginning of period or negative for end of period payments).  Default value is 12.
 `mortTableAdj` | Int32 | The adjustment years to apply as a shift to the mortality table (not the age). This is done before unisex blending.
 
-[Back to Financial](RBLeFinancial.md)
+[Back to Financial](RBLeFinancial.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

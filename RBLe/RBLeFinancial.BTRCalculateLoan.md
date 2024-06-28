@@ -20,4 +20,4 @@ Parameter | Type | Description
 `midPointCont` | Object | Optional. Use mid point contributions timing calculation method.
 `rounding` | Int32 | Optional. Rounding, Defaulted to 0 decimals
 
-[Back to Financial](RBLeFinancial.md)
+[Back to Financial](RBLeFinancial.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

@@ -14,4 +14,4 @@ Parameter | Type | Description
 `rateNAW` | Object | NAW increase rate, defaulted to 4.5%.
 `lawYear` | Int32 | SS law year, defaulted to current law year.
 
-[Back to Financial](RBLeFinancial.md)
+[Back to Financial](RBLeFinancial.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

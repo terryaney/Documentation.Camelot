@@ -13,4 +13,4 @@ Parameter | Type | Description
 `scopeDepth` | Object | How many parent levels to walk back up to determine mapping scope.  Default value is one.
 `defaultValue` | Object | Value to return to make coding specification formulas easier.
 
-[Back to Xml Mapping](RBLeXmlMapping.md)
+[Back to Xml Mapping](RBLeXmlMapping.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

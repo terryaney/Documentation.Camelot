@@ -15,4 +15,4 @@ Parameter | Type | Description
 `allowedFormats` | String | A | delimitted string that supplies a list of allowable formats to attempt to parse 'value'.
 `validDates` | String | A , delimitted string of allowable dates to validate in the format of 1..N, Last, Mon-Sun, Mon-Sun.[N|Last] (Nth occurence of or last day in month), or W1-W5 (first through the fifth week of month).  If the 'pattern' starts with '!' it is a 'not' check.
 
-[Back to Validation](RBLeValidation.md)
+[Back to Validation](RBLeValidation.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)
