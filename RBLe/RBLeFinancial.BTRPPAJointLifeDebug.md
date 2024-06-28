@@ -1,6 +1,6 @@
 # BTRPPAJointLifeDebug Function
 
-Replacement function for the Cfgena.xla!PPAJointLife() function.  Returns a decimal value equal to the selected joint life annuity factor by the PPA method.
+Debug version of BTRPPAJointLife that returns value or exception string (instead of #VALUE on error).  Replacement function for the Cfgena.xla!PPAJointLife() function.  Returns a decimal value equal to the selected joint life annuity factor by the PPA method.
 
 ## Syntax
 

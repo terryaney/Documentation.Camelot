@@ -1,6 +1,6 @@
 # BTRJointLifeDebug Function
 
-Replacement function for the Cfgena.xla!JointLife() function.  Returns decimal value equal to the selected joint life annuity factor.
+Debug version of BTRJointLife that returns value or exception string (instead of #VALUE on error).  Replacement function for the Cfgena.xla!JointLife() function.  Returns decimal value equal to the selected joint life annuity factor.
 
 ## Syntax
 

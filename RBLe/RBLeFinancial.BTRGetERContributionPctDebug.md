@@ -1,6 +1,6 @@
 # BTRGetERContributionPctDebug Function
 
-DOC: Han, Cfgena replacement?  Returns employer contribution % based on contribution parameters.
+Debug version of BTRGetERContributionPct that returns value or exception string (instead of #VALUE on error).  DOC: Han, Cfgena replacement?  Returns employer contribution % based on contribution parameters.
 
 ## Syntax
 

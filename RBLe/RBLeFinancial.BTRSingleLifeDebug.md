@@ -1,6 +1,6 @@
 # BTRSingleLifeDebug Function
 
-Replacement function for the Cfgena.xla!SingleLife() function.  Returns a decimal value equal to the selected single life annuity factor.
+Debug version of BTRSingleLife that returns value or exception string (instead of #VALUE on error).  Replacement function for the Cfgena.xla!SingleLife() function.  Returns a decimal value equal to the selected single life annuity factor.
 
 ## Syntax
 

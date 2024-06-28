@@ -1,6 +1,6 @@
 # BTRGetMatchPctDebug Function
 
-DOC: Han, Cfgena replacement?  Returns employer match % based on match parameters.
+Debug version of BTRGetMatchPct that returns value or exception string (instead of #VALUE on error).  DOC: Han, Cfgena replacement?  Returns employer match % based on match parameters.
 
 ## Syntax
 

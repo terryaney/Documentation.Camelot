@@ -1,6 +1,6 @@
 # BTRSSPIADebug Function
 
-A replacement function for the Cfgena.xla!SSExactPays() function using a single current pay value.  Returns a decimal value representing the age 65 Social Security monthly benefit using exact pays.
+Debug version of BTRSSPIA that returns value or exception string (instead of #VALUE on error).  A replacement function for the Cfgena.xla!SSExactPays() function using a single current pay value.  Returns a decimal value representing the age 65 Social Security monthly benefit using exact pays.
 
 ## Syntax
 

@@ -1,6 +1,6 @@
 # BTRCalculateLoanDebug Function
 
-DOC: Han, Cfgena replacement?  Returns an array with 3 values: balance at EOY, principle payments with investment return at EOY and principle payments with investment return at EOB.
+Debug version of BTRCalculateLoan that returns value or exception string (instead of #VALUE on error).  DOC: Han, Cfgena replacement?  Returns an array with 3 values: balance at EOY, principle payments with investment return at EOY and principle payments with investment return at EOB.
 
 ## Syntax
 

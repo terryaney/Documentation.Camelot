@@ -1,6 +1,6 @@
 # BTRAnnBuckDebug Function
 
-A replacement function for the Annbuck.xla!AnnBuck() function.  Returns a decimal value representing the selected life annuity factor.
+Debug version of BTRAnnBuck that returns value or exception string (instead of #VALUE on error).  A replacement function for the Annbuck.xla!AnnBuck() function.  Returns a decimal value representing the selected life annuity factor.
 
 ## Syntax
 

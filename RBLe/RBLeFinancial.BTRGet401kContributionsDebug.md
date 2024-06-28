@@ -1,6 +1,6 @@
 # BTRGet401kContributionsDebug Function
 
-DOC: Han, Cfgena replacement?  Returns 401(k) contributions/match.
+Debug version of BTRGet401kContributions that returns value or exception string (instead of #VALUE on error).  DOC: Han, Cfgena replacement?  Returns 401(k) contributions/match.
 
 ## Syntax
 

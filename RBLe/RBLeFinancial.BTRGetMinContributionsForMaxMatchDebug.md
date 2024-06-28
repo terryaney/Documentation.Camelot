@@ -1,6 +1,6 @@
 # BTRGetMinContributionsForMaxMatchDebug Function
 
-DOC: Han, Cfgena replacement?  Returns minimum employee contribution to get max mactch based on match parameters.
+Debug version of BTRGetMinContributionsForMaxMatch that returns value or exception string (instead of #VALUE on error).  DOC: Han, Cfgena replacement?  Returns minimum employee contribution to get max mactch based on match parameters.
 
 ## Syntax
 

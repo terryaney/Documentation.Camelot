@@ -1,6 +1,6 @@
 # BTRGetERContributionDebug Function
 
-DOC: Han, Cfgena replacement?  Returns employer contributions.
+Debug version of BTRGetERContribution that returns value or exception string (instead of #VALUE on error).  DOC: Han, Cfgena replacement?  Returns employer contributions.
 
 ## Syntax
 

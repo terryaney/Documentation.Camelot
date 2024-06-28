@@ -1,6 +1,6 @@
 # BTRTargetFundIDDebug Function
 
-DOC: Han, Cfgena replacement?  Returns index of Target Fund based on retirement year and target fund group.
+Debug version of BTRTargetFundID that returns value or exception string (instead of #VALUE on error).  DOC: Han, Cfgena replacement?  Returns index of Target Fund based on retirement year and target fund group.
 
 ## Syntax
 

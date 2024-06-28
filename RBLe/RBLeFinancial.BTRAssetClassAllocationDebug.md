@@ -1,6 +1,6 @@
 # BTRAssetClassAllocationDebug Function
 
-DOC: Han, Cfgena replacement?  Returns plan asset class allocation based on Fund allocations and how Funds are mapped to assets classes.
+Debug version of BTRAssetClassAllocation that returns value or exception string (instead of #VALUE on error).  DOC: Han, Cfgena replacement?  Returns plan asset class allocation based on Fund allocations and how Funds are mapped to assets classes.
 
 ## Syntax
 

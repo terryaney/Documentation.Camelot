@@ -1,6 +1,6 @@
 # BTRPPASingleLifeDebug Function
 
-Replacement function for the Cfgena.xla!PPASingleLife() function.  Returns a decimal value equal to the selected single life annuity factor by the PPA method.
+Debug version of BTRPPASingleLife that returns value or exception string (instead of #VALUE on error).  Replacement function for the Cfgena.xla!PPASingleLife() function.  Returns a decimal value equal to the selected single life annuity factor by the PPA method.
 
 ## Syntax
 
