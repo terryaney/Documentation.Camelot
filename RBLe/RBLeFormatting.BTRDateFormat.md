@@ -2,6 +2,7 @@
 
 Formats a Date value to a string representation using the specified format and culture-specific format information.
 
+**The string representation of the value of this instance as specified by `format` and `culture`.**
 ## Remarks
 
 The `BTRDateFormat` method is similar to Excel's `Format()` function with the exception that `BTRDateFormat` can dynamically format a date based on `culture` using the same `format` string.  

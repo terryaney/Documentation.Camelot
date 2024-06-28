@@ -2,6 +2,7 @@
 
 Joins a range of text strings into one string using seperator.
 
+**The string after joining all 'values' (all but last of `argsAndSeparator`) with the 'seperator' (last `argsAndSeparator`).**
 ## Syntax
 
 ```excel
