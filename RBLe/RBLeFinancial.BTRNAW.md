@@ -8,10 +8,10 @@ A replacement function for the Cfgena.xla!SSNAW() function.  Returns a decimal v
 =BTRNAW(yearEvent, rateNAW, lawYear)
 ```
 
-Parameter | Type | Description
----|---|---
-`yearEvent` | Int32 | Year of requested wage base.
-`rateNAW` | Double | NAW increase rate, defaulted to 4.5%.
-`lawYear` | Int32 | SS law year, defaulted to current law year.
+Parameter | Type | Default | Description
+---|---|---|---
+`yearEvent` | Int32 | `` | Year of requested wage base.
+`rateNAW` | Double? | `0.045` | NAW increase rate, defaulted to 4.5%.
+`lawYear` | Int32? | `0` | SS law year, defaulted to current law year.
 
 [Back to Financial](RBLeFinancial.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

@@ -8,8 +8,8 @@ Convert a date to Unix time.
 =BTRToUnixTime(date)
 ```
 
-Parameter | Type | Description
----|---|---
-`date` | DateTime | The date to convert.
+Parameter | Type | Default | Description
+---|---|---|---
+`date` | DateTime | `` | The date to convert.
 
 [Back to Crypto](RBLeCrypto.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

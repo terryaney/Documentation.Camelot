@@ -8,11 +8,11 @@ A replacement function for the Cfgena.xla!WageBase() function.  Returns a decima
 =BTRWageBase(yearEvent, rateNAW, lawYear, unrounded)
 ```
 
-Parameter | Type | Description
----|---|---
-`yearEvent` | Int32 | Year of requested wage base.
-`rateNAW` | Double | NAW increase rate, defaulted to 4.5%.
-`lawYear` | Int32 | SS law year, defaulted to current law year.
-`unrounded` | Boolean | Whether or not to apply the $300 rounding.
+Parameter | Type | Default | Description
+---|---|---|---
+`yearEvent` | Int32 | `` | Year of requested wage base.
+`rateNAW` | Double? | `0.045` | NAW increase rate, defaulted to 4.5%.
+`lawYear` | Int32? | `0` | SS law year, defaulted to current law year.
+`unrounded` | Boolean? | `False` | Whether or not to apply the $300 rounding.
 
 [Back to Financial](RBLeFinancial.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

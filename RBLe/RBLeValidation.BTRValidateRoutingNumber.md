@@ -11,8 +11,8 @@ The logic for this method was created by following [this routine](http://www.wik
 =BTRValidateRoutingNumber(value)
 ```
 
-Parameter | Type | Description
----|---|---
-`value` | String | The routing number input provided by user to validate.
+Parameter | Type | Default | Description
+---|---|---|---
+`value` | String | `""` | The routing number input provided by user to validate.
 
 [Back to Validation](RBLeValidation.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

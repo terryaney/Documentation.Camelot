@@ -8,13 +8,13 @@ Returns the value (or fallback is not found) from columnToReturn column in a tab
 =BTRLookup(values, table, columnToReturn, columnToSearch, fallback, caseSensitive)
 ```
 
-Parameter | Type | Description
----|---|---
-`values` | Object[,] | Value to search for.
-`table` | Object[,] | Range of cells to search (first row must be column headers).
-`columnToReturn` | String | Optional. Column name containing return value. Last column is default
-`columnToSearch` | String | Optional. Column name to search.  First column is default.
-`fallback` | Object | Optional.  Value to return if a match is not found.  #N/A is the default.
-`caseSensitive` | Boolean | Optional.  Whether or not search is case sensitive. false is the default.
+Parameter | Type | Default | Description
+---|---|---|---
+`values` | Object[,] | `` | Value to search for.
+`table` | Object[,] | `` | Range of cells to search (first row must be column headers).
+`columnToReturn` | String? |  | Optional. Column name containing return value. Last column is default
+`columnToSearch` | String? |  | Optional. Column name to search.  First column is default.
+`fallback` | Object? | `#N/A` | Optional.  Value to return if a match is not found.  #N/A is the default.
+`caseSensitive` | Boolean? | `false` | Optional.  Whether or not search is case sensitive. false is the default.
 
 [Back to General Utility Helpers](RBLeGeneralUtilityHelpers.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

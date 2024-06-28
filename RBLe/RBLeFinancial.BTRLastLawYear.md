@@ -8,8 +8,8 @@ Last law year for which yearly indexed functions were updated.
 =BTRLastLawYear()
 ```
 
-Parameter | Type | Description
----|---|---
+Parameter | Type | Default | Description
+---|---|---|---
 
 
 [Back to Financial](RBLeFinancial.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

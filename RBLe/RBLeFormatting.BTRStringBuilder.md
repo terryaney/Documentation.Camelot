@@ -18,9 +18,9 @@ The `BTRStringBuilder` method is similar to C#'s `string.Format()` function.
 =BTRStringBuilder(template, parameters)
 ```
 
-Parameter | Type | Description
----|---|---
-`template` | String | The string template to use in the builder with zero based subsitution tokens (i.e. `{0}`, `{1}`, ...).
-`parameters` | Object[] | The parameters to substitute into the string template.
+Parameter | Type | Default | Description
+---|---|---|---
+`template` | String | `""` | The string template to use in the builder with zero based subsitution tokens (i.e. `{0}`, `{1}`, ...).
+`parameters` | Object[] | `` | The parameters to substitute into the string template.
 
 [Back to Formatting](RBLeFormatting.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

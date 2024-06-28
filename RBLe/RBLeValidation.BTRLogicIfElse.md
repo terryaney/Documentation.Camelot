@@ -8,8 +8,8 @@ Given param array of {condition1}, {expression1}, {condition2}, {expression2}, .
 =BTRLogicIfElse(expressions)
 ```
 
-Parameter | Type | Description
----|---|---
-`expressions` | Object[] | List of 'paired' parameters.  Each pair is condition, expression.  If condition is true, return expression.
+Parameter | Type | Default | Description
+---|---|---|---
+`expressions` | Object[] | `` | List of 'paired' parameters.  Each pair is condition, expression.  If condition is true, return expression.
 
 [Back to Validation](RBLeValidation.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)
