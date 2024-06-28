@@ -15,7 +15,7 @@ Parameter | Type | Default | Description
 `isMatchCatchUp` | Boolean |  | Required.  Whether to provide match on catch-up contributions.
 `isPreTaxOverflowToAfterTax` | Boolean |  | Required.  Whether to allow pre-tax contributions over limit to overflow to after-tax contributions.
 `isAfterTaxMatch` | Boolean |  | Required.  Whether to provide match on after-tax contributions.
-`matchParam` | String |  | Required.  | delimited list of periods.  Each period is in the form of M:P:P where M is number of months for this period, and each P is a tier of a , seperated pair of decimal values.
+`matchParam` | String |  | Required.  \| delimited list of periods.  Each period is in the form of M:P:P where M is number of months for this period, and each P is a tier of a , seperated pair of decimal values.
 `year` | Int32 |  | Required.  Calculation year.
 `monthEnd` | Double |  | Required.  Calculate match as of the end of this month.
 `payPeriod` | Int32 |  | Required.  Number of Pay period in a year.

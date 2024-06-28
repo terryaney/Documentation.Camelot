@@ -29,7 +29,7 @@ Parameter | Type | Default | Description
 `isCatchUpMatch` | Boolean |  | Required.  Whether to provide match on catch-up contributions.
 `isPreTaxOverflowToAfterTax` | Boolean |  | Required.  Whether to allow pre-tax contributions over limit to overflow to after-tax contributions.
 `isMatchAfterTax` | Boolean |  | Required.  Whether to provide match on after-tax contributions.
-`matchParam` | String |  | Required.  | delimited list of periods.  Each period is in the form of M:P:P where M is number of months for this period, and each P is a tier of a , seperated pair of decimal values.
+`matchParam` | String |  | Required.  \| delimited list of periods.  Each period is in the form of M:P:P where M is number of months for this period, and each P is a tier of a , seperated pair of decimal values.
 `contributionType` | Int32 |  | Required.  The ContributionType to use for calculations.  PercentBasedOnAge = 1, PercentBasedOnService = 2, PercentBasedOnAgePlusService = 3.
 `contributionParam` | String |  | Required.  Contribution parameters.  See mPm for info.
 `year` | Int32 |  | Required.  Calculation year.
