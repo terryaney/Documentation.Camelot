@@ -10,7 +10,7 @@ Returns 'fieldName' (element or attribute) value from provided Xml datasource.  
 
 Parameter | Type | Default | Description
 ---|---|---|---
-`fieldName` | String | `""` | The name of the xml element or attribute.
+`fieldName` | String |  | The name of the xml element or attribute.
 `defaultValue` | String? | `fieldName` | Value to return to make coding specification formulas easier.
 
 [Back to Xml Mapping](RBLeXmlMapping.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

@@ -10,10 +10,10 @@ Returns an integer indicating whether an input string is a valid age/date and wi
 
 Parameter | Type | Default | Description
 ---|---|---|---
-`value` | String | `""` | A string that contains a date or age to validate.
-`dateBirth` | DateTime | `` | The participant's date of birth.
-`minimum` | DateTime | `` | A DateTime representing the minimum value allowed if 'value' is a date.
-`maximum` | DateTime | `` | A DateTime representing the minimum value allowed if 'value' is a date.
+`value` | String |  | A string that contains a date or age to validate.
+`dateBirth` | DateTime |  | The participant's date of birth.
+`minimum` | DateTime |  | A DateTime representing the minimum value allowed if 'value' is a date.
+`maximum` | DateTime |  | A DateTime representing the minimum value allowed if 'value' is a date.
 `dateOptions` | DateOptionsType? | `DateOptionsType.None` | Additional options to apply to date (FirstOfMonthOrCoincident=1, LastOfMonthOrCoincident=2).
 `culture` | String? | `"en-US"` | A string that supplies culture-specific format information about 'value'.
 `allowedFormats` | String? |  | An | delimitted string that supplies a list of allowable formats to attempt to parse 'value'.

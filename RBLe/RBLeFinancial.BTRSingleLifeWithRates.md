@@ -10,9 +10,9 @@ Replacement function for the Cfgena.xla!???() function (DOC: Han, which function
 
 Parameter | Type | Default | Description
 ---|---|---|---
-`mortTable` | String | `""` | Required.  The name of the mortality table that you wish to use.
-`intRates` | Double[,] | `` | Required.  A 6x2 array representing interest rates.  The first column refers to the period for which the corresponding interest rate in the second column applies.
-`age` | Double | `` | Required.  The current age (see Remarks) to calculate the factor of. Value is typically 20 to 110 (matching mortality table ages). Interpolation is performed if value is not integral.
+`mortTable` | String |  | Required.  The name of the mortality table that you wish to use.
+`intRates` | Double[,] |  | Required.  A 6x2 array representing interest rates.  The first column refers to the period for which the corresponding interest rate in the second column applies.
+`age` | Double |  | Required.  The current age (see Remarks) to calculate the factor of. Value is typically 20 to 110 (matching mortality table ages). Interpolation is performed if value is not integral.
 `howDefer` | String? | `"Y"` | The method used to determine deferrment age.  'A' for age, 'Y' for years.  Default value is 'Y'.
 `whenDefer` | Double? | `0` | The age or years for deferred payment; 0-110.  When 'howDefer' is Y, deferred age is 'age' + value, otherwise value.  Default value is 0.
 `howTemp` | String? | `"Y"` | The method used to determine temporary period.  'A' for age, 'Y' for years.  Default value is 'Y'.

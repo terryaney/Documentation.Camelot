@@ -10,9 +10,9 @@ Replacement function for the Cfgena.xla!SingleLife() function.  Returns a decima
 
 Parameter | Type | Default | Description
 ---|---|---|---
-`mortTable` | String | `""` | Required.  The name of the mortality table that you wish to use.
-`intRate` | Double | `` | Required.  The interest rate to use.
-`age` | Double | `` | Required.  The current age (see Remarks) to calculate the factor of. Value is typically 20 to 110 (matching mortality table ages). Interpolation is performed if value is not integral.
+`mortTable` | String |  | Required.  The name of the mortality table that you wish to use.
+`intRate` | Double |  | Required.  The interest rate to use.
+`age` | Double |  | Required.  The current age (see Remarks) to calculate the factor of. Value is typically 20 to 110 (matching mortality table ages). Interpolation is performed if value is not integral.
 `typeCF` | String? | `""` | Commutation Function (CF) type, please see CFGENA help for details.
 `pmtsPerYear` | Int32? | `12` | The frequency of payments per year (positive for beginning of period or negative for end of period payments).  Default value is 12.
 `mortTableAdj` | Int32? | `0` | The adjustment years to apply as a shift to the mortality table (not the age). This is done before unisex blending.

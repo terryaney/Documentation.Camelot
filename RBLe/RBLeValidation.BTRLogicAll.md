@@ -10,8 +10,8 @@ Returns 1 if all keys provided evaluate to not 'false' (#error, 0, FALSE) or 0 i
 
 Parameter | Type | Default | Description
 ---|---|---|---
-`keys` | String | `""` | Comma delimitted list of key values to use to find the rows in the table parameter.
-`table` | Object[,] | `` | Table containing the columns holding keys and values to find and do a falsy check (#error, 0, FALSE).
+`keys` | String |  | Comma delimitted list of key values to use to find the rows in the table parameter.
+`table` | Object[,] |  | Table containing the columns holding keys and values to find and do a falsy check (#error, 0, FALSE).
 `valueColumn` | Int32? | `table.Columns.Length` | The column (1..table columns) number containing the value to compare to ensure not falsy.  Default is the last column of 'table' parameter.
 `caseSensitive` | Boolean? | `false` | Whether or not a case sensitive search is performed. Default is false.
 

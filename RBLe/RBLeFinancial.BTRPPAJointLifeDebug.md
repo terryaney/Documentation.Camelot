@@ -27,13 +27,13 @@ An `ArgumentOutOfRangeException` can be thrown if any of the following condition
 
 Parameter | Type | Default | Description
 ---|---|---|---
-`mortTable` | String | `""` | Required.  The name of the mortality table that you wish to use.
-`spMortTable` | String | `""` | Required.  The name of the mortality table that you wish to use.
-`intRate1` | Double | `` | Required.  The interest rate to use for years 0 - 4.
-`intRate2` | Double | `` | Required.  The interest rate to use for years 5 - 19.
-`intRate3` | Double | `` | Required.  The interest rate to use for years 20 and after.
-`age` | Double | `` | Required.  The current member age (see Remarks) to calculate the factor of. Value is typically 20 to 110 (matching mortality table ages). Interpolation is performed if value is not integral.
-`spAge` | Double | `` | Required.  The spouse age (see Remarks) to calculate the factor of. Value is typically 20 to 110 (matching mortality table ages). Interpolation is performed if value is not integral.
+`mortTable` | String |  | Required.  The name of the mortality table that you wish to use.
+`spMortTable` | String |  | Required.  The name of the mortality table that you wish to use.
+`intRate1` | Double |  | Required.  The interest rate to use for years 0 - 4.
+`intRate2` | Double |  | Required.  The interest rate to use for years 5 - 19.
+`intRate3` | Double |  | Required.  The interest rate to use for years 20 and after.
+`age` | Double |  | Required.  The current member age (see Remarks) to calculate the factor of. Value is typically 20 to 110 (matching mortality table ages). Interpolation is performed if value is not integral.
+`spAge` | Double |  | Required.  The spouse age (see Remarks) to calculate the factor of. Value is typically 20 to 110 (matching mortality table ages). Interpolation is performed if value is not integral.
 `annuityOption` | String? | `"C"` | The options for annuity factors. 'C' for contingent, 'S' for survivor, 'P' for popup, 'D' for double popup and 'J' for joint life factor only.  Default value is 'C'.
 `jointFraction` | Double? | `0.5` | The fraction of contingent/survivor amount to the primary amount; 0-1.  Default value is 0.5.
 `howDefer` | String? | `"Y"` | The method used to determine deferrment age.  'A' for age, 'Y' for years.  Default value is 'Y'.

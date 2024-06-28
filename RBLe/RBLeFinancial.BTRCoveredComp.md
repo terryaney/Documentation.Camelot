@@ -10,7 +10,7 @@ A replacement function for the Cfgena.xla!CoveredComp() function.  Returns a dec
 
 Parameter | Type | Default | Description
 ---|---|---|---
-`yearBirth` | Int32 | `` | The member's year of birth.
+`yearBirth` | Int32 |  | The member's year of birth.
 `rateNAW` | Double? | `0.045` | NAW increase rate, defaulted to 4.5%.
 `yearEvent` | Int32? | `0` | Year of requested covered compensation.
 `lawYear` | Int32? | `0` | SS law year, defaulted to current law year.

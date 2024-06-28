@@ -10,8 +10,8 @@ Concatenates all values (or fallback is not found) from columnToReturn column in
 
 Parameter | Type | Default | Description
 ---|---|---|---
-`values` | String | `""` | Comma delimitted list of values to search for.
-`table` | Object[,] | `` | Range of cells to search (first row must be column headers).
+`values` | String |  | Comma delimitted list of values to search for.
+`table` | Object[,] |  | Range of cells to search (first row must be column headers).
 `columnToReturn` | String? |  | Optional. Column name containing return value. Last column is default
 `columnToSearch` | String? |  | Optional. Column name to search.  First column is default.
 `fallback` | Object? | `#N/A` | Optional.  Value to return if a match is not found.  #N/A is the default.

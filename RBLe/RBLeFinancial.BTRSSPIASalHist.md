@@ -10,10 +10,10 @@ A replacement function for the Cfgena.xla!SSTableProj() function using a pay arr
 
 Parameter | Type | Default | Description
 ---|---|---|---
-`dateBirth` | DateTime | `` | The member's date of birth.
-`dateEvent` | DateTime | `` | The member's date of event (i.e. Date Term).
-`ageRetire` | Double | `` | The member's age at retirement.
-`actualPay` | Double[] | `` | The member's annual compensations ending at current Social Security year.  Annual compensation will be projected for any missing years from age 18 through the year before payment start.
+`dateBirth` | DateTime |  | The member's date of birth.
+`dateEvent` | DateTime |  | The member's date of event (i.e. Date Term).
+`ageRetire` | Double |  | The member's age at retirement.
+`actualPay` | Double[] |  | The member's annual compensations ending at current Social Security year.  Annual compensation will be projected for any missing years from age 18 through the year before payment start.
 `rateNAW` | Double? | `0.045` | NAW increase rate.
 `rateFuturePay` | Double? | `0.05` | Future pay increase rate.
 `rateBackPay` | Double? | `0` | Backward pay increase rate.

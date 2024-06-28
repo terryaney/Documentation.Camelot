@@ -13,11 +13,11 @@ If you defer a temporary or certain annuity to an age earlier than the individua
 
 Parameter | Type | Default | Description
 ---|---|---|---
-`mortTable` | String | `""` | Required.  The name of the mortality table that you wish to use.
-`intRate1` | Double | `` | Required.  The interest rate to use for years 0 - 4.
-`intRate2` | Double | `` | Required.  The interest rate to use for years 5 - 19.
-`intRate3` | Double | `` | Required.  The interest rate to use for years 20 and after.
-`age` | Double | `` | Required.  The current age (see Remarks) to calculate the factor of. Value is typically 20 to 110 (matching mortality table ages). Interpolation is performed if value is not integral.
+`mortTable` | String |  | Required.  The name of the mortality table that you wish to use.
+`intRate1` | Double |  | Required.  The interest rate to use for years 0 - 4.
+`intRate2` | Double |  | Required.  The interest rate to use for years 5 - 19.
+`intRate3` | Double |  | Required.  The interest rate to use for years 20 and after.
+`age` | Double |  | Required.  The current age (see Remarks) to calculate the factor of. Value is typically 20 to 110 (matching mortality table ages). Interpolation is performed if value is not integral.
 `howDefer` | String? | `"Y"` | The method used to determine deferrment age.  'A' for age, 'Y' for years.  Default value is 'Y'.
 `whenDefer` | Double? | `0` | The age or years for deferred payment; 0-110.  When 'howDefer' is Y, deferred age is 'age' + value, otherwise value.  Default value is 0.
 `howTemp` | String? | `"Y"` | The method used to determine temporary period.  'A' for age, 'Y' for years.  Default value is 'Y'.

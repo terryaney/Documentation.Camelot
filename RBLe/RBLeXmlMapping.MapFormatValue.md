@@ -10,8 +10,8 @@ Returns 'value' formatted as string given the desired 'format' pattern.  Placeho
 
 Parameter | Type | Default | Description
 ---|---|---|---
-`value` | Object | `` | The value (or model field) to format.
-`format` | String | `""` | A valid C# format string in the format of {0:format}.
+`value` | Object |  | The value (or model field) to format.
+`format` | String |  | A valid C# format string in the format of {0:format}.
 `defaultValue` | String? | `"[MapFormatValue(`value`, "`format`")]"` | Value to return to make coding specification formulas easier.
 
 [Back to Xml Mapping](RBLeXmlMapping.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

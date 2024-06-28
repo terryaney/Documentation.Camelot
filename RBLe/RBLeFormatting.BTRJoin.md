@@ -11,6 +11,6 @@ Joins a range of text strings into one string using seperator.
 
 Parameter | Type | Default | Description
 ---|---|---|---
-`argsAndSeparator` | Object[] | `` | The string values to join with last parameter being the separator.
+`argsAndSeparator` | Object[] |  | The string values to join with last parameter being the separator.
 
 [Back to Formatting](RBLeFormatting.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

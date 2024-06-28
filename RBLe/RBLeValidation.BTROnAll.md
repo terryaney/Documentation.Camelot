@@ -10,6 +10,6 @@ Returns 1 if all parameters provided evaluate to not 'false' (#error, 0, FALSE, 
 
 Parameter | Type | Default | Description
 ---|---|---|---
-`parameters` | Object[] | `` | The parameters to evaluate falsy conditions.
+`parameters` | Object[] |  | The parameters to evaluate falsy conditions.
 
 [Back to Validation](RBLeValidation.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

@@ -24,22 +24,22 @@ The `matchType` and `contributionType` determine how each tier of numbers are pr
 
 Parameter | Type | Default | Description
 ---|---|---|---
-`matchType` | Int32 | `` | Required.  The MatchType to use for calculations.  MultiplierBasedOnPercent = 1, MultiplierBasedOnDollars = 2, ERMatchPercentBasedOnPercent = 3, ERMatchDollarsBasedOnDollars = 4.
-`isTrueUp` | Boolean | `` | Required.  Whether to credit true-up math at the end of the year when employee hits contribution limit.
-`isCatchUpMatch` | Boolean | `` | Required.  Whether to provide match on catch-up contributions.
-`isPreTaxOverflowToAfterTax` | Boolean | `` | Required.  Whether to allow pre-tax contributions over limit to overflow to after-tax contributions.
-`isMatchAfterTax` | Boolean | `` | Required.  Whether to provide match on after-tax contributions.
-`matchParam` | String | `""` | Required.  | delimited list of periods.  Each period is in the form of M:P:P where M is number of months for this period, and each P is a tier of a , seperated pair of decimal values.
-`contributionType` | Int32 | `` | Required.  The ContributionType to use for calculations.  PercentBasedOnAge = 1, PercentBasedOnService = 2, PercentBasedOnAgePlusService = 3.
-`contributionParam` | String | `""` | Required.  Contribution parameters.  See mPm for info.
-`year` | Int32 | `` | Required.  Calculation year.
-`monthEnd` | Double | `` | Required.  Calculate contributions as of the end of this month.
-`payPeriod` | Int32 | `` | Required.  Number of Pay period in a year.
-`rateOfPay` | Double | `` | Required.  Annual Pay rate as of start pay period.
-`payPeriodWhenPayIncreases` | Int32 | `` | Required.  Pay period when pay increases.
-`ratePayIncrease` | Double | `` | Required.  Pay increase rate.
-`rateOfInflation` | Double | `` | Required.  Inflation rate (used to project limits).
-`rateOfReturn` | Double | `` | Required.  Investment rate of return.
+`matchType` | Int32 |  | Required.  The MatchType to use for calculations.  MultiplierBasedOnPercent = 1, MultiplierBasedOnDollars = 2, ERMatchPercentBasedOnPercent = 3, ERMatchDollarsBasedOnDollars = 4.
+`isTrueUp` | Boolean |  | Required.  Whether to credit true-up math at the end of the year when employee hits contribution limit.
+`isCatchUpMatch` | Boolean |  | Required.  Whether to provide match on catch-up contributions.
+`isPreTaxOverflowToAfterTax` | Boolean |  | Required.  Whether to allow pre-tax contributions over limit to overflow to after-tax contributions.
+`isMatchAfterTax` | Boolean |  | Required.  Whether to provide match on after-tax contributions.
+`matchParam` | String |  | Required.  | delimited list of periods.  Each period is in the form of M:P:P where M is number of months for this period, and each P is a tier of a , seperated pair of decimal values.
+`contributionType` | Int32 |  | Required.  The ContributionType to use for calculations.  PercentBasedOnAge = 1, PercentBasedOnService = 2, PercentBasedOnAgePlusService = 3.
+`contributionParam` | String |  | Required.  Contribution parameters.  See mPm for info.
+`year` | Int32 |  | Required.  Calculation year.
+`monthEnd` | Double |  | Required.  Calculate contributions as of the end of this month.
+`payPeriod` | Int32 |  | Required.  Number of Pay period in a year.
+`rateOfPay` | Double |  | Required.  Annual Pay rate as of start pay period.
+`payPeriodWhenPayIncreases` | Int32 |  | Required.  Pay period when pay increases.
+`ratePayIncrease` | Double |  | Required.  Pay increase rate.
+`rateOfInflation` | Double |  | Required.  Inflation rate (used to project limits).
+`rateOfReturn` | Double |  | Required.  Investment rate of return.
 `preTaxPercentage` | Double? | `0` | Optional.  Pre-tax contribution as a % of pay.
 `preTaxFlatPerPayPeriod` | Double? | `0` | Optional.  Flat $ pre-tax contribution amount per pay period.
 `rothPercentage` | Double? | `0` | Optional.  Roth contribution as a % of pay.

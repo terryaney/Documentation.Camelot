@@ -10,12 +10,12 @@ TODO: HAN: Argument documentation. Determine retirement eligibility.
 
 Parameter | Type | Default | Description
 ---|---|---|---
-`mode` | Int32 | `` | TODO: Document this parameter.
-`appendix` | Int64 | `` | TODO: Document this parameter.
-`dateTerm` | DateTime | `` | TODO: Document this parameter.
-`age` | Double | `` | TODO: Document this parameter.
-`service` | Double | `` | TODO: Document this parameter.
-`dateParticipation` | DateTime | `` | TODO: Document this parameter.
-`range` | Object[,] | `` | TODO: Document this parameter.
+`mode` | Int32 |  | TODO: Document this parameter.
+`appendix` | Int64 |  | TODO: Document this parameter.
+`dateTerm` | DateTime |  | TODO: Document this parameter.
+`age` | Double |  | TODO: Document this parameter.
+`service` | Double |  | TODO: Document this parameter.
+`dateParticipation` | DateTime |  | TODO: Document this parameter.
+`range` | Object[,] |  | TODO: Document this parameter.
 
 [Back to Date Helpers](RBLeDateHelpers.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)
