@@ -1,10 +1,4 @@
-﻿TODO: rble macro language content
-
-TODO: link to
-	Tables Section or ResultBuilder Framework (two diff links)
-
-
-# RBLe CalcEngines
+﻿# RBLe CalcEngines
 
 The spreadsheets used to perform the complex actuarial calculations or business logic for KAT products should originally be converted to a RBLe CalcEngine (CE).
 
@@ -21,6 +15,25 @@ If the CE is also being used for an administration site, there will be an RBLBen
 - [Creating/Maintaining CalcEngine Guidelines](#creatingmaintaining-calcengine-guidelines) - Discusses the guidelines for creating and maintaining CalcEngines.
 
 [Back to RBLe Framework](RBLe.md)
+
+## Creating/Maintaining CalcEngine Guidelines
+
+**Do use KAT.Extensibility.Excel.xll Convert to RBLe CalcEngine function whenever a new CE is being created for a client.**
+
+If at all possible, use the add-in every time instead of copying an old CE from a previous client. This will ensure you have the latest tab structure in place when handing off the original CE to KAT to implement. KAT has tools that validate and generate some required configurations/code and are only possible if the latest tab structure is in place. If it is too much work to start from scratch, please make every attempt to at least generate a new RBLInput tab as this is the most important tab to KAT. You can use the Insert Sheet -> Input Page function from KAT.Extensibility.Excel.xll.
+
+**Do organize to minimize processing by RBLe Framework by organizing input and result tabs correctly.**
+
+Only include required information on these tabs. Do not include input constants, helper variables, or helper tables in tab processing. You can place 'worker' items on a separate tab or in a 'non-processed' location to prevent RBLe from processing it (discussed in detail in appropriate section below). On input tabs, to ensure the optimal processing speed, make sure to place 'constant' or 'calculated' input rows in a location to avoid being processed by RBL. If one result sheet services two types of calculation types, make sure to turn off any rows or tables that are not used for the current calculation type.
+
+**Do name the CE Conduent_ClientName_CE.xlsm.**
+
+Although not required, KAT suggests naming new files with this format.
+
+**Do make columns wide enough.**
+
+Data output is in the exact format as shown in the spreadsheet. Note that if a column is too narrow and ###### is the display, that is what will be exported. So be sure your columns are wide enough for all situations.
+
 
 ## RBLe Tabs
 
@@ -626,7 +639,7 @@ Notes about nesting:
 
 ##### Result Tab Flow
 
-Each table on a result tab is handled in the following manner before even being passed to the ResultBuilder Framework and are referred to as RBLe Table Exporting Rules:
+Each table on a result tab is handled in the following manner before even being passed to the [ResultBuilder Framework](Evolution.ResultBuilder.md) and are referred to as RBLe Table Exporting Rules:
 
 - Only export row if `on` is set to `1`. If you have a column named on you can control whether or not the entire row is exported from the CE by placing a 1 or 0 in the column for a specific row. If you do not have a column named `on` then every row will be exported. 
 - Only export a column if the name is not a 'special' column name. 
@@ -635,7 +648,7 @@ Each table on a result tab is handled in the following manner before even being 
 - Only export a column if it is turned on. You can control whether or not specific columns get exported by providing a 'special' row with an id of on. Then if you place a 1 in the columns you want exported, all other columns that are blank or have 0 in the column will not be exported. Important: If you provide a on your, you must make sure to provide the correct 1 or 0 value for **every** column in the table. 
 - Convert `<<` to `<` and `>>` to `>` to facilitate HTML syntax in results. If you need to provide HTML coding (i.e. bolding, hyperlinks, italics, etc.) in your result, you need to put double up value html brackets. For example `<<b>>bold<</b>>` or `<<i>>italics<</i>>`. You may want to consult with KAT for valid HTML syntax given the functionality you desire. 
 
-Almost all tables are 'generic' and completely defined by Conduent; however, the navigation and contents tables are for specific processing and have column names that are only applicable when used in the context of those tables. This special processing is discussed in the [Evolution ResultBuilder Framework](Evolution.ResultBuilder.md) section.
+Almost all tables are 'generic' and completely defined by Conduent; however, the navigation and contents tables are for specific processing and have column names that are only applicable when used in the context of those tables. This special processing is discussed in the [ResultBuilder Framework](Evolution.ResultBuilder.md) section.
 
 #### RBLUpdate – MHA Calculated Data Load
 
@@ -688,21 +701,286 @@ Configure two CalcEngines with different tabs to run in the pipeline before the 
 </rbl-config>
 ```
 
-## Creating/Maintaining CalcEngine Guidelines
+## RBLe Macro Language
 
-**Do use KAT.Extensibility.Excel.xll Convert to RBLe CalcEngine function whenever a new CE is being created for a client.**
+The RBLe Macro language is meant to be a replacement for any VBA code that was required in a CalcEngine. The two most common scenarios that required VBA code in a CE were aggregating data and manipulating chart objects. As mentioned, charts should be done using HighCharts and aggregation can be easily accomplished using RBLe Macros. Aggregation in VBA was normally accomplished by:
 
-If at all possible, use the add-in every time instead of copying an old CE from a previous client. This will ensure you have the latest tab structure in place when handing off the original CE to KAT to implement. KAT has tools that validate and generate some required configurations/code and are only possible if the latest tab structure is in place. If it is too much work to start from scratch, please make every attempt to at least generate a new RBLInput tab as this is the most important tab to KAT. You can use the Insert Sheet -> Input Page function from KAT.Extensibility.Excel.xll.
+1. Iterating through ages. 
+1. Copy a date or age into appropriate 'work area' causing a set of calculations to occur. 
+1. Copy result of calculations to an output locations (usually becoming a RBL result table or data source for a chart). 
+1. Repeat steps 2-3 for all ages. 
+1. Restore the initial starting state and use the results. 
 
-**Do organize to minimize processing by RBLe Framework by organizing input and result tabs correctly.**
+By creating a named range called `RBLeMacro` anywhere in a CE pointing to a table with the following layout, macros will be processed.
 
-Only include required information on these tabs. Do not include input constants, helper variables, or helper tables in tab processing. You can place 'worker' items on a separate tab or in a 'non-processed' location to prevent RBLe from processing it (discussed in detail in appropriate section below). On input tabs, to ensure the optimal processing speed, make sure to place 'constant' or 'calculated' input rows in a location to avoid being processed by RBL. If one result sheet services two types of calculation types, make sure to turn off any rows or tables that are not used for the current calculation type.
+Column | Description
+---|---
+`Action` | The name of the RBLe Macro action to perform. Similar to RBL result processing, when processing top to bottom, when two blank values in this column are encountered, processing stops. 
+`Value` | The value associated with the Action. If the action specified is expecting a range of cells for the input, you must use `=BTRCellAddress(sheet!range)` where range can be a range of cells or named range but you must use the `BTRCellAddress` function using the sheet!range syntax to ensure proper formula/cell parsing. 
+`Destination` | For actions that place information into a desired locations, this column value specifies the location. Again, when identifying a cell or range, you must use the `BTRCellAddress` function. 
+`Comment` (Optional) | A column for the CE developer to place comments associated with current macro instruction.
 
-**Do name the CE Conduent_ClientName_CE.xlsm.**
+### Important Notes When Using RBLe Macro Language
 
-Although not required, KAT suggests naming new files with this format.
+1. All references to cells in the macro instruction table **must have** `Sheet!cell` or `Sheet!range` prefix for things to work property. If range is global, put the sheet name where the range lives. 
+1. When setting up the RBLeMacro table, developers can skip one row for whitespace. **Skipping two rows ends macro.** 
+1. Developers can add comments for each macro instruction row in the optional Comment column or by any text entry in the Action column starting with //. Any row with action text starting with // are ignored. 
+1. Developers can suffix any action name with #stop to stop processing after the macro row has finished executing (helpful during debugging). 
+1. When using variables (either with the SetVariable action or =BTRGetMacroVariable(name) function), BTR recommends creating a 'variable name table' that is just a list of string names and reference those strings in any macro instructions to avoid typo problems and enable usage auditing. 
+1. All destination values should use [BTRCellAddress](RBLeRBLeMacro.BTRCellAddress.md) to create a 'reference' to a cell. This also helps so that things don't break when cells moved (if they just typed in a string literal representing the address).<br/><br/>NOTE: Because of the way server side calculations work `BTRCellAddress` doesn't behave exactly as expected. It is ran 'outside' of normal Excel 'calculation' restrictions meaning it will **always** calculate its address no matter what the Calculation mode is set to. For example, `=BTRCellAddress("A"+Sheet!A1)` if you set `A1=1`, then turn off Calculation, then set `A1=2`, when debugging locally within Excel, it obeys the Calculation mode and still returns `A1`, however, the server side calculation has to always calculate this and will return `A2`. So, be aware of this behavior when coding up macros.<br/><br/>
+1. `BTRCellAddress` is used to specify a range reference in a worksheet. Needed to allow macro processing to parse cell addresses. Aids developers in two ways. The rowOffset, colOffset, additionalRows, and additionalColumns parameters are all optional.<br/><br/>Explicit strings used as an address do not update when the range is moved.<br/><br/>The optional 'offset' and 'additional' parameters make it easier to dynamically specify a range when needed.<br/><br/>
+1. For the RunFunction action, the Value column should be set via `=BTRCellAddress(fn)` where fn is the cell containing the FunctionStart action. BTR recommends to create a worksheet scoped named range and use that, i.e. `=BTRCellAddress(RBLeMacro!functionName)`. 
+1. `Delete`, `CopyValue`, `CopyAddress`, `CopyToArray`, `SetParam`, and `SetVariable` are the only Actions that use Destination column. 
+1. The best practice for the BlockRepeat action is to put the iterator/conditional value into the Destination column. Macro instruction processing will not use it, but makes it very obvious where the condition cell for block is. 
+1. The default value for `BlockStart` and `BlockBreak` actions is `TRUE` meaning you can leave value blank. Developers only need to provide a `Value` column value if you need to conditionally control whether or not you skip or break/stop the block respectively. Note, developers cannot set `BlockRepeat` to `TRUE` or `=TRUE` because of infinite loop potential.
+1. Variables are discussed more below with the `SetVariable` action, but [BTRGetMacroVariable](RBLeRBLeMacro.BTRGetMacroVariable.md) is used to retrieve the value of a variable and is useful in macro programming.  Used to retrieve a variable previously stored via the SetVariable action. This function is normally used when a variable is used as a looping construct. The SetVariable action will have a value of =BTRGetMacroVariable(variableName)+1 and the condition for the BlockRepeat action will then check the value using the BTRGetMacroVariable function.<br/><br/>This function was created so that macro instructions could run with Excel's calculation mode turned off and yet still have a counting iterator because RBLe does not support turning off calculation in a sheet by sheet basis (i.e. leaving the RBLe Macro sheet calculation enabled while disabling the rest of the workbook calculation heavy sheets).
 
-**Do make columns wide enough.**
 
-Data output is in the exact format as shown in the spreadsheet. Note that if a column is too narrow and ###### is the display, that is what will be exported. So be sure your columns are wide enough for all situations.
+### RBLe Macro Actions
 
+All values specified in the Value and Destination columns representing a Range should use `BTRCellAddress` to create a 'reference' to a cell.
+
+Action | Description
+---|---
+`CopyValue` | Copies a value into the desired range.<br/><br/>`Value`: The value to copy. The value can be an explicit value (string, number, or date) or cell reference (grabbing value from cell).<br/><br/>`Destination`: The destination Range to copy to.
+`CopyAddress` | Copies source range into target range.<br/><br/>`Value`: The source Range to copy.<br/><br/>`Destination`: The destination Range to copy to.
+`Delete` | Clears the contents of the target range.<br/><br/>`Destination`: The destination Range to clear.
+`Calculation` | Turns on or off CE calculation for the workbook.<br/><br/>`Value`: `TRUE` or `FALSE` to turn on or off calculation.
+`Calculate` | Forces CE to immediate calculate all its values (used when `Calculation` has been set to `FALSE`).
+`SetParam` | Sets a parameter value for the upcoming Execute action. The number and names of the parameters are determined by the function performed in the Execute action.<br/><br/>`Value`: The parameter value to use. The value can be an explicit value (string, number, or date), cell reference (grabbing value from cell), or range reference identified via the BTRGetCellAddress.<br/><br/>`Destination`: String value representing the name of the parameter.
+`Execute` | Executes a custom helper function implemented in C# using any parameters previously set via the SetParam action. The available functions will be listed in the Execute Action Functions.<br/><br/>`Value`: The name of the function to execute.<br/><br/>See [RBLe Macro Execute Action Functions](#rble-macro-execute-action-functions) for more information.
+`SetVariable` | Copies value into variable for later use.<br/><br/>`Value`: The value to store. The value can be an explicit value (string, number, or date) or cell reference (grabbing value from cell).<br/><br/>`Destination`: String value representing the name of the variable.<br/><br/>**Note**: Useful if the developer has turned off calculation, but needs to keep track of some counters, accumulators during macro processing that contains `BlockRepeat` actions and other block constructs.
+`CopyToArray` | Copies source range into an array variable for later use.<br/><br/>`Value`: The source Range to copy.<br/><br/>`Destination`: String value representing the name of the array variable.<br/><br/>**Note**: Currently used in conjunction with `RankStochastic` and `SumStochastic` execution functions.
+`Stop` | Immediately stops processing of the RBLe Macro instructions.<br/><br/>`Value`: Optional. TRUE or FALSE. Default is TRUE.<br/><br/>**Note**: Suffixing any action name with #stop has the same affect.
+`TraceMacro` | Turns on tracing of macro instructions for debugging purposes. The trace can then be viewed in the browser's console window or Excel's add-in log window.<br/><br/>`Value`: TRUE or FALSE to turn on or off tracing.
+`SetTimeout` | By default, RBLe Macro limits the total execution time to 1 minute before throwing an exception.<br/><br/>`Value`: Number of minutes to allow macro to process before throwing exception.<br/><br/>**Note**: Currently this action is only supported during debugging for developers when testing in Excel. The action is ignored when actual calculation is running on BTR servers.
+`SetIterations` | By default, RBLe Macro limits the total number of BlockRepeat actions executed to 2000 (across entire macro, not just within one block).<br/><br/>`Value`: Number of iterations to allow before throwing exception.<br/><br/>**Note**: Use this action with extreme caution. Setting it too high could result in your calculation locking up BTR server resources if the macro does not end properly (i.e. if the developer introduced an infinite loop).
+
+### RBLe Macro Block Constructs
+
+Action | Description
+---|---
+`BlockStart` | Indicates the start of a block of instructions grouped together and must be paired with a `BlockEnd` or `BlockRepeat` action.<br/><br/>`Value`: Optional. `TRUE` or `FALSE`. Default is `TRUE`.
+`BlockEnd` | Indicates the end of a block of instructions. Blocks can be nested.
+`BlockBreak` | Stops the execution of the currently running block.<br/><br/>`Value`: Optional. `TRUE` or `FALSE` specifying whether to stop current block. Default is `TRUE`.
+`BlockRepeat` | Indicates the end of a block of instructions grouped together allowing for the opportunity for the instructions to be repeated. It must be paired with a BlockStart action.<br/><br/>`Value`: TRUE or FALSE specifying whether the current block of instructions should be processed again.<br/><br/>`Destination`: Not used, but recommended to hold the iterator/counting variable for better readability.
+`FunctionStart` | Similar to `BlockStart`, this indicates the start of a block of instructions grouped together and must be paired with a `FuncitonEnd` action. The difference is that this block of instructions will only be executed if called via the `RunFunction` action whereas `BlockStart` and `BlockEnd` instructions are processed as soon as they are encountered.<br/><br/>BTR recommends placing all `FunctionStart` and `FunctionEnd` blocks at the bottom of the list of all macro instructions instead of intermixed with the actions that will actually be executing in the top down fashion.
+`FunctionEnd` | Indicates the end of a function. Unlike BlockStart and BlockEnd, functions cannot be nested.
+`FunctionBreak` | Stops the execution of the currently running function.<br/><br/>`Value`: Optional. `TRUE` or `FALSE` specifying whether to stop current function. Default is `TRUE`.
+`RunFunction` | Runs the macro instructions created with the FunctionStart and FunctionEnd constructs.<br/><br/>`Value`: The cell reference defined via BTRGetCellAddress pointing to the Action column of the FunctionStart instruction that you want to run.
+
+### RBLe Macro Execute Action Functions
+
+Using the Execute action, you can provide one of the following function names in the Value column to execute provided you supplied all parameters via the `SetParam` action.
+
+**Note**: All parameters set via SetParam action and case specific.
+
+Function | Description
+---|---
+`EmployeeProjections` | TODO: Phil/Han/SB to provide documentation. This was a 'port' of VBA projection we had.
+`StochasticProjection`<br/>`DeterministicProjection` | TODO: Han to provide documentation.
+`SortRange` | Similar to Excel's [Range.Sort](https://msdn.microsoft.com/en-us/library/office/ff840646.aspx?f=255&MSPPError=-2147217396), sorts the range based on options passed in. All parameters of type Range must be defined via `BTRCellAddress`.
+`ContributionSolver` | TODO: Han to provide documentation.
+`GetClassAllocations` | TODO: Han to provide documentation.
+`GoalSeek` | TODO: Han to provide documentation.
+`MapFundToAssetClass` | TODO: Han to provide documentation.
+
+#### EmployeeProjections
+
+TODO: Phil/Han/SB to provide documentation. This was a 'port' of VBA projection we had.
+
+TODO: Han, is ProjectionWorkArea different than sheetName!tWorkResults?
+
+Parameter | Type | Description
+---|---|---
+`sheetName` | `string` | Name of sheet containing the projection work area with defined name ranges.
+
+**Expected Global Named Ranges**
+
+Name | Description
+---|---
+`ProjectionWorkArea` | TODO: Han to provide documentation on meaning. **Note**: This was previously named datClear in VBA implementation. 
+`ProjectionDOTInput` | TODO: Han to provide documentation on meaning. **Note**: If not provided, iDateTerm is used. 
+`ProjectionDOTStorage` | TODO: Han to provide documentation on meaning. 
+`ProjectionDORInput` | TODO: Han to provide documentation on meaning. **Note**: If not provided, iDateBenComm is used. 
+`ProjectionDORStorage` | TODO: Han to provide documentation on meaning. 
+
+**Expected Sheet Named Ranges**
+
+Name | Description
+---|---
+`sheetName!ProjectionDOT` | TODO: Han to provide documentation on meaning. 
+`sheetName!ProjectionDOR` | TODO: Han to provide documentation on meaning. 
+`sheetName!ProjectionAge1DOT` | TODO: Han to provide documentation on meaning. 
+`sheetName!ProjectionAge1DOR` | TODO: Han to provide documentation on meaning. 
+`sheetName!tWorkResults` | TODO: Han to provide documentation on meaning.
+
+#### StochasticProjection/DeterministicProjection
+
+All parameters are case sensitive and must be set with the `SetParam` action. All parameters of type Range must be defined via `BTRCellAddress`.
+
+Parameter | Type | Description
+---|---|---
+`resultCell` | `Range` | **StochasticProjection only**. TODO: Han to provide documentation. 
+`ranks` | `Range` | **StochasticProjection only**. TODO: Han to provide documentation. 
+`tableName` | `string` |  StochasticProjection only. TODO: Han to provide documentation. 
+`numberOfAssetClasses` | `int` | **StochasticProjection only**. TODO: Han to provide documentation. 
+`fundAllocations` | `Range` | **StochasticProjection only**. TODO: Han to provide documentation. 
+`runToAudit` | `int` | **StochasticProjection only**. TODO: Han to provide documentation. 
+`fundAllocations` | `Range` | TODO: Han to provide documentation. 
+`inputAllocations401k` | `Range` | TODO: Han to provide documentation. 
+`inputAllocationsEmployer` | `Range` | Optional. TODO: Han to provide documentation. 
+`deriskAtRetirement` | `bool` | Optional. TODO: Han to provide documentation. 
+`projectionYears` | `int` | TODO: Han to provide documentation. 
+`yearCurrent` | `int` | TODO: Han to provide documentation. 
+`ageBeginningOfYear` | `decimal` | TODO: Han to provide documentation. 
+`annualPay` | `decimal` | TODO: Han to provide documentation. 
+`balance401k` | `decimal` | TODO: Han to provide documentation. 
+`balanceEmployerContributions` | `decimal` | TODO: Han to provide documentation. 
+`balanceNonQual` | `decimal` | TODO: Han to provide documentation. 
+`balanceLoan` | `decimal` | TODO: Han to provide documentation. 
+`retireAge` | `int` | TODO: Han to provide documentation. 
+`pretaxPercentage` | `decimal` | TODO: Han to provide documentation. 
+`pretaxFlatPerPayPeriod` | `decimal` | TODO: Han to provide documentation. 
+`aftertaxPercentage` | `decimal` | TODO: Han to provide documentation. 
+`aftertaxFlatPerPayPeriod` | `decimal` | TODO: Han to provide documentation. 
+`startPayPeriod` | `int` | TODO: Han to provide documentation. 
+`monthEnd` | `int` | TODO: Han to provide documentation. 
+`payPeriod` | `int` | TODO: Han to provide documentation. 
+`payIncreaseTiming` | `int` | Optional. TODO: Han to provide documentation. 
+`bonusPaymentTiming` | `int` | Optional. TODO: Han to provide documentation. 
+`matchFrequency` | `int` | Optional. TODO: Han to provide documentation. 
+`employerContributionFrequency` | `int` | Optional. TODO: Han to provide documentation. 
+`pretaxRothPayIsLimited` | `bool` | Optional. TODO: Han to provide documentation. 
+`doNotLimit401kPlan` | `bool` | Optional. TODO: Han to provide documentation. 
+`doNotLimitEmployerPlan` | `bool` | Optional. TODO: Han to provide documentation. 
+`increaseMonth` | `int` | Optional. TODO: Han to provide documentation. 
+`increaseFrequency` | `int` | Optional. TODO: Han to provide documentation. 
+`increasePercentage` | `decimal` | Optional. TODO: Han to provide documentation. 
+`maxRate` | `decimal` | Optional. TODO: Han to provide documentation. 
+`payIncrease` | `Range` | TODO: Han to provide documentation. 
+`bonusPercentageOfPay` | `Range` | TODO: Han to provide documentation. 
+`nonStochastic401kReturn` | `bool` | Optional. TODO: Han to provide documentation. 
+`nonStochasticEmployerReturn` | `bool` | Optional. TODO: Han to provide documentation. 
+`stochasticPayIncrease` | `bool` | Optional. TODO: Han to provide documentation. 
+`midPointContribution` | `bool` | Optional. TODO: Han to provide documentation. 
+`isOverflowToNonQual` | `bool` | Optional. TODO: Han to provide documentation. 
+`isAdjustPayOtherSavings1By401kCont` | `bool` | Optional. TODO: Han to provide documentation. 
+`isAdjustPayOtherSavings2By401kCont` | `bool` | Optional. TODO: Han to provide documentation. 
+`isAdjustPayOtherSavings2ByOtherSavings1Cont` | `bool` | Optional. TODO: Han to provide documentation. 
+`investmentReturn` | `Range` | Optional. TODO: Han to provide documentation. 
+`investmentReturnEmployer` | `Range` | Optional. TODO: Han to provide documentation. 
+`investmentReturnOtherSavings` | `Range` | Optional. TODO: Han to provide documentation. 
+`inflation` | `Range` | Optional. TODO: Han to provide documentation. 
+`isTrueup` | `Range` | TODO: Han to provide documentation. 
+`isCatchupMatch` | `Range` | TODO: Han to provide documentation. 
+`isPretaxOverflowToAftertax` | `Range` | TODO: Han to provide documentation. 
+`isAftertaxMatch` | `Range` | TODO: Han to provide documentation. 
+`matchType` | `Range` | TODO: Han to provide documentation. 
+`matchParam` | `Range` | TODO: Han to provide documentation. 
+`employerContributionType` | `Range` | Optional. TODO: Han to provide documentation. 
+`employerContributionParam` | `Range` | Optional. TODO: Han to provide documentation. 
+`employer401kContributionParam` | `Range` | Optional. TODO: Han to provide documentation. 
+`yearToDatePay` | `decimal` | TODO: Han to provide documentation. 
+`yearToDatePretax` | `decimal` | TODO: Han to provide documentation. 
+`yearToDateRoth` | `decimal` | TODO: Han to provide documentation. 
+`yearToDateAftertax` | `decimal` | TODO: Han to provide documentation. 
+`yearToDatePretaxCatchup` | `decimal` | TODO: Han to provide documentation. 
+`yearToDateRothCatchup` | `decimal` | TODO: Han to provide documentation. 
+`yearToDateEmployerMatch` | `decimal` | TODO: Han to provide documentation. 
+`yearToDateEmployerContributions` | `decimal` | Optional. TODO: Han to provide documentation. 
+`serviceBeginningOfYear` | `decimal` | Optional. TODO: Han to provide documentation. 
+`employerContributionAnnualLimit` | `decimal` | Optional. TODO: Han to provide documentation. 
+`employer401kContributionAnnualLimit` | `decimal` | Optional. TODO: Han to provide documentation. 
+`limitPay` | `decimal` | Optional. TODO: Han to provide documentation. 
+`limitPretax` | `decimal` | Optional. TODO: Han to provide documentation. 
+`limitContribution` | `decimal` | Optional. TODO: Han to provide documentation. 
+`payAdjustment401k` | `decimal` | Optional. TODO: Han to provide documentation. 
+`payAdjustmentER` | `decimal` | Optional. TODO: Han to provide documentation. 
+`employer401kContributionType` | `int` | Optional. TODO: Han to provide documentation. 
+`employer401kContributionFrequency` | `int` | Optional. TODO: Han to provide documentation. 
+`yearToDateEmployer401kContribution` | `decimal` | Optional. TODO: Han to provide documentation. 
+`socialSecurityRetirementAge` | `int` | TODO: Han to provide documentation. 
+`socialSecurityBenefit` | `decimal` | TODO: Han to provide documentation. 
+`replacementRatio` | `decimal` | TODO: Han to provide documentation. 
+`retirementPaymentDuration` | `int` | TODO: Han to provide documentation. 
+`minIncomeFromAnnuityPercentage` | `decimal` | TODO: Han to provide documentation. 
+`otherSavings` | `Range` | TODO: Han to provide documentation. 
+`Annuities` | `Range` | TODO: Han to provide documentation. 
+`tempExpenses` | `Range` | TODO: Han to provide documentation. 
+`loans` | `Range` | Optional. TODO: Han to provide documentation. 
+`detailsCell` | `Range` | TODO: Han to provide documentation.
+
+#### SortRange
+
+Similar to Excel's [Range.Sort](https://msdn.microsoft.com/en-us/library/office/ff840646.aspx?f=255&MSPPError=-2147217396), sorts the range based on options passed in.
+
+All parameters are case sensitive and must be set with the SetParam action. All parameters of type Range must be defined via `BTRCellAddress`.
+
+Parameter | Type | Description
+---|---|---
+`range` | `Range` | The data range to sort. 
+`key1` | `Range` | Range Specifies the first sort field; determines the values to be sorted. 
+`order1` | `string` | Optional. Determines the sort order for the values specified in `key1`. `A` for ascending or `D` for descending. Defaults to `A`. 
+`dataOption1` | `string` | Optional. Specifies how to sort text in the range specified in key1. `N` for normal or `T` for Text as Numbers. Defaults to `N`. 
+`orientation` | `string` | Optional. Specifies whether to sort rows or columns. `C` for columns or `R` for rows. Defaults to `C`. 
+`matchCase` | `bool` | Optional. Set to `True` to perform a case-sensitive sort, `False` to perform non-case sensitive sort. Defaults to `false`. 
+`key2` | `Range` | Optional. Specifies the second sort field; determines the values to be sorted. 
+`order2` | `string` | Optional. If `key2` is provided, determines the sort order for the values specified in `key2`. `A` for ascending or `D` for descending. Defaults to `A`. 
+`dataOption2` | `string` | Optional. If `key2` is provided, specifies how to sort text in the range specified in `key2`. `N` for normal or `T` for Text as Numbers. Defaults to `N`. 
+`key3` | `Range` | Optional. Specifies the third sort field; determines the values to be sorted. 
+`order3` | `string` | Optional. If `key3` is provided, determines the sort order for the values specified in `key3`. `A` for ascending or `D` for descending. Defaults to `A`. 
+`dataOption3` | `string` | Optional. If `key3` is provided, specifies how to sort text in the range specified in `key3`. `N` for normal or `T` for Text as Numbers. Defaults to `N`.
+
+#### ContributionSolver
+
+TODO: Han to provide documentation
+
+All parameters are case sensitive and must be set with the SetParam action. All parameters of type Range must be defined via `BTRCellAddress`.
+
+Parameter | Type | Description
+---|---|---
+`goal` | `decimal` | Specifies the desired goal from the calculated result of the formula in the cell represented by valueCell. 
+`valueCell` | `Range` | The cell to test the goal against. 
+`changingCell` | `Range` | The cell to change during testing. 
+`maxContribution` | `decimal` | TODO: Han to provide.
+
+#### GetClassAllocations
+
+TODO: Han to provide documentation
+
+All parameters are case sensitive and must be set with the SetParam action. All parameters of type Range must be defined via `BTRCellAddress`.
+
+Parameter | Type | Description
+---|---|---
+`changingCell` | `Range` | The cell to change during testing. 
+`tableName` | `string` | TODO: Han to provide. 
+`year` | `int` | TODO: Han to provide. 
+`planType` | `int` | TODO: Han to provide.  Value must be able to convert to `FundPlanType { EmployeeContributed = 0, EmployerContributed = 1, Loan = 2 }`
+`fundAllocations` | `Range` | TODO: Han to provide. 
+`inputAllocations` | `Range` | TODO: Han to provide. 
+
+#### GoalSeek
+
+Similar to Excel's GoalSeek method, calculates the values necessary to achieve a specific goal. If the goal is an amount returned by a formula, this calculates a value that, when supplied to your formula, causes the formula to return the number you want.
+
+All parameters are case sensitive and must be set with the SetParam action. All parameters of type Range must be defined via `BTRCellAddress`.
+
+Parameter | Type | Description
+---|---|---
+`goal` | `decimal` | Specifies the desired goal from the calculated result of the formula in the cell represented by `valueCell`. 
+`valueCell` | `Range` | The cell to test the goal against. 
+`changingCell` | `Range` | The cell to change during testing.
+
+#### MapFundToAssetClass
+
+TODO: Han to provide documentation
+
+All parameters are case sensitive and must be set with the SetParam action. All parameters of type Range must be defined via `BTRCellAddress`.
+
+Parameter | Type | Description
+---|---|---
+`changingCell` | `Range` | The cell to change during testing. 
+`tableName` | `string` | TODO: Han to provide.
+`year` | `int` | TODO: Han to provide.
+`fundID` | `string` | TODO: Han to provide.
