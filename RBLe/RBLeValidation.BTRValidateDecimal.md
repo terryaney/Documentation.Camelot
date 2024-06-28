@@ -11,9 +11,9 @@ Returns an integer indicating whether an input string is a valid decimal value a
 Parameter | Type | Default | Description
 ---|---|---|---
 `value` | String |  | A string that contains a date and time to convert.
-`minimum` | Double |  | A double representing the minimum value allowed if 'value' is a double.
-`maximum` | Double |  | A double representing the minimum value allowed if 'value' is a double.
-`culture` | String? | `"en-US"` | A string that supplies culture-specific format information about 'value'.
+`minimum` | Double |  | A double representing the minimum value allowed if `value` is a double.
+`maximum` | Double |  | A double representing the minimum value allowed if `value` is a double.
+`culture` | String? | `"en-US"` | A string that supplies culture-specific format information about `value`.
 `decimalPlaces` | Int32? |  | An integer value representing the maximum number of decimal places allowed.
 
 [Back to Validation](RBLeValidation.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)
