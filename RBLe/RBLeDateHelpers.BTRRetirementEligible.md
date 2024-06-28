@@ -1,6 +1,6 @@
 # BTRRetirementEligible Function
 
-HAN: Argument documentation. Determine retirement eligibility.
+TODO: HAN: Argument documentation. Determine retirement eligibility.
 
 ## Syntax
 

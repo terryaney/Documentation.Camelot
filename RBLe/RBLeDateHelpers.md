@@ -11,7 +11,7 @@ Function | Description
 [`BTRDateDiff`](RBLeDateHelpers.BTRDateDiff.md) | Returns difference in years, months, full months (integer) or days between two dates.
 [`BTRFirstOfMonthOrCoincident`](RBLeDateHelpers.BTRFirstOfMonthOrCoincident.md) | Returns a DateTime object converted to the first day of the month coincident or following.
 [`BTRGetDateForDay`](RBLeDateHelpers.BTRGetDateForDay.md) | Given a `startDate` date and day of week, find the next date whose day of the week equals `desiredDay` and `dateType`.
-[`BTRRetirementEligible`](RBLeDateHelpers.BTRRetirementEligible.md) | HAN: Argument documentation. Determine retirement eligibility.
+[`BTRRetirementEligible`](RBLeDateHelpers.BTRRetirementEligible.md) | TODO: HAN: Argument documentation. Determine retirement eligibility.
 
 
 [Back to RBLe Framework](RBLe.md)
