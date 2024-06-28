@@ -2,7 +2,7 @@
 
 Builds a string using the template with zero based subsitution tokens (i.e. {0}, {1}, ...) and substitutes them for the supplied parameters.
 
-**The string after substituting all `parameters` into the `template`.**
+**Returns:** The string after substituting all `parameters` into the `template`.
 ## Remarks
 
 The `BTRStringBuilder` method is similar to C#'s `string.Format()` function.  

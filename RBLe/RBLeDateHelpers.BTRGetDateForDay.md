@@ -2,7 +2,7 @@
 
 Given a `startDate` date and day of week, find the next date whose day of the week equals `desiredDay` and `dateType`.
 
-**`startDate` converted to the first day of the month coincident or following.**
+**Returns:** `startDate` converted to the first day of the month coincident or following.
 ## Remarks
 
 1. If `startDate.DayOfWeek` equals `desiredDay` and `dateType` is `Next` or `Previous`, `startDate` is returned.  
