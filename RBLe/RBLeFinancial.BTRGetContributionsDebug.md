@@ -1,7 +1,18 @@
 # BTRGetContributionsDebug Function
 
 Debug version of BTRGetContributions that returns value or exception string (instead of #VALUE on error).  DOC: Han, Cfgena replacement?  Returns 401k contributions/match.
-
+Both 'matchParam' and 'contributionParam' are a | delimited list of periods.  Each period is in the form of `M:P:P:P` where `M` is number of months for this period, and each `P` is a tier of a `,` seperated pair of decimal values.  
+The `matchType` and `contributionType` determine how each tier of numbers are processed.  Each tier's value pairs are described below:  
+1. `CalculationMatchType.MultiplierBasedOnPercent` - ContrbutionPercent, Multiplier  
+1. CalculationMatchType.MultiplierBasedOnDollars` - ContributionDollars, Multiplier  
+1. `CalculationMatchType.ERMatchPercentBasedOnPercent` - EEContributionPercent, ERContributionPercent  
+1. `CalculationMatchType.ERMatchDollarsBasedOnDollars` - ContributionDollars, ERContributionDollars  
+1. `CalculationContributionType.PercentBasedOnAge` - Age, ContributionPercent  
+1. `CalculationContributionType.PercentBasedOnService` - Service, ContributionPercent  
+1. `CalculationContributionType.PercentBasedOnAgePlusService` - AgePlusService, ContributionPercent  
+1. `CalculationContributionType.DollarsBasedOnAge` - Age, ContributionDollars  
+1. `CalculationContributionType.DollarsBasedOnService` - Service, ContributionDollars  
+1. `CalculationContributionType.DollarsBasedOnAgePlusService` - AgePlusService, ContributionDollars
 ## Syntax
 
 ```excel

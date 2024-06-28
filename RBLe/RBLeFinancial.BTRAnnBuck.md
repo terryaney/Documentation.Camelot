@@ -1,7 +1,26 @@
 # BTRAnnBuck Function
 
 A replacement function for the Annbuck.xla!AnnBuck() function.  Returns a decimal value representing the selected life annuity factor.
-
+If you defer a temporary or certain annuity to an age earlier than the individual's current age, the result is calculated only for the remainder of the annuity. For example, a 10-year temporary annuity deferred to age 65 for a 70-year old means that there are only 5 years remaining in the annuity and, thus, the result is equivalent to an immediate 5-year temporary annuity.  
+Non-integer values for `memberAge`, `spouseAge`, `deferredAge`, `temporaryPeriod`, and `guaranteePeriod` can be used.  The factor will then be interpolated.  
+An `ArgumentOutOfRangeException` can be thrown if any of the following conditions occur:  
+1. `intRates` durations contain any negative or decimal numbers or the sum of the durations greater than 120.  
+1. `memberSex` is not 1 or 2.  
+1. `spouseSex` is not 1 or 2.  
+1. `memberAge` is less than 1 or greater than 120.  
+1. `spouseAge` is less than 1 or greater than 120.  
+1. `deferredAge` is less than 0 or greater than 120 or less than `memberAge` (when `deferredAge` > 0).  
+1. `mortalityImprovement` is not 0, 1, 2, 11, 12, 21, 22, 31, 32, 41, 42, 51, or 52.  
+1. `mortalityImprovement` is 1, 11, 21, 31, 41, or 51 and `unisexBlending` is 2 or `memberYearOfBirth` is 0 or `spouseYearOfBirth` is 0.  
+1. `mortalityImprovement` is 21, 22, 51, or 52 and the static year of selected male or female mortality tables are less than 2014.  
+1. `continuingPercentage` is less than 0.  
+1. `paymentTiming` is not 1, 2, or 3.  
+1. `preRetirementMortality` is not 1, 2, 3, 4, 5, or 6.  
+1. `maleUnisexPercentage` is less than 0 or greater than 1.  
+1. `unisexBlending` is not 0, 1, or 2  
+1. `temporaryPeriod` is less than 0 or greater than Min( 120 - Max( `memberAge`, `spouseAge` ), 120 - `deferredAge` ).  
+1. `guaranteePeriod` is greater than `temporaryPeriod` (when `temporaryPeriod` is greater than 0).  
+1. `maleTableAdjustment` or `femaleTableAdjustment` is less than Max( -10, `-age` ) or greater than Min( 10, 120 - `age` ).
 ## Syntax
 
 ```excel

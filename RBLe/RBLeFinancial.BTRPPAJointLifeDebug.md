@@ -1,7 +1,21 @@
 # BTRPPAJointLifeDebug Function
 
 Debug version of BTRPPAJointLife that returns value or exception string (instead of #VALUE on error).  Replacement function for the Cfgena.xla!PPAJointLife() function.  Returns a decimal value equal to the selected joint life annuity factor by the PPA method.
-
+If you defer a temporary or certain annuity to an age earlier than the individual's current age, the result is calculated only for the remainder of the annuity. For example, a 10-year temporary annuity deferred to age 65 for a 70-year old means that there are only 5 years remaining in the annuity and, thus, the result is equivalent to an immediate 5-year temporary annuity.  
+Non-integer values for `memberAge`, `spouseAge`, `deferredAge`, `temporaryPeriod`, and `guaranteePeriod` can be used.  The factor will then be interpolated.  
+An `ArgumentOutOfRangeException` can be thrown if any of the following conditions occur:  
+1. `intRates` durations contain any negative or decimal numbers or the sum of the durations greater than 120.  
+2. `memberAge` is less than 1 or greater than 120.  
+3. `spouseAge` is less than 1 or greater than 120.  
+4. `deferredAge` is less than 0 or greater than 120 or less than `memberAge` (when `deferredAge` > 0).  
+5. `mortalityImprovement` is not 0, 1, 2, 31 or 32.  
+6. `mortalityImprovement` is 1 or 31 and `unisexBlending` is 2 or `memberYearOfBirth` is 0 or `spouseYearOfBirth` is 0.  
+7. `continuingPercentage` is less than 0.  
+8. `maleUnisexPercentage` is less than 0 or greater than 1.  
+9. `unisexBlending` is not 0, 1, or 2  
+10. `temporaryPeriod` is less than 0 or greater than Min( 120 - Max( `memberAge`, `spouseAge` ), 120 - `deferredAge` ).  
+11. `guaranteePeriod` is greater than `temporaryPeriod` (when `temporaryPeriod` is greater than 0).  
+12. `maleTableAdjustment` or `femaleTableAdjustment` is less than Max( -10, `-age` ) or greater than Min( 10, 120 - `age` ).
 ## Syntax
 
 ```excel

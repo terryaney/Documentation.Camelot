@@ -1,7 +1,11 @@
 # BTRNumberFormat Function
 
 Formats a numeric value to a string representation using the specified format and culture-specific format information.
-
+The `BTRNumberFormat` method is similar to Excel's `Format()` function with the exception that `BTRNumberFormat` can dynamically format a number based on `culture` using the same `format` string.  
+  
+*See Also*  
+[Standard Numeric Format Strings](http://msdn.microsoft.com/en-us/library/dwhawy9k(v=vs.110).aspx)  
+[Custom Numeric Format Strings](http://msdn.microsoft.com/en-us/library/0c899ak8(v=vs.110).aspx)
 ## Syntax
 
 ```excel
