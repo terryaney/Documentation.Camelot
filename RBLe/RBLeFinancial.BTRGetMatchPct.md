@@ -29,7 +29,7 @@ Parameter | Type | Description
 `rothFlatPerPayPeriod` | Double | Optional.  Flat $ Roth contribution amount per pay period.
 `afterTaxPercentage` | Double | Optional.  After-tax contribution as a % of pay.
 `afterTaxFlatPerPayPeriod` | Double | Optional.  Flat $ after-tax contribution amount per pay period.
-`startPayPeriod` | Object | Optional.  Starting Pay period.  Defaults to 1.
+`startPayPeriod` | Int32 | Optional.  Starting Pay period.  Defaults to 1.
 `ytdPay` | Double | Optional.  YTD savings pay.
 `ytdPreTax` | Double | Optional.  YTD pre-tax contributions.
 `ytdRoth` | Double | Optional.  YTD Roth contributions.
@@ -40,7 +40,7 @@ Parameter | Type | Description
 `ageBOY` | Double | Optional.  Age at BOY.
 `matchFrequency` | Int32 | Optional.  Frequency of match in a year.
 `limitAfterTax` | Double | Optional.  Aftertax limit.
-`isOverflowToCatchUp` | Object | Optional.  Overflow from preTax to catchup.
+`isOverflowToCatchUp` | Boolean | Optional.  Overflow from preTax to catchup.
 `preTaxCatchUpPercentage` | Double | Optional.  Pre-tax catchup contribution as a % of pay.
 `preTaxCatchUpFlatPerPayPeriod` | Double | Optional.  Flat $ pre-tax catchup contribution amount per pay period.
 `rothCatchUpPercentage` | Double | Optional.  Roth catchup contribution as a % of pay.

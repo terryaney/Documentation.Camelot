@@ -12,8 +12,8 @@ Parameter | Type | Description
 ---|---|---
 `formula` | String | Formula to evaluate with optional {K.id} tokens.
 `table` | Object[,] | Range of cells to search (first row must be column headers).
-`columnToReturn` | Object | Optional. Column name containing return value. Last column is default
-`columnToSearch` | Object | Optional. Column name to search.  First column is default.
-`caseSensitive` | Object | Optional.  Whether or not search is case sensitive. false is the default.
+`columnToReturn` | String | Optional. Column name containing return value. Last column is default
+`columnToSearch` | String | Optional. Column name to search.  First column is default.
+`caseSensitive` | Boolean | Optional.  Whether or not search is case sensitive. false is the default.
 
 [Back to General Utility Helpers](RBLeGeneralUtilityHelpers.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

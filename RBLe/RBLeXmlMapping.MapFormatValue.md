@@ -12,6 +12,6 @@ Parameter | Type | Description
 ---|---|---
 `value` | Object | The value (or model field) to format.
 `format` | String | A valid C# format string in the format of {0:format}.
-`defaultValue` | Object | Value to return to make coding specification formulas easier.
+`defaultValue` | String | Value to return to make coding specification formulas easier.
 
 [Back to Xml Mapping](RBLeXmlMapping.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

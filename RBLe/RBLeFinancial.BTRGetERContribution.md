@@ -20,15 +20,15 @@ Parameter | Type | Description
 `rateOfPayIncrease` | Double | Required.  Pay increase rate.
 `rateOfInflation` | Double | Required.  Inflation rate (used to project limits).
 `rateOfReturn` | Double | Required.  Investment rate of return.
-`startPayPeriod` | Object | Optional.  Starting Pay period.  Defaults to 1.
+`startPayPeriod` | Int32 | Optional.  Starting Pay period.  Defaults to 1.
 `ytdPay` | Double | Optional.  YTD savings pay.
 `ytdErContribution` | Double | Optional.  YTD employer contributions.
 `ageBOY` | Double | Optional.  Age at BOY.
 `svcBOY` | Double | Optional.  Service at BOY.
 `erContributionAnnualLimit` | Double | Optional.  Employer contribution annual limit. Defaults to unlimited.
 `erContributionFrequency` | Int32 | Optional.  Frequency of ER Contribution in a year.
-`midPointContribution` | Object | Optional.  Use mid point contributions timing calculation method.
-`noLimit` | Object | Optional.  Don't apply IRS limit.
+`midPointContribution` | Boolean | Optional.  Use mid point contributions timing calculation method.
+`noLimit` | Boolean | Optional.  Don't apply IRS limit.
 `limitPay` | Double | Optional.  Pay Limit.
 `limitContribution` | Double | Optional.  Contribution limit.
 `isOverflowToNonQual` | Boolean | Optional.  Overflow to non qualified plan.

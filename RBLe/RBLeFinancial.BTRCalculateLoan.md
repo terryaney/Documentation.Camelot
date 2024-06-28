@@ -16,8 +16,8 @@ Parameter | Type | Description
 `interestRate` | Double | Required. Loan interest rate.
 `monthEnd` | Int32 | Required. Calculate contributions as of the end of this month.
 `returnRate` | Double | Required. Investment rate of return.
-`startPayPeriod` | Object | Optional. Starting pay period. Default to 1.
-`midPointCont` | Object | Optional. Use mid point contributions timing calculation method.
+`startPayPeriod` | Int32 | Optional. Starting pay period. Default to 1.
+`midPointCont` | Boolean | Optional. Use mid point contributions timing calculation method.
 `rounding` | Int32 | Optional. Rounding, Defaulted to 0 decimals
 
 [Back to Financial](RBLeFinancial.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

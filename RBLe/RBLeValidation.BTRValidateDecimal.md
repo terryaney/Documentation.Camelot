@@ -13,7 +13,7 @@ Parameter | Type | Description
 `value` | String | A string that contains a date and time to convert.
 `minimum` | Double | A double representing the minimum value allowed if 'value' is a double.
 `maximum` | Double | A double representing the minimum value allowed if 'value' is a double.
-`culture` | Object | An string that supplies culture-specific format information about 'value'.
-`decimalPlaces` | Object | An integer value representing the maximum number of decimal places allowed.
+`culture` | String | A string that supplies culture-specific format information about 'value'.
+`decimalPlaces` | Int32 | An integer value representing the maximum number of decimal places allowed.
 
 [Back to Validation](RBLeValidation.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

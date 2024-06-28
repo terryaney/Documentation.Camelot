@@ -46,7 +46,7 @@ Parameter | Type | Description
 `rothFlatPerPayPeriod` | Double | Optional.  Flat $ Roth contribution amount per pay period.
 `afterTaxPercentage` | Double | Optional.  After-tax contribution as a % of pay.
 `afterTaxFlatPerPayPeriod` | Double | Optional.  Flat $ after-tax contribution amount per pay period.
-`startPayPeriod` | Object | Optional.  Starting Pay period.  Defaults to 1.
+`startPayPeriod` | Int32 | Optional.  Starting Pay period.  Defaults to 1.
 `ytdPay` | Double | Optional.  YTD savings pay.
 `ytdPreTax` | Double | Optional.  YTD pre-tax contributions.
 `ytdRoth` | Double | Optional.  YTD Roth contributions.
@@ -61,7 +61,7 @@ Parameter | Type | Description
 `isRetirementYear` | Boolean | Optional.  DOC: Han, Is this retirement year?
 `matchFrequency` | Int32 | Optional.  Frequency of match in a year.
 `erContributionFrequency` | Int32 | Optional.  Frequency of ER Contribution in a year.
-`preTaxRothPayIsLimited` | Object | Optional.  Employee Pretax/Roth & Catchup Contributions is based on limited pay.
+`preTaxRothPayIsLimited` | Boolean | Optional.  Employee Pretax/Roth & Catchup Contributions is based on limited pay.
 `midPointContribution` | Boolean | Optional.  Use mid point contributions timing calculation method.
 `noLimit` | Boolean | Optional.  Don't apply IRS limit.
 `increaseMonth` | Int32 | Optional.  Pretax auto increase timing (month): Enter 4 if increase happens on 4/1.
@@ -73,11 +73,11 @@ Parameter | Type | Description
 `limitContribution` | Double | Optional.  Contribution limit.
 `isOverflowToNonQual` | Boolean | Optional.  Overflow to non qualified plan.
 `limitAfterTax` | Double | Optional.  Aftertax limit.
-`isOverflowToCatchUp` | Object | Optional.  Overflow from preTax to catchup.
+`isOverflowToCatchUp` | Boolean | Optional.  Overflow from preTax to catchup.
 `preTaxCatchUpPercentage` | Double | Optional.  Pre-tax catchup contribution as a % of pay.
 `preTaxCatchUpFlatPerPayPeriod` | Double | Optional.  Flat $ pre-tax catchup contribution amount per pay period.
 `rothCatchUpPercentage` | Double | Optional.  Roth catchup contribution as a % of pay.
 `rothCatchUpFlatPerPayPeriod` | Double | Optional.  Flat $ Roth catchup contribution amount per pay period.
-`matchPayIsLimited` | Object | Optional.  Employer match is based on limited pay.
+`matchPayIsLimited` | Boolean | Optional.  Employer match is based on limited pay.
 
 [Back to Financial](RBLeFinancial.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)

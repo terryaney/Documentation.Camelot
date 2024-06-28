@@ -19,7 +19,7 @@ Parameter | Type | Description
 `payPeriodWhenPayIncreases` | Int32 | Required.  Pay period when pay increases.
 `rateOfPayIncrease` | Double | Required.  Pay increase rate.
 `rateOfInflation` | Double | Required.  Inflation rate (used to project limits).
-`startPayPeriod` | Object | Required.  Investment rate of return.
+`startPayPeriod` | Int32 | Optional.  Starting pay period.  Defaults to 1.
 `ytdPay` | Double | Optional.  YTD savings pay.
 `ytdErContribution` | Double | Optional.  YTD employer contributions.
 `ageBOY` | Double | Optional.  Age at BOY.

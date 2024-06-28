@@ -11,7 +11,7 @@ A replacement function for the Cfgena.xla!WageBase() function.  Returns a decima
 Parameter | Type | Description
 ---|---|---
 `yearEvent` | Int32 | Year of requested wage base.
-`rateNAW` | Object | NAW increase rate, defaulted to 4.5%.
+`rateNAW` | Double | NAW increase rate, defaulted to 4.5%.
 `lawYear` | Int32 | SS law year, defaulted to current law year.
 `unrounded` | Boolean | Whether or not to apply the $300 rounding.
 
