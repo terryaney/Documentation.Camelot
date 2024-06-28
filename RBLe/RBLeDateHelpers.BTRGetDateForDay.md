@@ -1,6 +1,9 @@
 # BTRGetDateForDay Function
 
 Given a `startDate` date and day of week, find the next date whose day of the week equals `desiredDay` and `dateType`.
+
+## Remarks
+
 If `startDate.DayOfWeek` equals `desiredDay` and `dateType` is `Next` or `Previous`, `startDate` is returned.  
 If `dateType` is `PreviousWeek` or `NextWeek`, the `desiredDay` before the previous Sunday or after the next Sunday, respectively, will be returned.  
 If `dateType` is `Previous` or `Next`, the first occurrence of the `desiredDay` in the appropriate direction will be returned.  

@@ -1,6 +1,9 @@
 # BTRNumberFormat Function
 
 Formats a numeric value to a string representation using the specified format and culture-specific format information.
+
+## Remarks
+
 The `BTRNumberFormat` method is similar to Excel's `Format()` function with the exception that `BTRNumberFormat` can dynamically format a number based on `culture` using the same `format` string.  
   
 *See Also*  

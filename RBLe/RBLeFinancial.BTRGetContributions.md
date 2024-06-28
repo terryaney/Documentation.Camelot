@@ -1,6 +1,9 @@
 # BTRGetContributions Function
 
 DOC: Han, Cfgena replacement?  Returns 401k contributions/match.
+
+## Remarks
+
 Both 'matchParam' and 'contributionParam' are a | delimited list of periods.  Each period is in the form of `M:P:P:P` where `M` is number of months for this period, and each `P` is a tier of a `,` seperated pair of decimal values.  
 The `matchType` and `contributionType` determine how each tier of numbers are processed.  Each tier's value pairs are described below:  
 1. `CalculationMatchType.MultiplierBasedOnPercent` - ContrbutionPercent, Multiplier  

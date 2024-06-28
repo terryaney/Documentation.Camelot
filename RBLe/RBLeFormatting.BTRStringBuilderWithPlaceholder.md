@@ -1,6 +1,9 @@
 # BTRStringBuilderWithPlaceholder Function
 
 Builds a string using the template with zero based subsitution tokens (i.e. {0}, {1}, ...) and substitutes them for the supplied parameters.
+
+## Remarks
+
 The `BTRStringBuilder` method is similar to C#'s `string.Format()` function.  
   
 *See Also*  

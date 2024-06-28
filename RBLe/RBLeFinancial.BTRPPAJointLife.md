@@ -1,6 +1,9 @@
 # BTRPPAJointLife Function
 
 Replacement function for the Cfgena.xla!PPAJointLife() function.  Returns a decimal value equal to the selected joint life annuity factor by the PPA method.
+
+## Remarks
+
 If you defer a temporary or certain annuity to an age earlier than the individual's current age, the result is calculated only for the remainder of the annuity. For example, a 10-year temporary annuity deferred to age 65 for a 70-year old means that there are only 5 years remaining in the annuity and, thus, the result is equivalent to an immediate 5-year temporary annuity.  
 Non-integer values for `memberAge`, `spouseAge`, `deferredAge`, `temporaryPeriod`, and `guaranteePeriod` can be used.  The factor will then be interpolated.  
 An `ArgumentOutOfRangeException` can be thrown if any of the following conditions occur:  
