@@ -108,9 +108,9 @@ June 2005 Pay Credit | Benefit | `{yyyy-mm}` | amt-paycred | `[Benefit:{yyyy-mm2
 
 You can see that the above table has three distinct wildcard indexes in the column headers. When the data is exported, you will be prompted for those three indexes. The prompts will look like:
 
-![![PayHist Index Substitution](Assets/history.substitute.payhist.jpg)  
-![![Benefit Index 1 Substitution](Assets/history.substitute.benefit.1.jpg)  
-![![Benefit  Index 2 Substitution](Assets/history.substitute.benefit.2.jpg)  
+![PayHist Index Substitution](Assets/history.substitute.payhist.jpg)  
+![Benefit Index 1 Substitution](Assets/history.substitute.benefit.1.jpg)  
+![Benefit  Index 2 Substitution](Assets/history.substitute.benefit.2.jpg)  
 
 So using wildcard syntax, you do not need to change column headers every month.
 

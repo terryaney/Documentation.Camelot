@@ -10,9 +10,9 @@ Minimally, they will contain three RBLe Framework tabs:
 
 If the CE is also being used for an administration site, there will be an RBLBenCalc calculation tab as well. You can have as many result tabs as you'd like and you may or may not have some RBLUpdate tabs depending on whether you have a Calculated Data Load specified for an administration site.
 
+- [Creating/Maintaining CalcEngine Guidelines](#creatingmaintaining-calcengine-guidelines) - Discusses the guidelines for creating and maintaining CalcEngines.
 - [RBLe Tabs](#rble-tabs) - Discusses the different RBLe tab types, standard table processing rules, structure, and features available in generating results for RBLe clients.
 - [Calculation Pipelines](#calculation-pipelines) - Discusses how multiple CalcEngines can be 'chained' together feedings the 'results' from one CalcEngine into the 'inputs' of the next CalcEngine in the pipeline before generating the final result.
-- [Creating/Maintaining CalcEngine Guidelines](#creatingmaintaining-calcengine-guidelines) - Discusses the guidelines for creating and maintaining CalcEngines.
 
 [Back to RBLe Framework](RBLe.md)
 
@@ -120,17 +120,36 @@ During each calculation, all inputs and data items are cleared before loading th
 
 ##### Framework Inputs
 
-Every calculation sends back a set of framework inputs that are set programmatically via the `KatAppOptions`, versus an actual input on the page.
+Every calculation sends back a set of framework inputs that are set programmatically via the `KatAppOptions` or server side processing, versus an actual input on a page.
+
+The following inputs are available both from `KatAppOptions` and server side processing:
 
 Input | Description
 ---|---
-iConfigureUI | A value of `1` indicates that this is the first calculation called after the markup has been rendered.  Can be turned off via `IKatAppOptions.runConfigureUICalculation`
-iDataBind | A value of `1` indicates that all `rbl-listcontrol` and `rbl-defaults` should be processed to set default data bound values (note, this happens on the same calculation that sends `iConfigureUI=1`).
-iInputTrigger | The name of the input that triggered the calculation (if any) will be passed.
-iCurrentPage | Describes which page the calculation is being submitted from.  Passed from `IKatAppOptions.currentPage`
-iCurrentUICulture | Specifies which culture should be when generating results.  Passed from `IKatAppOptions.currentUICulture`
-iEnvironment | Specifies the environment in which the RBLe Service is executing.  Passed from `IKatAppOptions.environment` (`PITT.PROD`, `PITT.UAT`, or `WN.PROD`)
+`iConfigureUI` | A value of `1` indicates that this is the first calculation called after the markup has been rendered.  Can be turned off via `IKatAppOptions.runConfigureUICalculation`
+`iDataBind` | A value of `1` indicates that all `rbl-listcontrol` and `rbl-defaults` should be processed to set default data bound values (note, this happens on the same calculation that sends `iConfigureUI=1`).
+`iInputTrigger` | The name of the input that triggered the calculation (if any) will be passed.
+`iCurrentPage` | Describes which page the calculation is being submitted from.  Passed from `IKatAppOptions.currentPage`
+`iCurrentUICulture` | Specifies which culture should be when generating results.  Passed from `IKatAppOptions.currentUICulture`
+`iEnvironment` | Specifies the environment in which the RBLe Service is executing.  Passed from `IKatAppOptions.environment` (`PITT.PROD`, `PITT.UAT`, or `WN.PROD`)
 
+The following are currently only support by Evolution framework and applied via server side processing:
+
+Input | Description
+---|---
+`iMHACalcType` | Calculation type passed during Admin (MHA) site calculations. Matches key column from `MHACalculationTypes` Framework Lookup Table. 
+`iMHAFinalCalculation` | If the user is performing a 'Final Calculation' (enabled by a FinalCalculation section in result), this will be set to `1`. 
+`iMHCalcType` | Calculation type passed during ESS (MH) site calculations. Matches key column from `MHCalculationTypes` Framework Lookup Table. 
+`iMHAUpdateType` | Calculation type passed during Admin (MHA) site batch processes that perform data updates. Matches key column from `MHAUpdateTypes` Framework Lookup Table. 
+`iMHABatchType` | Calculation type passed during Admin (MHA) site batch processes that create calculations and/or adhoc report data (no data updating). Matches key column from `MHABatchTypes` Framework Lookup Table. 
+`iIsTestSE` | If this input is present it will put a `1` if the Test CE is being used. 
+`iIsAdHocConfig` | This value is set to `1` when initial job for an process creating adhoc report data is ran. A single 'empty' job (no data/inputs) is ran so that export/layout configurations can be properly exported. 
+`iAWSAdminAuthID` | If an Admin is running a calculation on a Modeling site, the authentication id (i.e. philip.parker) is passed in to this parameter and you can use it if needed (i.e. to provide 'helper' text/tables or something). 
+`iIsMiniBatch` | This value is set to `1` when a mini batch from RBL Add-In is being run. Helpful in setting default values to use for mini batch because inputs are cleared upon the first calculation ran. 
+`iJobToken` | This is just a guaranteed unique ID that should be outputted on the `variable` table (`job-token`). The RBL Framework uses this to ensure that the results coming back are the proper results for the current participant. 
+`iDebugInputNames-Off` | If this input is present it will just put a `|` delimited list of all the input names passed into the CE. This can be helpful in debugging why some inputs aren't being populated (i.e. case sensitivity problems).
+
+**Note**: You need to remove the `-Off` from the `iDebugInputNames-Off` input to make this work, didn't want it on by default every time due to extra processing/looping required.
 
 ##### Input Naming Guidelines
 

@@ -2313,10 +2313,9 @@ When determining whether a RBLe calculation cached result is available, a 'cache
 1. If no actions (visiting another page and saving data) have modified *any part* of data model (see [RBL Calculation Caching](#rbl-calculation-caching) for more information about when RBLe caches are cleared) the RBLe cache would still be intact and a generated cache key (since the values for `cacheRefreshKeys` have not changed) would find a valid result cache.
 1. There is no need to invalidate RBLe caches since since the underlying data has not changed nor has the calculation configuration, so the same result would be returned.
 
-
 **Handling Query String Refresh Keys**
 
-Regardless of RBLe caching, data cache refresh keys for temporary queries (query strings) *always* have to run so that the data is always available.  This is because the Nexgen framework automatically destroys all `.Query` API results on every page navigation.  If a page has any interactions in it that trigger a calculation (in additional to the first/iConfigureUI calculation) that depend on the temporary queries, the Nexgen framework has to guarantee that the data is always available.  
+Regardless of RBLe caching, data cache refresh keys for temporary queries (query strings) *always* have to run so that the data is always available.  This is because the Nexgen framework automatically destroys all `.Query` API results on every page navigation.  If a page has any interactions in it that trigger a calculation (in additional to the first/`iConfigureUI` calculation) that depend on the temporary queries, the Nexgen framework has to guarantee that the data is always available.  
 
 Consider the following (without re-running the data cache refresh keys for temporary queries, using configuration above):
 
