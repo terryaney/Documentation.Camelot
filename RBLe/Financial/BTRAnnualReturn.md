@@ -19,4 +19,4 @@ Parameter | Type | Default | Description
 `returnByClass` | Double[,] |  | Required.  Array of investment returns by assets classes.
 `fundIndex` | String |  | Optional.  If provided allocation will be changed 100% to that target fund.
 
-[Back to Financial](Readme.md) | [Back to All RBLe Functions](/RBLe/RBLe.md#function-documentation)
+[Back to Financial](Readme.md) | [Back to All RBLe Functions](/RBLe/Readme.md#function-documentation)

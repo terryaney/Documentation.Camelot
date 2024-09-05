@@ -12,4 +12,4 @@ Parameter | Type | Default | Description
 ---|---|---|---
 `parameters` | Object[] |  | The parameters to evaluate falsy conditions.
 
-[Back to Validation](Readme.md) | [Back to All RBLe Functions](/RBLe/RBLe.md#function-documentation)
+[Back to Validation](Readme.md) | [Back to All RBLe Functions](/RBLe/Readme.md#function-documentation)

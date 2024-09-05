@@ -13,4 +13,4 @@ Parameter | Type | Default | Description
 `value` | Object |  | The value to attempt to convert to a number.
 `defaultValue` | Double? |  | Value to return to make coding specification formulas easier.
 
-[Back to Xml Mapping](Readme.md) | [Back to All RBLe Functions](/RBLe/RBLe.md#function-documentation)
+[Back to Xml Mapping](Readme.md) | [Back to All RBLe Functions](/RBLe/Readme.md#function-documentation)

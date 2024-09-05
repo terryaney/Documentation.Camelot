@@ -13,4 +13,4 @@ Parameter | Type | Default | Description
 `value` | String |  | The input provided by user to search for a match.
 `pattern` | String |  | The regular expression pattern to match.
 
-[Back to Validation](Readme.md) | [Back to All RBLe Functions](/RBLe/RBLe.md#function-documentation)
+[Back to Validation](Readme.md) | [Back to All RBLe Functions](/RBLe/Readme.md#function-documentation)

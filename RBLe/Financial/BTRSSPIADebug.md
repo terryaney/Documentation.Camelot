@@ -27,4 +27,4 @@ Parameter | Type | Default | Description
 `postNRDIncrease` | Boolean? | `true` | Include post NRD Increase?
 `yearCOLAStops` | Int32? | `0` | Year COLA Stops
 
-[Back to Financial](Readme.md) | [Back to All RBLe Functions](/RBLe/RBLe.md#function-documentation)
+[Back to Financial](Readme.md) | [Back to All RBLe Functions](/RBLe/Readme.md#function-documentation)

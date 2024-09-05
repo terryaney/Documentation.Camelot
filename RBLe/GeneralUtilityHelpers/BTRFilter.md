@@ -15,4 +15,4 @@ Parameter | Type | Default | Description
 `includeHeadersInResults` | Boolean? | `true` | Optional.  Whether or not to include column headers in result table. Default is true.
 `expressions` | Object[] |  | Paired expressions.  First item is column name to search, second item is value to filter.
 
-[Back to General Utility Helpers](Readme.md) | [Back to All RBLe Functions](/RBLe/RBLe.md#function-documentation)
+[Back to General Utility Helpers](Readme.md) | [Back to All RBLe Functions](/RBLe/Readme.md#function-documentation)

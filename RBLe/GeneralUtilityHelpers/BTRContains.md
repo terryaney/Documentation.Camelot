@@ -14,4 +14,4 @@ Parameter | Type | Default | Description
 `find` | String |  | The text to search for.
 `caseInsensitive` | Boolean? | `true` | Optional.  Whether or not the search is case insensitive or not.  True is the default.
 
-[Back to General Utility Helpers](Readme.md) | [Back to All RBLe Functions](/RBLe/RBLe.md#function-documentation)
+[Back to General Utility Helpers](Readme.md) | [Back to All RBLe Functions](/RBLe/Readme.md#function-documentation)

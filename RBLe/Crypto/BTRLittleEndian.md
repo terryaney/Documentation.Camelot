@@ -12,4 +12,4 @@ Parameter | Type | Default | Description
 ---|---|---|---
 `hexValue` | String |  | The value to compute.
 
-[Back to Crypto](Readme.md) | [Back to All RBLe Functions](/RBLe/RBLe.md#function-documentation)
+[Back to Crypto](Readme.md) | [Back to All RBLe Functions](/RBLe/Readme.md#function-documentation)
