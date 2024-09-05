@@ -24,4 +24,4 @@ Function | Description
 [`BTRValidateRoutingNumber`](BTRValidateRoutingNumber.md) | Returns whether the provided input is a valid US banking routing number.
 
 
-[Back to RBLe Framework](/RBLe/RBLe.md)
+[Back to RBLe Framework](/RBLe/Readme.md)
