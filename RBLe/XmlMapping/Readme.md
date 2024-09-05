@@ -11,4 +11,4 @@ Function | Description
 [`MapValue`](XmlMapping\MapValue.md) | Returns 'fieldName' (element or attribute) value from provided Xml datasource.  Placeholder returning defaultValue in Excel.
 
 
-[Back to RBLe Framework](RBLe.md)
+[Back to RBLe Framework](/RBLe/RBLe.md)

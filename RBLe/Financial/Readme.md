@@ -52,4 +52,4 @@ Function | Description
 [`BTRXIRR`](Financial\BTRXIRR.md) | Returns the internal rate of return for a schedule of cash flows that is not necessarily periodic.
 
 
-[Back to RBLe Framework](RBLe.md)
+[Back to RBLe Framework](/RBLe/RBLe.md)

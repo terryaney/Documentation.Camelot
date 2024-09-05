@@ -8,4 +8,4 @@ Function | Description
 [`BTRGetMacroVariable`](RBLeMacro\BTRGetMacroVariable.md) | Returns variable value set during macro processing.  If not during macro processing, this returns null.
 
 
-[Back to RBLe Framework](RBLe.md)
+[Back to RBLe Framework](/RBLe/RBLe.md)
