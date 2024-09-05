@@ -57,4 +57,4 @@ Parameter | Type | Default | Description
 `maleSizeAdjustment` | Double? | `1` | A multiplier to adjust the male mortality rates (qx). Entering 0 or leaving it blank will multiply the rates by 1 (unchanged). Any other figure will serve as a multiplier. This action is done prior to applying unisex or generational improvements on the mortality table.
 `femaleSizeAdjustment` | Double? | `1` | A multiplier to adjust the female mortality rates (qx). Entering 0 or leaving it blank will multiply the rates by 1 (unchanged). Any other figure will serve as a multiplier. This action is done prior to applying unisex or generational improvements on the mortality table.
 
-[Back to Financial](RBLeFinancial.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)
+[Back to Financial](Readme.md) | [Back to All RBLe Functions](..\RBLe.md#function-documentation)

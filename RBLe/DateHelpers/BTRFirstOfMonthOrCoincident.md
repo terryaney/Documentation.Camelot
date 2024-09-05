@@ -12,4 +12,4 @@ Parameter | Type | Default | Description
 ---|---|---|---
 `target` | DateTime |  | The target date.
 
-[Back to Date Helpers](RBLeDateHelpers.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)
+[Back to Date Helpers](Readme.md) | [Back to All RBLe Functions](..\RBLe.md#function-documentation)

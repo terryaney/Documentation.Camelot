@@ -17,4 +17,4 @@ Parameter | Type | Default | Description
 `inputAllocations` | Double[]? |  | Optional.  Entered fund allocations (this will override current or future allocations).
 `fundIndex` | String? |  | Optional.  If provided allocation will be changed 100% to that target fund.
 
-[Back to Financial](RBLeFinancial.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)
+[Back to Financial](Readme.md) | [Back to All RBLe Functions](..\RBLe.md#function-documentation)

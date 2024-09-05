@@ -15,4 +15,4 @@ Parameter | Type | Default | Description
 `lawYear` | Int32? | `0` | SS law year, defaulted to current law year.
 `unrounded` | Boolean? | `False` | Whether or not to apply the $300 rounding.
 
-[Back to Financial](RBLeFinancial.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)
+[Back to Financial](Readme.md) | [Back to All RBLe Functions](..\RBLe.md#function-documentation)

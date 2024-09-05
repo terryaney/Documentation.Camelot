@@ -15,4 +15,4 @@ Parameter | Type | Default | Description
 `paymentAmounts` | Double[] |  | Required. The payment amounts made each period. Typically, each amount includes principal and interest but no other fees or taxes. For example, a monthly payment on a $10,000, four-year car loan at 12 percent is $263.33. You would enter -263.33 into the formula as one of the amounts.
 `paymentTiming` | Int32? | `0` | Optional. The number 0 (at the end of the period) or 1 (at the beginning of the period) and indicates when payments are due.  The default is 0.
 
-[Back to Financial](RBLeFinancial.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)
+[Back to Financial](Readme.md) | [Back to All RBLe Functions](..\RBLe.md#function-documentation)

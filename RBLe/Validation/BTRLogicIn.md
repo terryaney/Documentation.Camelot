@@ -15,4 +15,4 @@ Parameter | Type | Default | Description
 `caseSensitive` | Boolean? | `false` | Whether or not a case sensitive search is performed. Default is false.
 `delimitter` | Char? | `null` | An optional delimitter character to split items in 'table' before performing the compare.  Default is null.
 
-[Back to Validation](RBLeValidation.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)
+[Back to Validation](Readme.md) | [Back to All RBLe Functions](..\RBLe.md#function-documentation)

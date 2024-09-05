@@ -18,4 +18,4 @@ Parameter | Type | Default | Description
 `caseSensitive` | Boolean? | `false` | Optional.  Whether or not search is case sensitive. false is the default.
 `separator` | String? | `", "` | Optional. The string to use as a separator.  The separator is included in the return string only if values has more than one element. ', ' is the default.
 
-[Back to General Utility Helpers](RBLeGeneralUtilityHelpers.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)
+[Back to General Utility Helpers](Readme.md) | [Back to All RBLe Functions](..\RBLe.md#function-documentation)

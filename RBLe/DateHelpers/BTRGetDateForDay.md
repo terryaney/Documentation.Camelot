@@ -22,4 +22,4 @@ Parameter | Type | Default | Description
 `desiredDay` | String |  | Monday, Tuesday, ..., Friday representing which day you want.
 `dateType` | String |  | Date increment type.  `PreviousWeek`, `NextWeek`, `PreviousDay`, `NextDay`.
 
-[Back to Date Helpers](RBLeDateHelpers.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)
+[Back to Date Helpers](Readme.md) | [Back to All RBLe Functions](..\RBLe.md#function-documentation)

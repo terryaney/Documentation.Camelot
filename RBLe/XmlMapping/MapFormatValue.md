@@ -14,4 +14,4 @@ Parameter | Type | Default | Description
 `format` | String |  | A valid C# format string in the format of {0:format}.
 `defaultValue` | String? | `"[MapFormatValue(`value`, "`format`")]"` | Value to return to make coding specification formulas easier.
 
-[Back to Xml Mapping](RBLeXmlMapping.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)
+[Back to Xml Mapping](Readme.md) | [Back to All RBLe Functions](..\RBLe.md#function-documentation)

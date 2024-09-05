@@ -15,4 +15,4 @@ Parameter | Type | Default | Description
 `valueColumn` | Int32? | `table.Columns.Length` | The column (1..table columns) number containing the value to compare to ensure not falsy.  Default is the last column of 'table' parameter.
 `caseSensitive` | Boolean? | `false` | Whether or not a case sensitive search is performed. Default is false.
 
-[Back to Validation](RBLeValidation.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)
+[Back to Validation](Readme.md) | [Back to All RBLe Functions](..\RBLe.md#function-documentation)

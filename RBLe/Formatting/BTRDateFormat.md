@@ -38,4 +38,4 @@ culture = "fr-FR";
 // dateValue would have "09/05/1973" for a value.
 dateValue = BTRDateFormat( value, "d", culture );
 ```
-[Back to Formatting](RBLeFormatting.md) | [Back to All RBLe Functions](RBLe.md#function-documentation)
+[Back to Formatting](Readme.md) | [Back to All RBLe Functions](..\RBLe.md#function-documentation)
