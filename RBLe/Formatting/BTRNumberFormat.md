@@ -38,4 +38,4 @@ culture = "fr-FR";
 // currencyValue would have "10,50 €" for a value.
 currencyValue = BTRNumberFormat( value, "c", culture );
 ```
-[Back to Formatting](Readme.md) | [Back to All RBLe Functions](..\RBLe.md#function-documentation)
+[Back to Formatting](Readme.md) | [Back to All RBLe Functions](/RBLe/RBLe.md#function-documentation)

@@ -15,4 +15,4 @@ Parameter | Type | Default | Description
 `culture` | String? | `"en-US"` | Optional. The culture name to lookup.  If not provided, en-US is the default.
 `keyName` | String? | `key` | Optional. The name of the key column.  If not provided, 'key' is the default.
 
-[Back to Formatting](Readme.md) | [Back to All RBLe Functions](..\RBLe.md#function-documentation)
+[Back to Formatting](Readme.md) | [Back to All RBLe Functions](/RBLe/RBLe.md#function-documentation)

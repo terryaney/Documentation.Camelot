@@ -16,4 +16,4 @@ Parameter | Type | Default | Description
 `culture` | String? | `"en-US"` | A string that supplies culture-specific format information about `value`.
 `allowedFormats` | String? |  | A `\|` delimitted string that supplies a list of allowable formats to attempt to parse `value`.
 
-[Back to Validation](Readme.md) | [Back to All RBLe Functions](..\RBLe.md#function-documentation)
+[Back to Validation](Readme.md) | [Back to All RBLe Functions](/RBLe/RBLe.md#function-documentation)

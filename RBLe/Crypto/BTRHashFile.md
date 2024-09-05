@@ -13,4 +13,4 @@ Parameter | Type | Default | Description
 `fileName` | String |  | The file name to hash.
 `hashType` | String? | `"Sha256"` | Optional.  The hash implementation to use (i.e. Sha256).
 
-[Back to Crypto](Readme.md) | [Back to All RBLe Functions](..\RBLe.md#function-documentation)
+[Back to Crypto](Readme.md) | [Back to All RBLe Functions](/RBLe/RBLe.md#function-documentation)

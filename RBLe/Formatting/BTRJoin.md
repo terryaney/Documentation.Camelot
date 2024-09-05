@@ -13,4 +13,4 @@ Parameter | Type | Default | Description
 ---|---|---|---
 `argsAndSeparator` | Object[] |  | The string values to join with last parameter being the separator.
 
-[Back to Formatting](Readme.md) | [Back to All RBLe Functions](..\RBLe.md#function-documentation)
+[Back to Formatting](Readme.md) | [Back to All RBLe Functions](/RBLe/RBLe.md#function-documentation)

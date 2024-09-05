@@ -16,4 +16,4 @@ Parameter | Type | Default | Description
 `columnToSearch` | String? |  | Optional. Column name to search.  First column is default.
 `caseSensitive` | Boolean? | `false` | Optional.  Whether or not search is case sensitive. false is the default.
 
-[Back to General Utility Helpers](Readme.md) | [Back to All RBLe Functions](..\RBLe.md#function-documentation)
+[Back to General Utility Helpers](Readme.md) | [Back to All RBLe Functions](/RBLe/RBLe.md#function-documentation)

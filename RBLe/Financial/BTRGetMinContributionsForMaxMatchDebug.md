@@ -15,4 +15,4 @@ Parameter | Type | Default | Description
 `payPeriod` | Int32? | `1` | Optional.  Number of Pay period in a year.  Default is 1.
 `currPayPeriod` | Int32? | `1` | Optional.  Current Pay Period.  Default is 1.
 
-[Back to Financial](Readme.md) | [Back to All RBLe Functions](..\RBLe.md#function-documentation)
+[Back to Financial](Readme.md) | [Back to All RBLe Functions](/RBLe/RBLe.md#function-documentation)

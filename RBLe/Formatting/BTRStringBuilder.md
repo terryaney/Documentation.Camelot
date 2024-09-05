@@ -23,4 +23,4 @@ Parameter | Type | Default | Description
 `template` | String |  | The string template to use in the builder with zero based subsitution tokens (i.e. `{0}`, `{1}`, ...).
 `parameters` | Object[] |  | The parameters to substitute into the string template.
 
-[Back to Formatting](Readme.md) | [Back to All RBLe Functions](..\RBLe.md#function-documentation)
+[Back to Formatting](Readme.md) | [Back to All RBLe Functions](/RBLe/RBLe.md#function-documentation)

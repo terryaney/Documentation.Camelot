@@ -15,4 +15,4 @@ Parameter | Type | Default | Description
 ---|---|---|---
 `value` | String |  | The routing number input provided by user to validate.
 
-[Back to Validation](Readme.md) | [Back to All RBLe Functions](..\RBLe.md#function-documentation)
+[Back to Validation](Readme.md) | [Back to All RBLe Functions](/RBLe/RBLe.md#function-documentation)

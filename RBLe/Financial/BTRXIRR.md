@@ -16,4 +16,4 @@ Parameter | Type | Default | Description
 `maxRate` | Double? | `5.0` | Optional. The default is 5.0.
 `truncateTime` | Boolean? | `true` | Optional. The default is true.
 
-[Back to Financial](Readme.md) | [Back to All RBLe Functions](..\RBLe.md#function-documentation)
+[Back to Financial](Readme.md) | [Back to All RBLe Functions](/RBLe/RBLe.md#function-documentation)

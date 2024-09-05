@@ -31,4 +31,4 @@ Parameter | Type | Default | Description
 `impEffYr` | Int32? | `-1` | The year of calculation if 'mortImp' is 1 or 2. The year entered in this argument will determine the effective year of the projected mortality table.
 `yob` | Int32? | `0` | The year of birth for the member if dynamic generational is enabled 'mortImp' is 1.
 
-[Back to Financial](Readme.md) | [Back to All RBLe Functions](..\RBLe.md#function-documentation)
+[Back to Financial](Readme.md) | [Back to All RBLe Functions](/RBLe/RBLe.md#function-documentation)
