@@ -4730,4 +4730,4 @@ Are these still valid?
 1. Document custom 'view model' and how it is passed in...sample with doc center 'showDownload'
 1. Original Docs: See [calculate With Different CalcEngine](#calculate-With-Different-CalcEngine) for information about running secondary calculations via javascript and without requiring configuration up front.
 1. Section about how 'modals work' and different ways to call them and work with them (see cheatsheet)
-1. Section discussing the 'automatic' flows; a) when I load kaml views and b) after calculations (i.e. help tips (and .ka-ht-js class) and anything else automagic)
+1. Section discussing the 'automatic' flows; a) when I load kaml views and b) after calculations (i.e. help tips (and .ka-ht-js class that allows a button in helptips to run its own js instead of simply dismissing tip...need to call HelpTips.hideVisiblePopover() manually) and anything else automagic)
