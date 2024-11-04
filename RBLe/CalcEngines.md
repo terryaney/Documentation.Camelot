@@ -745,10 +745,10 @@ Column | Description
 1. When setting up the RBLeMacro table, developers can skip one row for whitespace. **Skipping two rows ends macro.** 
 1. Developers can add comments for each macro instruction row in the optional Comment column or by any text entry in the Action column starting with //. Any row with action text starting with // are ignored. 
 1. Developers can suffix any action name with #stop to stop processing after the macro row has finished executing (helpful during debugging). 
-1. When using variables (either with the SetVariable action or =BTRGetMacroVariable(name) function), BTR recommends creating a 'variable name table' that is just a list of string names and reference those strings in any macro instructions to avoid typo problems and enable usage auditing. 
+1. When using variables (either with the SetVariable action or =BTRGetMacroVariable(name) function), KAT recommends creating a 'variable name table' that is just a list of string names and reference those strings in any macro instructions to avoid typo problems and enable usage auditing. 
 1. All destination values should use [BTRCellAddress](RBLeRBLeMacro.BTRCellAddress.md) to create a 'reference' to a cell. This also helps so that things don't break when cells moved (if they just typed in a string literal representing the address).<br/><br/>NOTE: Because of the way server side calculations work `BTRCellAddress` doesn't behave exactly as expected. It is ran 'outside' of normal Excel 'calculation' restrictions meaning it will **always** calculate its address no matter what the Calculation mode is set to. For example, `=BTRCellAddress("A"+Sheet!A1)` if you set `A1=1`, then turn off Calculation, then set `A1=2`, when debugging locally within Excel, it obeys the Calculation mode and still returns `A1`, however, the server side calculation has to always calculate this and will return `A2`. So, be aware of this behavior when coding up macros.<br/><br/>
 1. `BTRCellAddress` is used to specify a range reference in a worksheet. Needed to allow macro processing to parse cell addresses. Aids developers in two ways. The rowOffset, colOffset, additionalRows, and additionalColumns parameters are all optional.<br/><br/>Explicit strings used as an address do not update when the range is moved.<br/><br/>The optional 'offset' and 'additional' parameters make it easier to dynamically specify a range when needed.<br/><br/>
-1. For the RunFunction action, the Value column should be set via `=BTRCellAddress(fn)` where fn is the cell containing the FunctionStart action. BTR recommends to create a worksheet scoped named range and use that, i.e. `=BTRCellAddress(RBLeMacro!functionName)`. 
+1. For the RunFunction action, the Value column should be set via `=BTRCellAddress(fn)` where fn is the cell containing the FunctionStart action. KAT recommends to create a worksheet scoped named range and use that, i.e. `=BTRCellAddress(RBLeMacro!functionName)`. 
 1. `Delete`, `CopyValue`, `CopyAddress`, `CopyToArray`, `SetParam`, and `SetVariable` are the only Actions that use Destination column. 
 1. The best practice for the BlockRepeat action is to put the iterator/conditional value into the Destination column. Macro instruction processing will not use it, but makes it very obvious where the condition cell for block is. 
 1. The default value for `BlockStart` and `BlockBreak` actions is `TRUE` meaning you can leave value blank. Developers only need to provide a `Value` column value if you need to conditionally control whether or not you skip or break/stop the block respectively. Note, developers cannot set `BlockRepeat` to `TRUE` or `=TRUE` because of infinite loop potential.
@@ -759,21 +759,35 @@ Column | Description
 
 All values specified in the Value and Destination columns representing a Range should use `BTRCellAddress` to create a 'reference' to a cell.
 
+Actions used most commonly used in RBLe Macros by CalcEngine developers to manipulate CalcEngine data in ways that are difficult to accomplish using standard Excel functions.
+
 Action | Description
 ---|---
-`CopyValue` | Copies a value into the desired range.<br/><br/>`Value`: The value to copy. The value can be an explicit value (string, number, or date) or cell reference (grabbing value from cell).<br/><br/>`Destination`: The destination Range to copy to.
-`CopyAddress` | Copies source range into target range.<br/><br/>`Value`: The source Range to copy.<br/><br/>`Destination`: The destination Range to copy to.
-`Delete` | Clears the contents of the target range.<br/><br/>`Destination`: The destination Range to clear.
-`Calculation` | Turns on or off CE calculation for the workbook.<br/><br/>`Value`: `TRUE` or `FALSE` to turn on or off calculation.
+`ApplyDataUpdates` | Aids CalcEngine calculations from needing round trip calculation after applying `data-updates`, re-registering data, and submitting a new calculation.  This does it all on the server side **as if** data-updates had been applied already so that the Calculation can return result tables from 'newly apply updates'.
 `Calculate` | Forces CE to immediate calculate all its values (used when `Calculation` has been set to `FALSE`).
-`SetParam` | Sets a parameter value for the upcoming Execute action. The number and names of the parameters are determined by the function performed in the Execute action.<br/><br/>`Value`: The parameter value to use. The value can be an explicit value (string, number, or date), cell reference (grabbing value from cell), or range reference identified via the BTRGetCellAddress.<br/><br/>`Destination`: String value representing the name of the parameter.
+`Calculation` | Turns on or off CE calculation for the workbook.<br/><br/>`Value`: `TRUE` or `FALSE` to turn on or off calculation.
+`CopyAddress` | Copies source range into target range.<br/><br/>`Value`: The source `Range` to copy.<br/><br/>`Destination`: The destination Range to copy to.
+`CopyRange` | Copies source range *formulas* into target range.<br/><br/>`Value`: The source `Range` of formulas to copy.<br/><br/>`Destination`: The destination Range to copy to.
+`CopyToArray` | Copies source range into an array variable for later use.<br/><br/>`Value`: The source Range to copy.<br/><br/>`Destination`: String value representing the name of the array variable.<br/><br/>**Note**: Currently used in conjunction with `RankStochastic` and `SumStochastic` [execution functions](#rble-macro-execute-action-functions).
+`CopyValue` | Copies a value into the desired range.<br/><br/>`Value`: The value to copy. The value can be an explicit value (string, number, or date) or cell reference (grabbing value from cell).<br/><br/>`Destination`: The destination Range to copy to.
+`CreateDataUpdates` | Aids CalcEngine calculations that create `data-updates`.<br/><br/>Given the format of this table (each row is an instruction for a single field - Profile or HistoryItem), this table can get unwieldly - even if you have just a couple history rows.<br/><br/>This action allows you to work with an RBLUpdate tab (whose layout is much easier to work with) and it will convert the RBLUpdate tab into data-updates for you.  To call this macro, you pass the name of the RBLUpdate tab in the Value column and use BTRCellAddress to specify the header location of the desired data-updates to populate in the Destination column.<br/><br/>For this macro to work, the table must have the following columns (in the correct order): `field`, `type`, `index`, `value`, `delete`, `on`.  And when you call CreateDataUpdates it will delete whatever is currently in the table before converting the instructions.
+`Delete` | Clears the contents of the target range.<br/><br/>`Destination`: The destination Range to clear.
 `Execute` | Executes a custom helper function implemented in C# using any parameters previously set via the SetParam action. The available functions will be listed in the Execute Action Functions.<br/><br/>`Value`: The name of the function to execute.<br/><br/>See [RBLe Macro Execute Action Functions](#rble-macro-execute-action-functions) for more information.
+`Evaluate` | Evaluates a string formula (i.e. `=1+2`) and returns the result.  This is helpful when the CalcEngine's calculation mode has been set to manual but a formula needs to be re-evaluated after massaging data/cells.  Destination can be a cell address or can set Macro variable value by using the `variable:` prefix (i.e. `variable:myVar`).<br/><br/>**Note:** If CalcEngine is in manual calculation mode, every formula that uses `BTRCellAddress` or `BTRGetMacroVariable` functions will automatically use the `Evaluate` functionality instead of reading 'current value' of cell.
+`EvaluateFormula` | This is same concept as `Evaluate` action but it simply takes the text of the `Value` column and preprends an `=` then evaluates it.  This is helpful if a formula to run is configured in an external source instead of the CalcEngine itself and loaded into an input tab as data/input.
+`FillDown` | Executes a 'FillDown' on target range.  `Value` is number of rows to fill down and `Destination` is the range to fill down.<br/><br/>Note: When this is called, all consecutive rows in the destination range are first cleared.
+`SetParam` | Sets a parameter value for the upcoming Execute action. The number and names of the parameters are determined by the function performed in the Execute action.<br/><br/>`Value`: The parameter value to use. The value can be an explicit value (string, number, or date), cell reference (grabbing value from cell), or range reference identified via the BTRGetCellAddress.<br/><br/>`Destination`: String value representing the name of the parameter.
 `SetVariable` | Copies value into variable for later use.<br/><br/>`Value`: The value to store. The value can be an explicit value (string, number, or date) or cell reference (grabbing value from cell).<br/><br/>`Destination`: String value representing the name of the variable.<br/><br/>**Note**: Useful if the developer has turned off calculation, but needs to keep track of some counters, accumulators during macro processing that contains `BlockRepeat` actions and other block constructs.
-`CopyToArray` | Copies source range into an array variable for later use.<br/><br/>`Value`: The source Range to copy.<br/><br/>`Destination`: String value representing the name of the array variable.<br/><br/>**Note**: Currently used in conjunction with `RankStochastic` and `SumStochastic` execution functions.
+`TransposeAddress` | Copies transposed source range values into target range.<br/><br/>`Value`: The source `Range` to copy.<br/><br/>`Destination`: The destination Range to copy transposed values to.
+
+Actions used primarily in debugging scenarios
+
+Action | Description
+---|---
 `Stop` | Immediately stops processing of the RBLe Macro instructions.<br/><br/>`Value`: Optional. TRUE or FALSE. Default is TRUE.<br/><br/>**Note**: Suffixing any action name with #stop has the same affect.
+`SetTimeout` | By default, RBLe Macro limits the total execution time to 1 minute before throwing an exception.<br/><br/>`Value`: Number of minutes to allow macro to process before throwing exception.<br/><br/>**Note**: Currently this action is only supported during debugging for developers when testing in Excel. The action is ignored when actual calculation is running on KAT servers.
+`SetIterations` | By default, RBLe Macro limits the total number of BlockRepeat actions executed to 2000 (across entire macro, not just within one block).<br/><br/>`Value`: Number of iterations to allow before throwing exception.<br/><br/>**Note**: Use this action with extreme caution. Setting it too high could result in your calculation locking up KAT server resources if the macro does not end properly (currently, the max iterations allowed is 5000).
 `TraceMacro` | Turns on tracing of macro instructions for debugging purposes. The trace can then be viewed in the browser's console window or Excel's add-in log window.<br/><br/>`Value`: TRUE or FALSE to turn on or off tracing.
-`SetTimeout` | By default, RBLe Macro limits the total execution time to 1 minute before throwing an exception.<br/><br/>`Value`: Number of minutes to allow macro to process before throwing exception.<br/><br/>**Note**: Currently this action is only supported during debugging for developers when testing in Excel. The action is ignored when actual calculation is running on BTR servers.
-`SetIterations` | By default, RBLe Macro limits the total number of BlockRepeat actions executed to 2000 (across entire macro, not just within one block).<br/><br/>`Value`: Number of iterations to allow before throwing exception.<br/><br/>**Note**: Use this action with extreme caution. Setting it too high could result in your calculation locking up BTR server resources if the macro does not end properly (i.e. if the developer introduced an infinite loop).
 
 ### RBLe Macro Block Constructs
 
@@ -783,10 +797,10 @@ Action | Description
 `BlockEnd` | Indicates the end of a block of instructions. Blocks can be nested.
 `BlockBreak` | Stops the execution of the currently running block.<br/><br/>`Value`: Optional. `TRUE` or `FALSE` specifying whether to stop current block. Default is `TRUE`.
 `BlockRepeat` | Indicates the end of a block of instructions grouped together allowing for the opportunity for the instructions to be repeated. It must be paired with a BlockStart action.<br/><br/>`Value`: TRUE or FALSE specifying whether the current block of instructions should be processed again.<br/><br/>`Destination`: Not used, but recommended to hold the iterator/counting variable for better readability.
-`FunctionStart` | Similar to `BlockStart`, this indicates the start of a block of instructions grouped together and must be paired with a `FuncitonEnd` action. The difference is that this block of instructions will only be executed if called via the `RunFunction` action whereas `BlockStart` and `BlockEnd` instructions are processed as soon as they are encountered.<br/><br/>BTR recommends placing all `FunctionStart` and `FunctionEnd` blocks at the bottom of the list of all macro instructions instead of intermixed with the actions that will actually be executing in the top down fashion.
+`FunctionStart` | Similar to `BlockStart`, this indicates the start of a block of instructions grouped together and must be paired with a `FuncitonEnd` action. The difference is that this block of instructions will only be executed if called via the `RunFunction` action whereas `BlockStart` and `BlockEnd` instructions are processed as soon as they are encountered.<br/><br/>KAT recommends placing all `FunctionStart` and `FunctionEnd` blocks at the bottom of the list of all macro instructions instead of intermixed with the actions that will actually be executing in the top down fashion.
 `FunctionEnd` | Indicates the end of a function. Unlike BlockStart and BlockEnd, functions cannot be nested.
 `FunctionBreak` | Stops the execution of the currently running function.<br/><br/>`Value`: Optional. `TRUE` or `FALSE` specifying whether to stop current function. Default is `TRUE`.
-`RunFunction` | Runs the macro instructions created with the FunctionStart and FunctionEnd constructs.<br/><br/>`Value`: The cell reference defined via BTRGetCellAddress pointing to the Action column of the FunctionStart instruction that you want to run.
+`RunFunction` | Runs the macro instructions created with the FunctionStart and FunctionEnd constructs.<br/><br/>`Value`: The cell reference defined via BTRGetCellAddress pointing to the Action column of the FunctionStart instruction that you want to run (KAT recommends to create a worksheet scoped named range).
 
 ### RBLe Macro Execute Action Functions
 
@@ -796,13 +810,34 @@ Using the Execute action, you can provide one of the following function names in
 
 Function | Description
 ---|---
-`EmployeeProjections` | TODO: Phil/Han/SB to provide documentation. This was a 'port' of VBA projection we had.
-`StochasticProjection`<br/>`DeterministicProjection` | TODO: Han to provide documentation.
-`SortRange` | Similar to Excel's [Range.Sort](https://msdn.microsoft.com/en-us/library/office/ff840646.aspx?f=255&MSPPError=-2147217396), sorts the range based on options passed in. All parameters of type Range must be defined via `BTRCellAddress`.
 `ContributionSolver` | TODO: Han to provide documentation.
+`EmployeeProjections` | TODO: Phil/Han/SB to provide documentation. This was a 'port' of VBA projection we had.
 `GetClassAllocations` | TODO: Han to provide documentation.
 `GoalSeek` | TODO: Han to provide documentation.
 `MapFundToAssetClass` | TODO: Han to provide documentation.
+`RankStochastic` | TODO: Han to provide documentation.
+`SortRange` | Similar to Excel's [Range.Sort](https://msdn.microsoft.com/en-us/library/office/ff840646.aspx?f=255&MSPPError=-2147217396), sorts the range based on options passed in. All parameters of type `Range` must be defined via `BTRCellAddress`.
+`StochasticProjection`<br/>`DeterministicProjection` | TODO: Han to provide documentation.
+`SumStochastic` | TODO: Han to provide documentation.
+`SendEmail` | Ability to trigger sending a notification email during macro processing.
+`SendText` | Ability to trigger sending a notification email during macro processing.
+`SeveranceCalc` | TODO: Han to provide documentation.
+`SUICalc` | TODO: Han to provide documentation.
+`SUICalcExtended` | TODO: Han to provide documentation.
+`ZelisApi` | TODO: Tom to provide documentation.
+
+#### ContributionSolver
+
+TODO: Han to provide documentation
+
+All parameters are case sensitive and must be set with the SetParam action. All parameters of type `Range` must be defined via `BTRCellAddress`.
+
+Parameter | Type | Description
+---|---|---
+`goal` | `decimal` | Specifies the desired goal from the calculated result of the formula in the cell represented by valueCell. 
+`valueCell` | `Range` | The cell to test the goal against. 
+`changingCell` | `Range` | The cell to change during testing. 
+`maxContribution` | `decimal` | TODO: Han to provide.
 
 #### EmployeeProjections
 
@@ -834,9 +869,83 @@ Name | Description
 `sheetName!ProjectionAge1DOR` | TODO: Han to provide documentation on meaning. 
 `sheetName!tWorkResults` | TODO: Han to provide documentation on meaning.
 
+#### GetClassAllocations
+
+TODO: Han to provide documentation
+
+All parameters are case sensitive and must be set with the SetParam action. All parameters of type `Range` must be defined via `BTRCellAddress`.
+
+Parameter | Type | Description
+---|---|---
+`changingCell` | `Range` | The cell to change during testing. 
+`tableName` | `string` | TODO: Han to provide. 
+`year` | `int` | TODO: Han to provide. 
+`planType` | `int` | TODO: Han to provide.  Value must be able to convert to `FundPlanType { EmployeeContributed = 0, EmployerContributed = 1, Loan = 2 }`
+`fundAllocations` | `Range` | TODO: Han to provide. 
+`inputAllocations` | `Range` | TODO: Han to provide. 
+
+#### GoalSeek
+
+Similar to Excel's GoalSeek method, calculates the values necessary to achieve a specific goal. If the goal is an amount returned by a formula, this calculates a value that, when supplied to your formula, causes the formula to return the number you want.
+
+All parameters are case sensitive and must be set with the SetParam action. All parameters of type `Range` must be defined via `BTRCellAddress`.
+
+Parameter | Type | Description
+---|---|---
+`goal` | `decimal` | Specifies the desired goal from the calculated result of the formula in the cell represented by `valueCell`. 
+`valueCell` | `Range` | The cell to test the goal against. 
+`changingCell` | `Range` | The cell to change during testing.
+
+#### MapFundToAssetClass
+
+TODO: Han to provide documentation
+
+All parameters are case sensitive and must be set with the SetParam action. All parameters of type `Range` must be defined via `BTRCellAddress`.
+
+Parameter | Type | Description
+---|---|---
+`changingCell` | `Range` | The cell to change during testing. 
+`tableName` | `string` | TODO: Han to provide.
+`year` | `int` | TODO: Han to provide.
+`fundID` | `string` | TODO: Han to provide.
+
+#### RankStochastic
+
+TODO: Han to provide documentation
+
+All parameters are case sensitive and must be set with the SetParam action. All parameters of type `Range` must be defined via `BTRCellAddress`.
+
+Parameter | Type | Description
+---|---|---
+`arrayKey` | `string` | Name of macro parameter that contains the array to rank.
+`changingCell` | `Range` | The cell to change during testing. 
+`ranks` | `Range` | Cell range containing range of integer ranks to use during processing
+
+
+#### SortRange
+
+Similar to Excel's [Range.Sort](https://msdn.microsoft.com/en-us/library/office/ff840646.aspx?f=255&MSPPError=-2147217396), sorts the range based on options passed in.
+
+All parameters are case sensitive and must be set with the SetParam action. All parameters of type `Range` must be defined via `BTRCellAddress`.
+
+Parameter | Type | Description
+---|---|---
+`range` | `Range` | The data range to sort. 
+`key1` | `Range` | Range Specifies the first sort field; determines the values to be sorted. 
+`order1` | `string` | Optional. Determines the sort order for the values specified in `key1`. `A` for ascending or `D` for descending. Defaults to `A`. 
+`dataOption1` | `string` | Optional. Specifies how to sort text in the range specified in key1. `N` for normal or `T` for Text as Numbers. Defaults to `N`. 
+`orientation` | `string` | Optional. Specifies whether to sort rows or columns. `C` for columns or `R` for rows. Defaults to `C`. 
+`matchCase` | `bool` | Optional. Set to `True` to perform a case-sensitive sort, `False` to perform non-case sensitive sort. Defaults to `false`. 
+`key2` | `Range` | Optional. Specifies the second sort field; determines the values to be sorted. 
+`order2` | `string` | Optional. If `key2` is provided, determines the sort order for the values specified in `key2`. `A` for ascending or `D` for descending. Defaults to `A`. 
+`dataOption2` | `string` | Optional. If `key2` is provided, specifies how to sort text in the range specified in `key2`. `N` for normal or `T` for Text as Numbers. Defaults to `N`. 
+`key3` | `Range` | Optional. Specifies the third sort field; determines the values to be sorted. 
+`order3` | `string` | Optional. If `key3` is provided, determines the sort order for the values specified in `key3`. `A` for ascending or `D` for descending. Defaults to `A`. 
+`dataOption3` | `string` | Optional. If `key3` is provided, specifies how to sort text in the range specified in `key3`. `N` for normal or `T` for Text as Numbers. Defaults to `N`.
+
 #### StochasticProjection/DeterministicProjection
 
-All parameters are case sensitive and must be set with the `SetParam` action. All parameters of type Range must be defined via `BTRCellAddress`.
+All parameters are case sensitive and must be set with the `SetParam` action. All parameters of type `Range` must be defined via `BTRCellAddress`.
 
 Parameter | Type | Description
 ---|---|---
@@ -930,76 +1039,185 @@ Parameter | Type | Description
 `loans` | `Range` | Optional. TODO: Han to provide documentation. 
 `detailsCell` | `Range` | TODO: Han to provide documentation.
 
-#### SortRange
-
-Similar to Excel's [Range.Sort](https://msdn.microsoft.com/en-us/library/office/ff840646.aspx?f=255&MSPPError=-2147217396), sorts the range based on options passed in.
-
-All parameters are case sensitive and must be set with the SetParam action. All parameters of type Range must be defined via `BTRCellAddress`.
-
-Parameter | Type | Description
----|---|---
-`range` | `Range` | The data range to sort. 
-`key1` | `Range` | Range Specifies the first sort field; determines the values to be sorted. 
-`order1` | `string` | Optional. Determines the sort order for the values specified in `key1`. `A` for ascending or `D` for descending. Defaults to `A`. 
-`dataOption1` | `string` | Optional. Specifies how to sort text in the range specified in key1. `N` for normal or `T` for Text as Numbers. Defaults to `N`. 
-`orientation` | `string` | Optional. Specifies whether to sort rows or columns. `C` for columns or `R` for rows. Defaults to `C`. 
-`matchCase` | `bool` | Optional. Set to `True` to perform a case-sensitive sort, `False` to perform non-case sensitive sort. Defaults to `false`. 
-`key2` | `Range` | Optional. Specifies the second sort field; determines the values to be sorted. 
-`order2` | `string` | Optional. If `key2` is provided, determines the sort order for the values specified in `key2`. `A` for ascending or `D` for descending. Defaults to `A`. 
-`dataOption2` | `string` | Optional. If `key2` is provided, specifies how to sort text in the range specified in `key2`. `N` for normal or `T` for Text as Numbers. Defaults to `N`. 
-`key3` | `Range` | Optional. Specifies the third sort field; determines the values to be sorted. 
-`order3` | `string` | Optional. If `key3` is provided, determines the sort order for the values specified in `key3`. `A` for ascending or `D` for descending. Defaults to `A`. 
-`dataOption3` | `string` | Optional. If `key3` is provided, specifies how to sort text in the range specified in `key3`. `N` for normal or `T` for Text as Numbers. Defaults to `N`.
-
-#### ContributionSolver
+#### SumStochastic
 
 TODO: Han to provide documentation
 
-All parameters are case sensitive and must be set with the SetParam action. All parameters of type Range must be defined via `BTRCellAddress`.
+All parameters are case sensitive and must be set with the SetParam action. All parameters of type `Range` must be defined via `BTRCellAddress`.
 
 Parameter | Type | Description
 ---|---|---
-`goal` | `decimal` | Specifies the desired goal from the calculated result of the formula in the cell represented by valueCell. 
-`valueCell` | `Range` | The cell to test the goal against. 
-`changingCell` | `Range` | The cell to change during testing. 
-`maxContribution` | `decimal` | TODO: Han to provide.
-
-#### GetClassAllocations
-
-TODO: Han to provide documentation
-
-All parameters are case sensitive and must be set with the SetParam action. All parameters of type Range must be defined via `BTRCellAddress`.
-
-Parameter | Type | Description
----|---|---
-`changingCell` | `Range` | The cell to change during testing. 
-`tableName` | `string` | TODO: Han to provide. 
-`year` | `int` | TODO: Han to provide. 
-`planType` | `int` | TODO: Han to provide.  Value must be able to convert to `FundPlanType { EmployeeContributed = 0, EmployerContributed = 1, Loan = 2 }`
-`fundAllocations` | `Range` | TODO: Han to provide. 
-`inputAllocations` | `Range` | TODO: Han to provide. 
-
-#### GoalSeek
-
-Similar to Excel's GoalSeek method, calculates the values necessary to achieve a specific goal. If the goal is an amount returned by a formula, this calculates a value that, when supplied to your formula, causes the formula to return the number you want.
-
-All parameters are case sensitive and must be set with the SetParam action. All parameters of type Range must be defined via `BTRCellAddress`.
-
-Parameter | Type | Description
----|---|---
-`goal` | `decimal` | Specifies the desired goal from the calculated result of the formula in the cell represented by `valueCell`. 
-`valueCell` | `Range` | The cell to test the goal against. 
+`arrayKey` | `string` | Name of macro parameter that contains the array to rank.
 `changingCell` | `Range` | The cell to change during testing.
 
-#### MapFundToAssetClass
+#### SendEmail
 
-TODO: Han to provide documentation
+Ability to trigger sending a notification email during macro processing.
 
-All parameters are case sensitive and must be set with the SetParam action. All parameters of type Range must be defined via `BTRCellAddress`.
+All parameters are case sensitive and must be set with the SetParam action. All parameters of type `Range` must be defined via `BTRCellAddress`.
 
 Parameter | Type | Description
 ---|---|---
-`changingCell` | `Range` | The cell to change during testing. 
-`tableName` | `string` | TODO: Han to provide.
-`year` | `int` | TODO: Han to provide.
-`fundID` | `string` | TODO: Han to provide.
+`to` | `string` | Required email address of recipient.
+`from` | `string` | Optional email address of sender. If not provided, the default sender is used.
+`subject` | `string` | Required subject of email.
+`body` | `string` | Required body of email.
+`cc` | `string` | Optional email address of recipient to be CC'd.
+`bcc` | `string` | Optional email address of recipient to be BCC'd.
+
+#### SendText
+
+Ability to trigger sending a notification text during macro processing.
+
+All parameters are case sensitive and must be set with the SetParam action. All parameters of type `Range` must be defined via `BTRCellAddress`.
+
+Parameter | Type | Description
+---|---|---
+`to` | `string` | Required phone number of recipient.
+`from` | `string` | Optional phone number of sender. If not provided, the default sender is used.
+`body` | `string` | Required body of text.
+
+#### SeveranceCalc
+
+TODO: Han to provide documentation
+
+All inputs are provided via a named range of `Inputs` in the currently running CalcEngine and must be in the following order.
+
+Input | Type | Description
+---|---|---
+`iProcessDate` | `string` | TODO: Han/Samantha/David
+`iCutoffTime` | `string` | TODO: Han/Samantha/David
+`iID` | `string` | TODO: Han/Samantha/David
+`iNameLast` | `string` | TODO: Han/Samantha/David
+`iNameFirst` | `string` | TODO: Han/Samantha/David
+`iDateTerm` | `string` | TODO: Han/Samantha/David
+`iYtdFicaWages` | `string` | TODO: Han/Samantha/David
+`iDateSevStart` | `string` | TODO: Han/Samantha/David
+`iSevAmount` | `string` | TODO: Han/Samantha/David
+`iSevPeriodBase` | `string` | TODO: Han/Samantha/David
+`iSevPeriodExcess` | `string` | TODO: Han/Samantha/David
+`iSevPeriodExt` | `string` | TODO: Han/Samantha/David
+`iDateSuiStart` | `string` | TODO: Han/Samantha/David
+`iSuiAmount` | `string` | TODO: Han/Samantha/David
+`iSuiPeriod` | `string` | TODO: Han/Samantha/David
+`iDateSuiStartExt` | `string` | TODO: Han/Samantha/David
+`iSuiPeriodExt` | `string` | TODO: Han/Samantha/David
+`iDateSuiStartAdd` | `string` | TODO: Han/Samantha/David
+`iSuiPeriodAdd` | `string` | TODO: Han/Samantha/David
+`iSuiAmountAdd` | `string` | TODO: Han/Samantha/David
+`iFileDate` | `string` | TODO: Han/Samantha/David
+`iPlanID` | `string` | TODO: Han/Samantha/David
+`iFICATaxable` | `string` | TODO: Han/Samantha/David
+`iSUIOffsetable` | `string` | TODO: Han/Samantha/David
+`iLSPct` | `string` | TODO: Han/Samantha/David
+`iCanOffset` | `string` | TODO: Han/Samantha/David
+`iNeedApproval` | `string` | TODO: Han/Samantha/David
+`iDateApproved` | `string` | TODO: Han/Samantha/David
+`iWageBaseYOT` | `string` | TODO: Han/Samantha/David
+`iWageBaseYOT1` | `string` | TODO: Han/Samantha/David
+`iPayrollDate` | `string` | Optional, TODO: Han/Samantha/David
+
+The CalcEngine must provide the following named ranges that are array based values.
+
+Name | Description
+---|---
+`Monitor` | TODO: Han/Samantha/David
+`Status` | TODO: Han/Samantha/David
+`Pay` | TODO: Han/Samantha/David
+`SUI` | TODO: Han/Samantha/David
+`cTableSevSetup` | TODO: Han/Samantha/David
+`cTableParams` | TODO: Han/Samantha/David
+
+Finally, the following named ranges must be supplied in the CalcEngine that will contain the result of the calculation.
+
+Name | Description
+---|---
+`sevout.Profile` | TODO: Han/Samantha/David
+`sevout.Pay` | TODO: Han/Samantha/David
+`sevout.Status` | TODO: Han/Samantha/David
+
+#### SUICalc
+
+TODO: Han to provide documentation
+
+Inputs are provided by the following named ranges in the currently running CalcEngine.
+
+Input | Type | Description
+---|---|---
+`id` | `string` | TODO: Han/Samantha/David
+`state` | `string` | TODO: Han/Samantha/David
+`termdate` | `string` | TODO: Han/Samantha/David
+`sui.accruedvac` | `string` | TODO: Han/Samantha/David
+`sui.delay_vac` | `string` | TODO: Han/Samantha/David
+`sui.max_delay` | `string` | TODO: Han/Samantha/David
+`sui.min_delay` | `string` | TODO: Han/Samantha/David
+`sui.pay1` | `double` | TODO: Han/Samantha/David
+`sui.pay2` | `double` | TODO: Han/Samantha/David
+`sui.pay3` | `double` | TODO: Han/Samantha/David
+`sui.pay4` | `double` | TODO: Han/Samantha/David
+`sui.pay5` | `double` | TODO: Han/Samantha/David
+`sui.pay6` | `double` | TODO: Han/Samantha/David
+
+Finally, the following named ranges must be supplied in the CalcEngine that will contain the result of the calculation.
+
+Name | Description
+---|---
+`suiresult.sui_amt` | TODO: Han/Samantha/David
+`suiresult.sui_weeks` | TODO: Han/Samantha/David
+`suiresult.sev_start` | TODO: Han/Samantha/David
+`suiresult.sui_start` | TODO: Han/Samantha/David
+`suiresult.state_tax_code` | Optional. TODO: Han/Samantha/David
+`suiresult.sui_tax_code` | If `suiresult.state_tax_code` exists, SUI tax code is processed as well.  TODO: Han/Samantha/David
+`suiresult.adp_state_tax_code` | Optional. TODO: Han/Samantha/David
+`suiresult.adp_sui_tax_code` | If `suiresult.adp_state_tax_code` exists, ADP SUI tax code is processed as well.  TODO: Han/Samantha/David
+
+
+#### SUICalcExtended
+
+TODO: Han to provide documentation
+
+Inputs are provided by the following named ranges in the currently running CalcEngine.
+
+Input | Type | Description
+---|---|---
+`state` | `string` | TODO: Han/Samantha/David
+`termdate` | `string` | TODO: Han/Samantha/David
+`sui.fed_ext` | `string` | TODO: Han/Samantha/David
+`sui.client_start_ext` | `string` | TODO: Han/Samantha/David
+`sui.client_start_add` | `string` | TODO: Han/Samantha/David
+`sui.date_start` | `string` | TODO: Han/Samantha/David
+`sui.max_weeks` | `string` | TODO: Han/Samantha/David
+`sui.latest_dot` | `string` | Optional.  TODO: Han/Samantha/David
+
+Finally, the following named ranges must be supplied in the CalcEngine that will contain the result of the calculation.
+
+Name | Description
+---|---
+`suiresult.sui_weeks_ext` | TODO: Han/Samantha/David
+`suiresult.sui_start_ext` | TODO: Han/Samantha/David
+`suiresult.sui_amt_add` | TODO: Han/Samantha/David
+`suiresult.sui_weeks_add` | TODO: Han/Samantha/David
+`suiresult.sui_start_add` | TODO: Han/Samantha/David
+
+#### ZelisApi
+
+TODO: Top to provide documentation
+
+All parameters are case sensitive and must be set with the SetParam action. All parameters of type `Range` must be defined via `BTRCellAddress`.
+
+Parameter | Type | Description
+---|---|---
+`key` | `string` | Required.  API key for Zelis API.
+`columns` | `Range` | Required. Range of column names to return from the API call.
+`project` | `string` | Required if `path` is not provided.  Zelis project to use when making the call.
+`version` | `string` | Optional.  API version to use when making call.  If not provided, `v7` is used.
+`domain` | `string` | Optional.  Zelis domain to use when making call.  If not provided, https://sandbox.providernexus.com is used.
+`method` | `string` | Required if `path` is not provided.  The Zelis method to call.
+`params` | `Range` | Optional.  Two column range of key/value pairs used to build a query string to append to API url (if `path` is not provided).
+`path` | `string` | Optional.  API url to use when making call.  If not provided, constructed with params in the format of `/api/{version}/projects/{project}/{method}`
+`container` | `string` | Required if results from Zelis are not in the form of a JsonArray.  A `.` delimited list of names of JSON tokens used to indicate the container of the data to return.
+`target` | `Range` | Destination target where results will be placed.
+
+##### ZelisApi container samples
+
+TODO: Terry
