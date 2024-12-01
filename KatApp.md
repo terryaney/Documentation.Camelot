@@ -392,30 +392,6 @@ Returns `true` if **all** values passed in evaluate to `true` using same conditi
 
 Returns `true` if **any** value passed in evaluates to `true` using same conditions described in `rbl.boolean()`.
 
-#### IStateRbl.pushTo
-
-**`pushTo(table: string, rows: ITabDefRow | Array<ITabDefRow>, calcEngine?: string, tab?: string) => void`**
-
-Allows Kaml Views to manually push 'additional result rows' into a calculation result table.  Typically used in [IKatApp.resultsProcessing](#ikatapponresultsprocessing) event handlers to inject rows before they are [processed into the application state](#rbl-framework-result-processing-in-katapp-state).
-
-```javascript
-application.on("resultsProcessing.ka", (event, results, inputs) => {
-    // Push 'core' inputs into rbl-value for every CalcEngine if they exist
-    // in this global handler instead of requiring *every* CalcEngine to return these.
-    application.state.rbl.pushTo("rbl-value",
-        [
-            { "@id": "currentPage", "value": inputs.iCurrentPage || "" },
-            { "@id": "parentPage", "value": inputs.iParentPage || "" },
-            { "@id": "referrerPage", "value": inputs.iReferrer || "" },
-            { "@id": "isModal", "value": inputs.iModalApplication || "0" },
-            { "@id": "isNested", "value": inputs.iNestedApplication || "0" }
-        ]
-    );
-});
-```
-
-The *first* CalcEngine key and its *first* result tab defined in the [`<rbl-config>`](#configuring-calcengines-and-template-files) element in the Kaml View will be used when pushing results if calcEngine and/or tab are not provided.
-
 ## IStateRbl
 
 Helper object used to access RBLe Framework Calculation results.
@@ -651,6 +627,58 @@ since 'undefined' will be treated as 'false' in rbl.boolean() because valueWhenM
  -->
 <a href="#" :disabled="rbl.value('rbl-disabled', 'allowLink', false)">Click Here</a>
 ```
+
+
+#### IStateRbl.pushTo
+
+**`pushTo(table: string, rows: ITabDefRow | Array<ITabDefRow>, calcEngine?: string, tab?: string) => void`**
+
+Allows Kaml Views to manually push 'additional result rows' into `rbl.results` that are computed outside of the KatApp Framework.
+
+```javascript
+const requestedKeys = el.attr("data-savanna-id");
+const requestedKeyParts = requestedKeys.split("|").map(p => p.trim());
+const content = result.content;
+
+application.state.rbl.pushTo("rbl-value",
+	[{ "@id": `s-${requestedKeys}`, "value": content != "" ? "1" : "0" }].concat(
+		requestedKeyParts.map(p => ({
+			"@id": `s-${p}`,
+			"value": content != "" && p == r.key ? "1" : "0"
+		}))
+	)
+);
+```
+
+The *first* CalcEngine key and its *first* result tab defined in the [`<rbl-config>`](#configuring-calcengines-and-template-files) element in the Kaml View will be used when pushing results if calcEngine and/or tab are not provided.
+
+#### IStateRbl.mergeRows
+
+**`mergeRows(tabDef: ITabDef, rows: ITabDefRow | Array<ITabDefRow>) => void`**
+
+Allows Kaml Views to manually push 'additional result rows' into a calculation result table before results are merged into `rbl.results`.  Typically used in [IKatApp.resultsProcessing](#ikatapponresultsprocessing) event handlers to inject rows before they are [processed into the application state](#rbl-framework-result-processing-in-katapp-state).
+
+```javascript
+application.on("resultsProcessing.ka", (event, results, inputs) => {
+    // Push 'core' inputs into rbl-value for every CalcEngine if they exist
+    // in this global handler instead of requiring *every* CalcEngine to return these.
+	const result = results.find(r => r["@calcEngine"].replace("_PROD", "").startsWith(application.calcEngines[0].name));
+
+	if (result != undefined) {
+		application.state.rbl.mergeRows(result, "rbl-value",
+			[
+				{ "@id": "currentPage", "value": inputs.iCurrentPage ?? "" },
+				{ "@id": "parentPage", "value": inputs.iParentPage ?? "" },
+				{ "@id": "referrerPage", "value": inputs.iReferrer ?? "" },
+				{ "@id": "isModal", "value": inputs.iModalApplication ?? "0" },
+				{ "@id": "isNested", "value": inputs.iNestedApplication ?? "0" }
+			]
+		);
+	}
+});
+```
+
+The *first* CalcEngine key and its *first* result tab defined in the [`<rbl-config>`](#configuring-calcengines-and-template-files) element in the Kaml View will be used when pushing results if calcEngine and/or tab are not provided.
 
 
 ## RBLe Framework Result Processing in KatApp State
