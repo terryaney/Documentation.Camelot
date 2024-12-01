@@ -484,7 +484,8 @@ Name | Description
 [`value`](#istaterblvalue) | Return a single value (`undefined` if not present) from `results`.
 [`number`](#istaterblnumber) | Return a single *number* value (`0` if not present or not a number) from `results`.
 [`boolean`](#istaterblboolean) | Return whether or not a single row.column value is truthy.
-[`pushTo`](#istatepushto) | Allows Kaml Views to manually push 'additional result rows' into a calculation result table.
+[`pushTo`](#istatepushto) | Allows Kaml Views to manually push 'additional result rows' into [`rbl.results`](#istaterbl-properties).
+[`mergeRows`](#istatemergerows) | Allows Kaml Views to manually push 'additional result rows' into a calculation result table before it is merged into `rbl.results`.
 
 The *first* CalcEngine key and its *first* result tab defined in the [`<rbl-config>`](#configuring-calcengines-and-template-files) element in the Kaml View will be used when accessing results.
 
