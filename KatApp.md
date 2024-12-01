@@ -369,7 +369,6 @@ Name | Description
 [`canSubmit`](#istatecansubmit) | Returns `true` if application is in the 'state' to submit to server for processing.
 [`onAll`](#istateonall) | Returns `true` if **all** values passed in evaluate to `true` using same conditions described in [`rbl.boolean()`](#istaterblboolean)
 [`onAny`](#istateonany) | Returns `true` if **any** values passed in evaluate to `true` using same conditions described in [`rbl.boolean()`](#istaterblboolean)
-[`pushTo`](#istatepushto) | Allows Kaml Views to manually push 'additional result rows' into a calculation result table.
 
 #### IState.canSubmit
 
@@ -393,9 +392,9 @@ Returns `true` if **all** values passed in evaluate to `true` using same conditi
 
 Returns `true` if **any** value passed in evaluates to `true` using same conditions described in `rbl.boolean()`.
 
-#### IState.pushTo
+#### IStateRbl.pushTo
 
-**`pushTo(tabDef: ITabDef, table: string, rows: ITabDefRow | Array<ITabDefRow>, calcEngine?: string, tab?: string) => void`**
+**`pushTo(table: string, rows: ITabDefRow | Array<ITabDefRow>, calcEngine?: string, tab?: string) => void`**
 
 Allows Kaml Views to manually push 'additional result rows' into a calculation result table.  Typically used in [IKatApp.resultsProcessing](#ikatapponresultsprocessing) event handlers to inject rows before they are [processed into the application state](#rbl-framework-result-processing-in-katapp-state).
 
@@ -403,7 +402,7 @@ Allows Kaml Views to manually push 'additional result rows' into a calculation r
 application.on("resultsProcessing.ka", (event, results, inputs) => {
     // Push 'core' inputs into rbl-value for every CalcEngine if they exist
     // in this global handler instead of requiring *every* CalcEngine to return these.
-    application.state.rbl.pushTo(results[0], "rbl-value",
+    application.state.rbl.pushTo("rbl-value",
         [
             { "@id": "currentPage", "value": inputs.iCurrentPage || "" },
             { "@id": "parentPage", "value": inputs.iParentPage || "" },
@@ -415,6 +414,7 @@ application.on("resultsProcessing.ka", (event, results, inputs) => {
 });
 ```
 
+The *first* CalcEngine key and its *first* result tab defined in the [`<rbl-config>`](#configuring-calcengines-and-template-files) element in the Kaml View will be used when pushing results if calcEngine and/or tab are not provided.
 
 ## IStateRbl
 
@@ -424,7 +424,6 @@ Helper object used to access RBLe Framework Calculation results.
 
 Property | Type | Description
 `results`<sup>1</sup> | `IStringIndexer<IStringIndexer<Array<ITabDefRow>>>` | JSON object containing results of all assocatied CalcEngines.  Typically not used by Kaml developers.  Instead, use other methods of `IStateRbl` to grab results.  The `string` key to results is the concatenation of `CalcEngineKey.TabName`.
-`options`<sup>2</sup> | `{ calcEngine?: string, tab?: string }` | Default configuration settings to be applied when working with the `IState.rbl` object and its methods.  The CalcEngine key and/or the `ITabDef` name to use as the default source when the CalcEngine key is not provided in methods that access RBLe Framework results.  If not provided, the *first* CalcEngine key and its *first* result tab defined in the [`<rbl-config>`](#configuring-calcengines-and-template-files) element in the Kaml View will be used when accessing results.
 
 <sup>1</sup> The `results` object can be visualized as below (See [RBLe Framework Result Processing in KatApp State](#rble-framework-result-processing-in-katapp-state) to understand how RBLe Framework result managed in KatApp state to ensure proper `reactivity` after each calculation):
 
@@ -485,14 +484,15 @@ Name | Description
 [`value`](#istaterblvalue) | Return a single value (`undefined` if not present) from `results`.
 [`number`](#istaterblnumber) | Return a single *number* value (`0` if not present or not a number) from `results`.
 [`boolean`](#istaterblboolean) | Return whether or not a single row.column value is truthy.
+[`pushTo`](#istatepushto) | Allows Kaml Views to manually push 'additional result rows' into a calculation result table.
+
+The *first* CalcEngine key and its *first* result tab defined in the [`<rbl-config>`](#configuring-calcengines-and-template-files) element in the Kaml View will be used when accessing results.
 
 #### IStateRbl.source
 
 **`source(table: string, calcEngine?: string, tab?: string, predicate?: (row: ITabDefRow) => boolean) => Array<ITabDefRow>`**
 
 The core method that returns table rows from `results` (and is leveraged internally by other `IState.rbl` methods).  The CalcEngine key and `ITabDef` name can be passed in if not using the 'default' CalcEngine and result tab. 
-
-When the `calcEngine` and/or `tab` parameter is not provided, a 'default' location has to be determined.  This can be set via the the `IState.rbl.options` object.
 
 1. CalcEngine is determined by `calcEngine` param, then [`rbl.options.calcEngine`](#istaterbloptionscalcengine) setting.
 1. Tab name is determined by `tab` param, then [`rbl.options.tab`](#istaterbloptionstab) setting.
