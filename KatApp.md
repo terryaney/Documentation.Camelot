@@ -2683,6 +2683,7 @@ Property | Type | Description
 `confirmedAsync` | `(response: any \| undefined, application: KatApp) => Promise<void>` | If the Kaml View needs to provide a delegate to run if modal dialog is 'confirmed', the `confirmedAsync` property solves that problem.  See [v-ka-modal Model Samples](#v-ka-modal-model-samples) for more information.
 `cancelledAsync` | `(response: any \| undefined, application: KatApp) => Promise<void>` | If the Kaml View needs to provide a delegate to run if modal dialog is 'cancelled', the `cancelledAsync` property solves that problem. See [v-ka-modal Model Samples](#v-ka-modal-model-samples) for more information.
 `catchAsync` | `(e: any \| undefined, application: KatApp) => Promise<void>` | If the Kaml View needs to provide a delegate to run if generating a modal dialog fails, the `catchAsync` property solves that problem. See [v-ka-modal Model Samples](#v-ka-modal-model-samples) for more information.<br/><br/>If no `catchAsync` is provided and generating a modal dialog fails, the response will simply be logged by the KatApp framework.
+`closed` | `(application: KatApp) => void` | If the Kaml View needs to provide a delegate to run after a modal dialog regardless of how it is closed, this delegate can be used.
 
 ### v-ka-modal Model Samples
 
