@@ -454,17 +454,17 @@ If the calculation has `iConfigureUI=1 and iValidate=0` input, the following dat
 {
     "rbl-input": [
         { 
-            "@id": "iNameFirst", 
+            "id": "iNameFirst", 
             "label": "First Name",
             "value": "John",
             "help": ""            
         },
         { 
-            "@id": "iNameMiddle", 
+            "id": "iNameMiddle", 
             "label": "Middle Name",
         },
         { 
-            "@id": "iNameLast", 
+            "id": "iNameLast", 
             "label": "Last Name",
             "value": "",
             "@value": { "text-forced": "true" },
@@ -484,24 +484,24 @@ If the calculation has `iConfigureUI=0 and iValidate=1` input, the following dat
 {
     "rbl-input": [
         { 
-            "@id": "iNameFirst", 
+            "id": "iNameFirst", 
             "label": "First Name",
             "value": "John",
         },
         { 
-            "@id": "iNameMiddle", 
+            "id": "iNameMiddle", 
             "label": "Middle Name",
         },
         { 
-            "@id": "iNameLast", 
+            "id": "iNameLast", 
             "label": "Last Name",
             "value": "",
             "@value": { "text-forced": "true" }
         }
     ],
     "errors": [
-        { "@id": "iNameFirst", "text": "First Name is required." },
-        { "@id": "iLastFirst", "text": "Last Name is required." }
+        { "id": "iNameFirst", "text": "First Name is required." },
+        { "id": "iLastFirst", "text": "Last Name is required." }
     ]
 }
 ```
@@ -542,29 +542,29 @@ This CalcEngine nesting configuration would result in the following JSON
 {
     orders: [
         {
-            "@id": 1,
+            "id": 1,
             date: "2021-07-13",
             amount: 45
             items: [
-                { "@id": 1, orderId: 1, sku: "PRD4321", price: 10, quantity: 3 },
-                { "@id": 2, orderId: 1, sku: "PRD5678", price: 5, quantity: 2 },
-                { "@id": 3, orderId: 1, sku: "PRD3344", price: 5, quantity: 1 }
+                { "id": 1, orderId: 1, sku: "PRD4321", price: 10, quantity: 3 },
+                { "id": 2, orderId: 1, sku: "PRD5678", price: 5, quantity: 2 },
+                { "id": 3, orderId: 1, sku: "PRD3344", price: 5, quantity: 1 }
             ]
         },
         {
-            "@id": 2,
+            "id": 2,
             date: "2021-08-13",
             amount: 33
             items: [
-                { "@id": 4, orderId: 2, sku: "PRD6677", price: 33, quantity: 1 }
+                { "id": 4, orderId: 2, sku: "PRD6677", price: 33, quantity: 1 }
             ]
         }
     ],
     orderItems: [
-        { "@id": 1, orderId: 1, sku: "PRD4321", price: 10, quantity: 3 },
-        { "@id": 2, orderId: 1, sku: "PRD5678", price: 5, quantity: 2 },
-        { "@id": 3, orderId: 1, sku: "PRD3344", price: 5, quantity: 1 },
-        { "@id": 4, orderId: 2, sku: "PRD6677", price: 33, quantity: 1 }
+        { "id": 1, orderId: 1, sku: "PRD4321", price: 10, quantity: 3 },
+        { "id": 2, orderId: 1, sku: "PRD5678", price: 5, quantity: 2 },
+        { "id": 3, orderId: 1, sku: "PRD3344", price: 5, quantity: 1 },
+        { "id": 4, orderId: 2, sku: "PRD6677", price: 33, quantity: 1 }
     ]
 }
 ```
@@ -605,40 +605,40 @@ This CalcEngine nesting configuration would result in the following JSON
 {
     plans: [
         {
-            "@id": "DB",
+            "id": "DB",
             name: "Retirement",
             subPlans: [
-                { "@id": 1, name: "Plan 1" },
-                { "@id": 2, name: "Plan 2" },
-                { "@id": 3, name: "Plan 3" }
+                { "id": 1, name: "Plan 1" },
+                { "id": 2, name: "Plan 2" },
+                { "id": 3, name: "Plan 3" }
             ]
         },
         {
-            "@id": "SDB",
+            "id": "SDB",
             name: "Special Retirement"
         },
         {
-            "@id": "HSA",
+            "id": "HSA",
             name: "HSA Savings",
             subPlans: [
-                { "@id": "HSA-1", name: "Savings 1" },
-                { "@id": "HSA-2", name: "Savings 2" },
-                { "@id": "HSA-3", name: "Savings 3" }
+                { "id": "HSA-1", name: "Savings 1" },
+                { "id": "HSA-2", name: "Savings 2" },
+                { "id": "HSA-3", name: "Savings 3" }
             ]
         },
         {
-            "@id": "FSA",
+            "id": "FSA",
             name: "FSA Savings",
             subPlans: [
-                { "@id": "FSA-1", name: "Savings 1" }
+                { "id": "FSA-1", name: "Savings 1" }
             ]
         },
         {
-            "@id": "MISC",
+            "id": "MISC",
             name: "Misc Savings"
         },
         {
-            "@id": "SIMPLE",
+            "id": "SIMPLE",
             name: "Simple (no subPlans)"
         }
     ]
