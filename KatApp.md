@@ -23,17 +23,8 @@ Create node.js Application to run application locally
 
 1. Clone repository and open the folder in Visual Studio Code
 1. Download Node.js from https://nodejs.org/en/download/ (one time to get *npm* installed)
-1. `npm i -g typescript` (one time to get tsc compiler installed)
-1. `npm i -g nodemon` (one time to get nodemon debugger/watcher installed)
-1. `npm i --save-dev typescript@latest` - Add `node_modules` *this* directory and update package.json file.
-1. `npm i --save-dev @types/jquery`
-1. `npm i --save-dev eslint @typescript-eslint/eslint-plugin @typescript-eslint/parser`
-1. `npm i --save-dev express`
-1. `npm i --save-dev @types/express`
-1. `npm i --save-dev @types/microsoft-ajax`
-1. `npm i --save-dev @types/nouislider`
-1. `npm i --save-dev @types/bootstrap@3.4.0`
-1. Should be able to `tsc --build` now and hit site or use the preferred `task ts` task to generate `tsc` output, `*.d.ts` file, and minified `*.js` file.
+1. From `src` folder, run `npm install`
+1. Should be able build typescript via `CTRL-P`, then type `Task Typescript RCL KatApp` to build typescript, minifiy js, create KatApp.d.ts and copy assests to the `test/wwwroot` folder as well.
 
 ## Definitions
 
@@ -41,7 +32,7 @@ There are many terms and concepts that will be discussed in this document.  The 
 
 Term | Definition
 ---|---
-KatApp | Dynamic webpage content driven by AJAX, using Kaml Views, RBLe Service, and Vue directives.
+KatApp | Dynamic webpage content driven by client server communication via `fetch` api, using Kaml Views, RBLe Service, and Vue directives.
 Kaml View | A _KatApp Markup Language_ file is a combination of RBL Configuration, HTML, CSS, and Javascript where the HTML supports Vue directives to leaverage CalcEngine results to produce presentation markup.
 RBLe Framework | Rapid Business Logic (evolved) calcuation service.  Driven by CalcEngine files which contains all of the business logic.
 CalcEngine | Specialized Excel speadsheet that drives business logic.
@@ -77,7 +68,7 @@ Below are the libraries required or used by KatApp framework.
 
 - petite-vue.js - Required [library](https://unpkg.com/petite-vue) to enable Vue processing and other functionality internal to KatApp framework.
 - jquery.js - Required [library](https://api.jquery.com/) to enable KatApp event processing and other functionality internal to KatApp framework.
-- bootstrap.js - Required to support [Modals](https://getbootstrap.com/docs/5.0/components/modal/), [Popovers](https://getbootstrap.com/docs/5.0/components/popovers/) and [Tooltips](https://getbootstrap.com/docs/5.0/components/tooltips/).
+- bootstrap.js - Required to support [Modals](https://getbootstrap.com/docs/5.3/components/modal/), [Popovers](https://getbootstrap.com/docs/5.3/components/popovers/) and [Tooltips](https://getbootstrap.com/docs/5.3/components/tooltips/).
 - highcharts.js - Optional, if `v-ka-highchart` directive is leveraged, to support building [Highcharts](https://api.highcharts.com/highcharts/) from CalcEngine results.
 
 # Initializing and Configuring a KatApp
@@ -3617,7 +3608,7 @@ Property | Type | Description
 `traceVerbosity`<sup>1</sup> | `TraceVerbosity` | Control the trace output level to display for the current KatApp by assigning desired enum value.  The default value is `TraceVerbosity.None`.
 `useTestCalcEngine` | `boolean` | Whether or not the RBLe Framework should the test version of the specified CalcEngine.  A `boolean` value can be passed in or using the querystring of `test=1` will enable the settings.  The default value is `false`.
 `useTestView` | `boolean` | Whether or not the KatApp Framework should use the test versions of any requested Kaml Views or Kaml Template Files that are hosted in the KAT CMS instead of by the Host Environment.  A `boolean` value can be passed in or using the querystring of `testview=1` will enable the settings. The default value is `false`.
-`showInspector` | `string` | The KatApp Framework can show diagnostic information about Vue directives since Vue processing removes all directives from the markup making it difficult at times to debug and find the original Kaml directives.  To enable, set the value to `1` or a comma delimitted list of the directive types you are most interested in.  Blank or `0` will disable.  When enabled, pressing `CTRL+SHIFT` together will toggle visual cues for each 'Vue enabled' element of the desired types.  Then use the browser 'inspect tool' to view an HTML comment about the Vue element.  A querystring of `showinspector=1` defaults to showing visual cues on the `resource,value,modal,template,html,text` settings or set the `showinspector` querystring to the desired settings you wish to inspect.  The default value off `0`.<br/><br/>The settings available are simply the name of the directive *without* `v-ka-` or `v-`.  The only exceptions are `v-ka-rbl-no-calc` -> `no-calc`, `v-ka-rbl-exclude` -> `exclude`, and `v-ka-unmount-clears-inputs` -> `unmount`.
+`showInspector` | `string` | The KatApp Framework can show diagnostic information about Vue directives since Vue processing removes all directives from the markup making it difficult at times to debug and find the original Kaml directives.  To enable, set the value to `1` or a comma delimitted list of the directive types you are most interested in.  Blank or `0` will disable.  When enabled, pressing `CTRL+ALT+I` together will toggle visual cues for each 'Vue enabled' element of the desired types.  Then use the browser 'inspect tool' to view an HTML comment about the Vue element.  A querystring of `showinspector=1` defaults to showing visual cues on the `resource,value,modal,template,html,text` settings or set the `showinspector` querystring to the desired settings you wish to inspect.  The default value off `0`.<br/><br/>The settings available are simply the name of the directive *without* `v-ka-` or `v-`.  The only exceptions are `v-ka-rbl-no-calc` -> `no-calc`, `v-ka-rbl-exclude` -> `exclude`, and `v-ka-unmount-clears-inputs` -> `unmount`.
 `debugResourcesDomain` | `string` | Whether or not the KatApp Framework should attempt to find requested Kaml Views or Kaml Template Files from the 'domain' passed in before checking the KAT CMS or Host Environment.  A `string` value providing a local web server address can be provided via `"debugResourcesDomain": "localhost:8887"` to enable the feature.  The default value is `undefined`.<br/><br/>KAT Evolution and Camelot frameworks enable this feature using a `localserver` querystring parameter.  For example, `https://hosted.site.domain/?localserver=localhost:5500` will enable the feature and attempt to find files at `http://localhost:5500/` before checking the KAT CMS or Host Environment.  Kaml files can be partitioned into view.kaml, view.kaml.js, view.kaml.css, and view.kaml.templates to promote single responsibility principle.<br/><br/>Using `debugResourcesDomain` supports this as well, however it makes individual requests for each file if the original Kaml file does not have a `<script/>` or `<style/>` section present.  If additional files are required to create the Kaml package, the `local-kaml-package` attribute must be set on the `<rbl-config/>` element.  See [Configuring CalcEngines and Template Files](#configuring-calcengines-and-template-files) for more information.
 
 <sup>1</sup> `TraceVerbosity` is defined as the following.
