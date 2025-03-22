@@ -67,7 +67,6 @@ See [Common Vue Directives](#Common-Vue-Directives) and [Custom KatApp Directive
 Below are the libraries required or used by KatApp framework.
 
 - petite-vue.js - Required [library](https://unpkg.com/petite-vue) to enable Vue processing and other functionality internal to KatApp framework.
-- jquery.js - Required [library](https://api.jquery.com/) to enable KatApp event processing and other functionality internal to KatApp framework.
 - bootstrap.js - Required to support [Modals](https://getbootstrap.com/docs/5.3/components/modal/), [Popovers](https://getbootstrap.com/docs/5.3/components/popovers/) and [Tooltips](https://getbootstrap.com/docs/5.3/components/tooltips/).
 - highcharts.js - Optional, if `v-ka-highchart` directive is leveraged, to support building [Highcharts](https://api.highcharts.com/highcharts/) from CalcEngine results.
 
@@ -76,12 +75,24 @@ Below are the libraries required or used by KatApp framework.
 To initiate a KatApp, options are provided via a configuration object passed on the [`KatApp.createAppAsync()`](#KatApp.createAppAsync) method. In the sample below, minimal options are shown.  See [IKatAppOptions](IKatAppOptions) for all available options.
 
 ```javascript
-$(document).ready(() => {
-    // Async IIFE
-    (async () => {
-        await KatApp.createAppAsync( '.katapp', { "view": "Nexgen:Channel.Home" } )
-            .catch(ex => console.log({ex}) );
-    })();
+function ready(fn) {
+	if (document.readyState !== 'loading') {
+		(async () => {
+			await fn();
+		})();
+	} else {
+		document.addEventListener('DOMContentLoaded', fn);
+	}
+}
+ready(async () => {
+    try
+	{
+		await KatApp.createAppAsync( '.katapp', { "view": "Nexgen:Channel.Home" } );
+	}
+	catch( ex )
+	{
+		console.error({ex});
+	}
 });
 ```
 
@@ -222,7 +233,7 @@ It is very important to keep Kaml View encapsulated as an isolated environment, 
 
 - [Scoping CSS](#scoping-css) - Discusses how Kaml Views can ensure CSS styles do not adversely affect the Host Environment.
 - [Scoping IDs](#scoping-ids) - Discusses how Kaml Views can ensure `HTMLElement.id` assignments are guaranteed to be unique.
-- [Scoping jQuery Selection](#scoping-jquery-selection) - Discusses how Kaml Views can ensure jQuery DOM queries are isolated to *only* their markup and not other Kaml Views or the Host Environment.
+- [Scoping Selection](#scoping-selection) - Discusses how Kaml Views can ensure DOM queries are isolated to *only* their markup and not other Kaml Views or the Host Environment.
 
 ### Scoping CSS
 
@@ -286,15 +297,17 @@ When creating HTML elements inside the Kaml View that need an `id` attribute pro
 </div>
 ```
 
-### Scoping jQuery Selection
+### Scoping Selection
 
-When `<script>` tags are included in Kaml View files, the correct way to obtain the KatApp element is by using this `{id}` token. Then, any time selection is needed, selection needs to be scoped to the currently running KatApp.  To do this, use the `application.select()` and `application.closest()` methods instead of the jQuery counterparts of `$()` or `$().closest()`.  This is also required to ensure proper selection scope when using [nested KatApps](#v-ka-app) as well.
+When `<script>` tags are included in Kaml View files, the correct way to obtain the KatApp element is by using this `{id}` token. Then, any time selection is needed, selection needs to be scoped to the currently running KatApp.  To do this, use the `selectElement()`, `selectElements()` and `closestElements()` methods of the application instead of global selector counterparts (i.e. `document.querySelector()`).  This is also required to ensure proper selection scope when using [nested KatApps](#v-ka-app) as well.
 
 ```html
 <!-- Snippet from the above sample structure -->
 <script>
 var application = KatApp.get('{id}');
-application.select(".warning-items").css("background-color", "red");
+application
+	.selectElements(".warning-items")
+	.forEach(e => e.style.backgroundColor = "red");
 </script>
 ```
 
@@ -2034,7 +2047,7 @@ Date input rendered via an `input-textbox-nexgen` template;
     isDisplay: base => inputs.iHideDateBirth != '1' && base.display,
     events: { 
         'keypress.enter.once': () => console.log('Hooray, enter pressed!'), 
-        'input.prevent': e => console.log($(e.currentTarget).attr('name')) 
+        'input.prevent': e => console.log(e.currentTarget.getAttribute('name'))
     }
 }"></div>
 
@@ -2049,8 +2062,8 @@ Render an upload control and corresponding comment control.
 <script>
     application.update({
         handlers: {
-            processUpload: () => application.select('.iUploadUpload').trigger('click'),
-            textAreaCharCount: e => application.select("#{id}_count").text(Math.max(0, 250 - $(e.currentTarget).val().length))
+            processUpload: () => application.selectElement('.iUploadUpload').click(),
+            textAreaCharCount: e => application.selectElement("#{id}_count").textContent = Math.max(0, 250 - e.currentTarget.value.length)
         }
     });
 </script>
@@ -2307,7 +2320,7 @@ when rendering the group, so only one element is required for both labels and he
     helps: [ { content: 'Tricky, but add your date of term' } ], 
     events: { 
         'keypress.enter.once': () => console.log('Hooray, enter pressed!'), 
-        'input': e => console.log($(e.currentTarget).attr('name')) 
+        'input': e => console.log(e.currentTarget.getAttribute('name')) 
     } 
 }"></div>
 
@@ -2725,7 +2738,7 @@ The `IKaAppModel` represents the model type containing the properties that confi
 Property | Type | Description
 ---|---|---
 `view` | `string` | The Kaml View to render inside the nested KatApp.
-`selector` | `string` | If provided, a JQuery selector `string` that is used to identify that KatApp.  This property aids in debugging by allowing Kaml View developers to type in `KatApp.get({selector})` in a browser console to get a reference to their KatApp.
+`selector` | `string` | If provided, a selector `string` that is used to identify that KatApp.  This property aids in debugging by allowing Kaml View developers to type in `KatApp.get({selector})` in a browser console to get a reference to their KatApp.
 `inputs` | `ICalculationInputs` | If inputs should be passed to the rendered nested application's Kaml View, provide a `ICalculationInputs` object.
 
 ## v-ka-table
@@ -3461,15 +3474,25 @@ Name | Description
 Asyncronous method to create a new KatApp bound to an `HTMLElement` selected via `selector`.
 
 ```javascript
-$(document).ready(function () {
-	(async () => {
+function ready(fn) {
+	if (document.readyState !== 'loading') {
+		(async () => {
+			await fn();
+		})();
+	} else {
+		document.addEventListener('DOMContentLoaded', fn);
+	}
+}
+ready(async () => {
+	try {
 		await KatApp.createAppAsync(
 			'.katapp', 
 			{ /* options */ } 
-		).catch(ex => {
-			console.log({ex});
-		});
-	})();
+		);
+	}
+	catch ( ex ) {
+		console.log( { ex } );
+	}
 });
 ```
 
@@ -3495,7 +3518,7 @@ Note: This is also the method used to investigate a KatApp during debug sessions
 
 `handleEvents(selector: string, configAction: (config: IKatAppEventsConfiguration) => void): void`
 
-Attach events to an application given a known JQuery selector string.  Can be called at any time during the life cycle of a KatApp application, *even before the application has been created and/or mounted*.
+Attach events to an application given a known selector string.  Can be called at any time during the life cycle of a KatApp application, *even before the application has been created and/or mounted*.
 
 When using this method to bind events, *almost always*, the last parameter, `application`, of any given event will be required since these event handlers are often generic and don't necessarily know 'which' application is being handled.
 
@@ -3632,12 +3655,12 @@ The `IKatApp` interface represents the KatApp 'application' object that the Kaml
 
 Property | Type | Description
 ---|---|---
-`el` | `JQuery` |  The `HTMLElement` that is the container for the `IKatApp`.
+`el` | `HTMLElement` |  The `HTMLElement` that is the container for the `IKatApp`.
 `options` | [`IKatAppOptions`](#ikatappoptions) | The `IKatAppOptions` that configure the options that control the `IKatApp`.
 `isCalculating` | `boolean` | Read Only; Whether or not the KatApp is currently triggering and processing a RBLe Framework calculation.
 `lastCalculation` | [`ILastCalculation | undefined`](#ilastcalculation) | Read Only; If a RBLe Framework calculation has previously run, this property will contain a snapshot of the `ILastCalculation` object.
 `state` | [`IState`](#istate) | The global state object passed into the Vue application.  Any updates to properties on the `state` object can trigger reactivity.
-`selector` | `string` | The JQuery selector string that was used to locate the `HTMLElement` and set the `el` property which hosts the KatApp.
+`selector` | `string` | The selector string that was used to locate the `HTMLElement` and set the `el` property which hosts the KatApp.
 
 ### IKatApp Methods
 
@@ -3655,8 +3678,11 @@ Name | Description
 [`getInputs`](#ikatappgetinputs) | Return a [`ICalculationInputs`](#icalculationinputs) object representing current Kaml View inputs.
 [`getInputValue`](#ikatappgetinputvalue) | Get the specified input value based on the input name passed.
 [`setInputValue`](#ikatappsetinputvalue) | Set the specified input value based on the input name passed.
-[`select`](#ikatappselect) | Select DOM element(s) scoped to the current KatApp.
-[`closest`](#ikatappclosest) | Select parent DOM element scoped to the current KatApp.
+[`selectElement`](#ikatappselectelement) | Select DOM element scoped to the current KatApp.
+[`selectElements`](#ikatappselectelements) | Select DOM elements scoped to the current KatApp.
+[`closestElement`](#ikatappclosest) | Select parent DOM element scoped to the current KatApp.
+[`on`](#ikatappon) | Add event handlers for DOM elements present within a KatApp.
+[`off`](#ikatappoff) | Remove event handlers for DOM elements present within a KatApp.
 [`notifyAsync`](#ikatappnotifyasync) | Allow a nested application to send information to its [`hostApplication`](#ikatappoptionshostapplication).
 [`debugNext`](#ikatappdebugnext) | Helper method to indicate to the KatApp what debugging features should be used during the next calculation.
 [`getTemplateContent`](#ikatappgettemplatecontent) | Returns the 'content' of a requested template.
@@ -3740,7 +3766,7 @@ Manually call a RBLe Framework calculation.  The parameters allow for a list of 
 
 #### IKatApp.apiAsync
 
-**`apiAsync(endpoint: string, apiOptions: IApiOptions, trigger?: JQuery, calculationSubmitApiConfiguration?: ISubmitApiOptions): Promise<IStringAnyIndexer | undefined>;`**
+**`apiAsync(endpoint: string, apiOptions: IApiOptions, trigger?: HTMLElement, calculationSubmitApiConfiguration?: ISubmitApiOptions): Promise<IStringAnyIndexer | undefined>;`**
 
 Use an [`IApiOptions`](#iapioptions) and [`ISubmitApiOptions`](#ISubmitApiOptions) object to submit a payload to an api endpoint and return the results on success. KatApps have the ability to call web api endpoints to perform actions that need server side processing (saving data, generating document packages, saving calculations, etc.).  All api endpoints should return an object indicating success or failure.
 
@@ -3782,7 +3808,7 @@ If the api endpoint returned a failure response, the `apiResponse` will be set t
 
 #### IKatApp.showModalAsync
 
-**`showModalAsync(options: IModalOptions, triggerLink?: JQuery): Promise<{ confirmed: boolean; response: any; }>;`**
+**`showModalAsync(options: IModalOptions, triggerLink?: HTMLElement): Promise<{ confirmed: boolean; response: any; }>;`**
 
 Manually show a modal dialog configured by the [`IModalOptions`](#imodaloptions) parameter and return an object indicating whether or not it was confirmed and the response returned (in both the 'confirmed' and 'cancelled' scenarios).
 
@@ -3826,36 +3852,96 @@ By default, `allowDisabled` is `false`, but if `true` is passed in, and the inpu
 
 #### IKatApp.setInputValue
 
-**`setInputValue(name: string, value: string | undefined, calculate?: boolean): JQuery | undefined;`**
+**`setInputValue(name: string, value: string | undefined, calculate?: boolean): Array<HTMLInputElement> | undefined;`**
 
 Given and input `name` and `value`, set the value of the HTML element and the value in the [`state.inputs`](#istate-properties). If `value` is undefined, the input name and property will be removed from `state.inputs`.
 
 By default, `calculate` is `false` so that setting input values does not trigger a calculation and Kaml Views can safely set multiple input values without a calculation. If `true` is passed in, then a RBLe Framework calculation will occur after the input value is applied.
 
-#### IKatApp.select
+#### IKatApp.selectElement
 
-**`.select(selector: string, context?: JQuery | HTMLElement): JQuery`**
+**`.selectElement<T extends HTMLElement>(selector: string, context?: HTMLElement): T | undefined`**
 
-This is a replacement function for jQuery's default `$()` selector method.  It is needed scope the selection within the current KatApp (does not reach outside the KatApp markup) and also prevents selection from selecting **inside** a nested KatApp.
+This is a replacement function for `document.querySelector()` selector method.  It is needed to scope the selection within the current KatApp (does not reach outside the KatApp markup) and also prevents selection from selecting **into** a nested KatApp.
+
+```javascript
+// Get address input
+const address = application.selectElement(".iAddress")
+```
+
+#### IKatApp.selectElements
+
+**`.selectElements<T extends HTMLElement>(selector: string, context?: HTMLElement): Array<T>`**
+
+This is a replacement function for `document.querySelector()` selector method.  It is needed to scope the selection within the current KatApp (does not reach outside the KatApp markup) and also prevents selection from selecting **into** a nested KatApp.
 
 ```javascript
 // Get all inputs of my application (but none from nested KatApps or outside of my KatApp in container site)
-application.select(":input");
+application.selectElements(":input");
 
 // Get all inputs of my application within the address container
-var address = application.select(".address")
-application.select(":input", address);
+const address = application.selectElement(".address")
+const addressInputs = application.selectElements(":input", address);
+
+/* or... */
+const addressInputs = application.selectElements(".address :input");
 ```
 
-#### IKatApp.closest
+#### IKatApp.closestElement
 
-**`.closest(element: JQuery | HTMLElement, selector: string): JQuery`**
+**`.closestElement<T extends HTMLElement>(element: HTMLElement, selector: string): T | undefined`**
 
-This is a replacement function for jQuery's default `$()` selector method.  It is needed scope the selection within the current KatApp (does not reach outside the KatApp markup - either to hosting site or a parent KatApp).
+This is a replacement function for `HTMLElement.closest()` method.  It is needed to scope the selection within the current KatApp (does not reach outside the KatApp markup - either to hosting site or a parent KatApp).
 
 ```javascript
-var name = application.select(".iName");
-var nameLabel application.closest(name, "label");
+const name = application.selectElement(".iName");
+const nameLabel = application.closestElement(name, "label");
+```
+
+#### IKatApp.on
+
+**`.on<T extends HTMLElement>(target: string | HTMLElement | Array<HTMLElement>, events: string, handler: (e: Event) => void, context?: HTMLElement): KatAppEventFluentApi<T>`**
+
+This is a replacement function for native HTMLElement.addEventListener.  It wraps the process of selecting DOM elements within the scopeof the current KatApp (does not reach outside the KatApp markup - either to hosting site or a parent KatApp), looping each element, adding event handler, and returning a 'fluent api' object that allows chaining of `on` and `off`.
+
+The `events` parameter can be a space delimitted list of (namespaced) events (i.e. `"click change"`).  The `target` parameter can be a string selector, a single `HTMLElement`, or an array of `HTMLElement`s.  If `target` is a string selector, it will be scoped to the current KatApp.
+
+**NOTE:** You only pass selector parameter on the first call to a chainable method (`on` or `off`).  See [IKatAppEventFluentApi](#ikatappeventfluentapi) for more information.
+
+```javascript
+const inputs = 
+	application
+		.on(":input", "change.ns", e => console.log(`${e.target.name} changed to ${e.target.value}`))
+		.on(":input", "blur.ns", e => console.log(`${e.target.name} lost focus`))
+		.elements;
+
+inputs.forEach( input => {
+	// do something with each input
+	input.setAttribute("data-processed", "true");
+});
+```
+
+#### IKatApp.off
+
+**`.on<T extends HTMLElement>(target: string | HTMLElement | Array<HTMLElement>, events: string, context?: HTMLElement): KatAppEventFluentApi<T>`**
+
+This is a replacement function for native HTMLElement.removeEventListener.  It wraps the process of selecting DOM elements within the scopeof the current KatApp (does not reach outside the KatApp markup - either to hosting site or a parent KatApp), looping each element, removing any event handler(s), and returning a 'fluent api' object that allows chaining of `on` and `off`.
+
+The `events` parameter can be a space delimitted list of (namespaced) events (i.e. `"click change"`).  The `target` parameter can be a string selector, a single `HTMLElement`, or an array of `HTMLElement`s.  If `target` is a string selector, it will be scoped to the current KatApp.
+
+**NOTE:** You only pass selector parameter on the first call to a chainable method (`on` or `off`).  See [IKatAppEventFluentApi](#ikatappeventfluentapi) for more information.
+
+```javascript
+const inputs = 
+	application
+		.off(":input", "change.ns")
+		.on(""change.ns", e => console.log(`${e.target.name} changed to ${e.target.value}`))
+		.elements;
+
+inputs.forEach( input => {
+	// do something with each input
+	input.setAttribute("data-processed", "true");
+});
 ```
 
 #### IKatApp.notifyAsync
@@ -4115,13 +4201,15 @@ application.handleEvents( events => {
 		// Loop all inputs that start with iCoverageA- and process them.
 		// data-inputname is in form of iCoverageA-id
 		// For each input, create a row with id/covered properties
-		var inputControlData = application.select("div[data-inputname^=iCoverageA-]");
-		inputControlData.each(function (index, element) {
-			var id = $(element).data("inputname").split("-")[1];
-			var v = $(element).hasClass("active") ? 1 : 0;
-			var row = { "id": id, covered: v };
-			coverageTable.rows.push(row);
-		});
+		application
+			.selectElements("div[data-inputname^=iCoverageA-]")
+			.forEach(element => {
+				var id = element.getAttribute("data-inputname").split("-")[1];
+				var v = element.classList.contains("active") ? 1 : 0;
+				var row = { "id": id, covered: v };
+				coverageTable.rows.push(row);
+			});
+
 		submitApiOptions.inputs.tables.push(coverageTable);
 
 		submitApiOptions.inputs.iCustomKamlInput = "custom-value";
@@ -4215,7 +4303,7 @@ This event is triggered to signal the 'end' of a DOM manipulation due to reactiv
 
 #### IKatApp.apiStart
 
-**`apiStart( endpoint: string, submitData: ISubmitApiData, trigger: JQuery<HTMLElement> | undefined, apiOptions: IApiOptions, application: IKatApp ) => boolean`**
+**`apiStart( endpoint: string, submitData: ISubmitApiData, trigger: HTMLElement | undefined, apiOptions: IApiOptions, application: IKatApp ) => boolean`**
 
 This event is triggered immediately before submitting the to an api endpoint.  This handler could be used to modify the `submitData` if required.  If the handler returns `false` or calls `e.preventDefault()`, then the api endpoint submission is immediately cancelled.
 
@@ -4234,7 +4322,7 @@ interface ISubmitApiData {
 
 #### IKatApp.apiComplete
 
-**`apiComplete( endpoint: string, successResponse: IStringAnyIndexer | undefined, trigger: JQuery<HTMLElement> | undefined, apiOptions: IApiOptions, application: IKatApp )`**
+**`apiComplete( endpoint: string, successResponse: IStringAnyIndexer | undefined, trigger: HTMLElement | undefined, apiOptions: IApiOptions, application: IKatApp )`**
 
 This event is triggered upon successful submission and response from the api endpoint that **is not** an endpoint that generates 'file download'.
 
@@ -4250,7 +4338,7 @@ application.handleEvents(events => {
 
 #### IKatApp.apiFailed
 
-**`apiFailed( endpoint: string, errorResponse: IApiErrorResponse, trigger: JQuery<HTMLElement> | undefined, apiOptions: IApiOptions, application: IKatApp )`**
+**`apiFailed( endpoint: string, errorResponse: IApiErrorResponse, trigger: HTMLElement | undefined, apiOptions: IApiOptions, application: IKatApp )`**
 
 This event is triggered when submission to an api endpoint fails.  The `errorResponse` object will have a `Validations` property that can be examined for more details about the cause of the exception. See [IKatApp.apiAsync](#ikatappapiasync) for more information on the `IApiErrorResponse` interface.
 
@@ -4305,10 +4393,20 @@ application.configure(config => {
 
 This event is triggered whenever a KatApp input has been updated.  It is a 'catch all' event that allows an application to bind a single event handler on the KatApp when all (or almost all inputs) on the page will use the same event handler.  The same goal could be accomplished via a [`IKaInputModel.events.input` delgate](#v-ka-input-model).
 
+## IKatAppEventFluentApi
+
+The `IKatAppEventFluentApi` interface is returned when using `application.on()` or `application.off()` methods.  It allows for chaining of the `on` and `off` methods to allow for multiple event handlers to be registered or removed in a single call chain.  It also contains the results of the original `selector` used during the first `on` or `off` call.
+
+Item | Description
+---|---|---
+`elements` | `Array<T extends HTMLElement>` | The elements matching the original selector of [`on`](#ikatappon) or [`off`](#ikatappoff).  If the elements selected are needed for other actions (i.e. applying styles, attributes, or effects), they can be accessed via this property.
+`on` | ( events: string, handler: (e: Event) => void ): IKatAppEventFluentApi` | Registers an event handler for the specified event(s) on all elements matching the original selector.
+`off` | ( events: string ): IKatAppEventFluentApi` | Removes all event handlers for the specified event(s) on all elements matching the original selector.
+
 
 ## Supporting Interfaces
 
-In addition to the primary `IKatApp` and `IKatAppOptions` interfaces, there are supporting interfaces that Kaml View developers will not necessarily declare, but rather are interfaces for properties or parameters on the main interface methods that are used.
+In addition to the primary `IKatApp`, `IKatAppEventFluentApi`, and `IKatAppOptions` interfaces, there are supporting interfaces that Kaml View developers will not necessarily declare, but rather are interfaces for properties or parameters on the main interface methods that are used.
 
 ### IStringIndexer / IStringAnyIndexer
 
@@ -4604,8 +4702,8 @@ Property | Type | Description
 ---|---|---
 `confirmedAsync` | `(response?: any) => Promise<void>` | Use the `confirmedAsync` property to access a method the KatApp Framework injected for use to indicate when a modal has been 'confirmed'.  See [IModalAppOptions confirmedAsync Sample](#imodalappoptions-confirmedasync-sample) for more information.
 `cancelled` | `(response?: any) => void` | Use the `cancelled` property to access a method the KatApp Framework injected for use to indicate when a modal has been 'cancelled'.<br/><br/>Optionally, a response object can be returned as well.  See [IModalAppOptions confirmedAsync Sample](#imodalappoptions-confirmedasync-sample) for sample on how to call helper methods on `modalAppOptions`.
-`closeButtonTrigger` | `string` | By default, when a modal application is displayed and there is a [`title`](#imodaloptionslabelstitle) provided, the modal allows the user to press `ESC` or click a dismissable `X` close button to close the dialog.  When this occurs, the [`cancelled`](#imodalappoptionscancelled) method is called. If the modal application state requires different behavior to occur, a JQuery selector string can be provided and the KatApp framework will click this instead.<br/><br/>Examples:<br/>1. A modal application has worked its way through 'steps', completed its function, and has arrived at the final 'confirm' step and is only presenting an 'OK' button to close the dialog and indicate 'confirmed' to the host application.  At this point, the modal application would want to assign `closeButtonTrigger` to a selector that would trigger clicking the 'OK' button.<br/>2. A modal has a primary function (i.e. selecting beneficiaries), but supports a secondary function (i.e. creating a new beneficiary on the fly) simply by changing its UI.  Dismissing the 'secondary' function via `ESC` or the `X` close button should only dismiss the secondary function and return to the primary function.  When displaying the secondary function UI, the modal application should assign the `closeButtonTrigger` and then clear it out when the secondary UI is hidden.
-`triggerLink` | `JQuery` | Read Only;  If the current modal application was launched via a [`v-ka-modal`](#v-ka-modal) link, the `trigger` property will be set to this JQuery element.  This would allow the Kaml View acting as the modal to inspect information that may have been placed on the 'trigger link' (i.e. `data-*` attributes) to provide additional information internal to the sites overall functionality.
+`closeButtonTrigger` | `string` | By default, when a modal application is displayed and there is a [`title`](#imodaloptionslabelstitle) provided, the modal allows the user to press `ESC` or click a dismissable `X` close button to close the dialog.  When this occurs, the [`cancelled`](#imodalappoptionscancelled) method is called. If the modal application state requires different behavior to occur, a selector string can be provided and the KatApp framework will click this element inside if a valid element is returned from `application.selectElement`.<br/><br/>Examples:<br/>1. A modal application has worked its way through 'steps', completed its function, and has arrived at the final 'confirm' step and is only presenting an 'OK' button to close the dialog and indicate 'confirmed' to the host application.  At this point, the modal application would want to assign `closeButtonTrigger` to a selector that would trigger clicking the 'OK' button.<br/>2. A modal has a primary function (i.e. selecting beneficiaries), but supports a secondary function (i.e. creating a new beneficiary on the fly) simply by changing its UI.  Dismissing the 'secondary' function via `ESC` or the `X` close button should only dismiss the secondary function and return to the primary function.  When displaying the secondary function UI, the modal application should assign the `closeButtonTrigger` and then clear it out when the secondary UI is hidden.
+`triggerLink` | `HTMLElement?` | Read Only;  If the current modal application was launched via a [`v-ka-modal`](#v-ka-modal) link, the `trigger` property will be set to this element.  This would allow the Kaml View acting as the modal to inspect information that may have been placed on the 'trigger link' (i.e. `data-*` attributes) to provide additional information internal to the sites overall functionality.
 
 #### IModalAppOptions confirmedAsync Sample
 
@@ -4732,10 +4830,11 @@ application.on("updateApiOptions.ka", (event, submitOptions) => {
     // Loop all inputs that start with iCoverageA- and process them.
     // data-inputname is in form of iCoverageA-id
     // For each input, create a row with id/covered properties
-    var inputControlData = application.select("div[data-inputname^=iCoverageA-]");
-    inputControlData.each(function (index, element) {
-        var id = $(element).data("inputname").split("-")[1];
-        var v = $(element).hasClass("active") ? 1 : 0;
+    application
+		.selectElements("div[data-inputname^=iCoverageA-]")
+		.forEach(element => {
+        var id = element.getAttribute("data-inputname").split("-")[1];
+        var v = element.classList.contains("active") ? 1 : 0;
         var row = { "id": id, covered: v };
         coverageTable.rows.push(row);
     });
