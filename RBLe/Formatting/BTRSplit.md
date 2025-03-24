@@ -13,6 +13,6 @@ Parameter | Type | Default | Description
 `listValues` | String |  | Delimmited list of values to split into an array.
 `delimiter` | String? | `","` | Optional.  Single character used to delimit the list.  Comma is the default.
 `index` | Int32? |  | Optional.  If BTRSplit is not sheet array formula, but used inline in cell formula, can provide 1 based index of value to return to eliminate need of INDEX() call.
-`indexOutOfRangeDefault` | String? |  | Optional.  If index is provided and is out of range of the values array, return this as the value.  Default is to return #VALUE.
+`indexOutOfRangeDefault` | String? |  | Optional.  If index is provided and is out of range of the values array, provide a STRING value to return otherwise, by default, #VALUE is returned.
 
 [Back to Formatting](Readme.md) | [Back to All RBLe Functions](/RBLe/Readme.md#function-documentation)
