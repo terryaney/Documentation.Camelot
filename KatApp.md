@@ -136,7 +136,7 @@ input&#x2011;tab | Attribute; The name of the tab where KatApp framework should 
 result&#x2011;tabs | Attribute; Comma delimitted list of result tabs to process during RBLe Calculation. When more than one result tab is provided, the tab is referenced by name; usually via a `tab` property passed into a Vue directive. Default is `RBLResult`.  [Input Token Substition](#input-token-substition) is supported.
 configure&#x2011;ui | Attribute; Whether or not this CalcEngine should run during the Kaml View's original [Configure UI Calculation](#IKatApp.configureUICalculation). Default is `true`.
 enabled | Attribute; Whether or not this CalcEngine should run during calculation processing. Default is `true`.  [Input Token Substition](#input-token-substition) and [Attribute Evaluation](#attribute-evaluation) are supported.
-pipeline | Element; One or more 'CalcEngines' to use in a [Calculation Pipelines](#calculation-pipelines) for the current CalcEngine.  Only the `name`, `input-tab`, and `result-tab` attributes are supported.  By default, if only a `name` is provided, the input and the result tab with the *same* name as the tabs configured on the primary CalcEngine will be used.
+pipeline | Element; Optional 'CalcEngines' to use in a [Calculation Pipeline](#calculation-pipelines) for the current CalcEngine.  Only the `name`, `input-tab`, and `result-tab` (**note singlular name**) attributes are supported.  By default, if only a `name` is provided, the input and the (first) result tab with the *same* name as the tabs configured on the primary CalcEngine will be used.
 
 ### Input Token Substition
 
