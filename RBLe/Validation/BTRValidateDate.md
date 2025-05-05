@@ -5,7 +5,7 @@ Returns an integer indicating whether an input string is a valid date and within
 ## Syntax
 
 ```excel
-=BTRValidateDate(value, minimum, maximum, culture, allowedFormats, validDates)
+=BTRValidateDate(value, minimum, maximum, culture, allowedFormats, validDates, twoDigitYearsAreCurrentCentury)
 ```
 
 Parameter | Type | Default | Description
@@ -16,5 +16,6 @@ Parameter | Type | Default | Description
 `culture` | String? | `"en-US"` | A string that supplies culture-specific format information about `value`.
 `allowedFormats` | String? |  | A `\|` delimitted string that supplies a list of allowable formats to attempt to parse `value`.
 `validDates` | String? |  | A `,` delimitted string of allowable dates to validate in the format of 1..N, Last, Mon-Sun, Mon-Sun.[N\|Last] (Nth occurence of or last day in month), or W1-W5 (first through the fifth week of month).  If pattern starts with `!`, it is a 'not' check.
+`twoDigitYearsAreCurrentCentury` | Object? |  | Whether or not all 2 digit years are treated as being in the current century.
 
 [Back to Validation](Readme.md) | [Back to All RBLe Functions](/RBLe/Readme.md#function-documentation)
