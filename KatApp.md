@@ -1951,7 +1951,7 @@ Property | Type | Description
 * [Standard date format strings](https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-date-and-time-format-strings#table-of-format-specifiers)
 * [Custom date format strings](https://learn.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings)
 
-The value can also be provided via the combination of `rbl-sliders.format` and `rbl-sliders.decimals` or the `rbl-input.display-format` RBLe Framework calculation value. When the format comes from `rbl-sliders`, it will be turned into the string of `{0:format + decimals}` (i.e. {0:p2} if `format` was `p` and `decimals` was `2`).
+The value can also be provided via the combination of `rbl-sliders.format` and `rbl-sliders.decimals` or the `rbl-input.display-format` RBLe Framework calculation value. When the format comes from `rbl-sliders`, it will be turned into the string of `format + decimals` (i.e. {0:p2} if `format` was `p` and `decimals` was `2`).
 
 <sup>3</sup> The `base` parameter passed into the delegate gives access to the associated `base.display`, `base.disabled`, and `base.noCalc` properties configured by the default RBLe Framework calculation value processing described above in each property.
 
@@ -3567,32 +3567,20 @@ When a Kaml Vew is a nested or modal application, it can use the `application.op
 Property | Type | Description
 ---|---|---
 `view` | `string \| undefined` | The name of the Kaml View to use in the KatApp in the format of `folder:name`.  Non-modal KatApps will always pass in a view via `"view": "Channel.Home"`.  The only time `view` is `undefined` is when [application.showModalAsync](#ikatappshowmodalasync) is called and static HTML content is passed in via the [IModalOptions.content](#imodaloptionscontent) or [IModalOptions.contentSelector](#imodaloptionscontentselector).
-`calculationUrl` | `string` | Url (usually an api endpoint in Host Environment) where RBLe Framework calculations should be posted to. A common endpoint that is used is `api/rble/sessionless-proxy`.
-`katDataStoreUrl` | `string \| undefined` | Url of where to download Kaml View and Template files from if they are not hosted in Host Environment.  If not provided, defaults to `https://btr.lifeatworkportal.com/services/camelot/datalocker/api/kat-apps/{name}/download`
-`kamlVerifyUrl` | `string` | Url (api endpoint in Host Environment) where Kaml views requested modal and nested KatApp applications are verified.  If not provided, defaults to `api/katapp/verify-katapp`.
-`anchoredQueryStrings` | `string?` | Optional query string that should be merged with every api call.  If not provided, it will use the query string (if any) that is present on the `calculationUrl`.
 `debug` | [`IKatAppDebugOptions \| undefined`](#ikatappdebugoptions) | Provide debug configuration used throughout lifetime of KatApp.
-`dataGroup` | `string` | The name of the current 'data group' that the user data is tied to.  Used as identification in tracing.
-`baseUrl` | `string?` | Optional string to indicate the base url to use before calling api endpoints.  It will be prepended before the `api/`.
-`currentPage` | `string` | The name of the current page as it is known in the Host Environment.  If a Kaml View is a shared view for various functionalities, this can be used in Kaml View javascript or a CalcEngine to help distinguish in which 'context' a Kaml View is running.
+`endpoints` | [`IKatAppEndpointOptions`](#ikatappendpointoptions) | Provide endpoint configurations used throughout lifetime of KatApp to communicate with Host environment.
+`delegates` | [`IKatAppDelegateOptions \| undefined`](#ikatappdelegateoptions) | Provide delegate/callback methods used throughout lifetime of KatApp.
 `userIdHash` | `string` | If the Kaml View is running in the context of a logged in user, a `userIdHash` can be passed in.  This value is used during caching operations that use browser sessionStorage.
+`dataGroup` | `string` | The name of the current 'data group' that the user data is tied to.  Used as identification in tracing.
+`currentPage` | `string` | The name of the current page as it is known in the Host Environment.  If a Kaml View is a shared view for various functionalities, this can be used in Kaml View javascript or a CalcEngine to help distinguish in which 'context' a Kaml View is running.
 `environment` | `string` | The name of the current environment as it is known in the Host Environment. This can be used in Kaml View javascript or a CalcEngine if different functionality needs to occur based on which environment (i.e. DEV, QA, PROD) a Kaml View is running<br/><br/>This value is passed into the RBLe Framework calculations via the `iEnvironment` input.
 `requestIP` | `string` | The IP address of the browser running the current KatApp.
-`currentCulture` | `string` | The current culture as it is known in the Host Environment.  This enables culture specific number and date formatting and is in the format of `languagecode2-country/regioncode2`.  The default value is `en-US`.<br/><br/>This value is passed into the RBLe Framework calculations via the `iCurrentCulture` input.  This controls default number and date formatting.
-`currentUICulture` | `string` | The current culture as it is known in the Host Environment.  This enables culture specific number and date formatting and is in the format of `languagecode2-country/regioncode2`.  The default value is `en-US`.<br/><br/>This value is passed into the RBLe Framework calculations via the `iCurrentUICulture` input.  This is primarily regarding the UI localization/translation part of the app.
 `inputs` | [`ICalculationInputs`](#icalculationinputs) | The Host Environment can pass in inputs that serve as the default values to inputs rendered in the Kaml View or simply as 'fixed' inputs (if no matching rendered inputs are present that would update them) that will be passed to every RBLe Framework calculation.  This value becomes the initial value for [`IState.inputs`](#istateinputs-icalculationinputs) when the KatApp is created.
 `inputCaching` | `boolean` | Whether or not the page inputs are cached after each calculation.  This allows the user to leave a page and come back and the inputs would automatically be retored.  The default is `false`.
-`manualResults`<sup>1</sup> | [`Array<IManualTabDef>`](#imanualtabdef) | The Host Environment can pass in 'manual results'.  These are results that are usually generated one time on the server and cached as needed.  Passing manual results to a KatApp removes the overhead needed to perform a RBLe Framework calculation.  
-`manualResultsEndpoint` | `string` | Similiar to `manualResults`, if provided, this endpoint could be called to retrieve a `manualResults` object from the Host Environment that is of type [`Array<IManualTabDef>`](#imanualtabdef).  Used to leverage browser caching.
-`relativePathTemplates`<sup>2</sup> | `IStringIndexer<string>` | If the Host Environment hosts all its own Kaml Views and Kaml Template files, instead of the KAT CMS, all the relative paths to existing Kaml Template files can be provided, instructing KatApp Framework to request it via relative path.
+`manualResults`<sup>1</sup> | [`Array<IManualTabDef>`](#imanualtabdef) | The Host Environment can pass in 'manual results'.  These are results that are usually generated one time on the server and cached as needed.  Passing manual results to a KatApp removes the overhead needed to perform a RBLe Framework calculation. 
 `resourceStrings` | [`IResourceStrings`](#iresourcestrings) | The Host Environment can pass in 'resource strings'.  This object is usually generated one time on the server and cached as needed and provides the KatApp the ability to localize its strings via the [v-ka-resource](#v-ka-resource) directive or via the [IKatApp.getLocalizedString](#ikatappgetlocalizedstring) method. 
-`resourceStringsEndpoint` | `string` | Similiar to `resourceStrings`, if provided, this endpoint could be called to retrieve the `resourceStrings` object from the Host Environment that is of type [`IResourceStrings`](#iresourcestrings).  Used to leverage browser caching.
-`relativePathTemplates`<sup>2</sup> | `IStringIndexer<string>` | If the Host Environment hosts all its own Kaml Views and Kaml Template files, instead of the KAT CMS, all the relative paths to existing Kaml Template files can be provided, instructing KatApp Framework to request it via relative path.
 `modalAppOptions` | [`IModalAppOptions`](#imodalappoptions) | Read Only; When a KatApp is being rendered as a modal ([v-ka-modal](#v-ka-modal)) application, the KatApp Framework will automatically assign this property; a [IModalAppOptions](#imodalappoptions) created from the [IModalOptions](#imodaloptions) parameter passed in when creating modal application.<br/><br/>This property is not accessed often; `modalAppOptions` is accessed when a Kaml View, launched as a modal, needs to call `modalAppOptions.cancelled` or `modalAppOptions.confirmedAsync`.
 `hostApplication` | [`IKatApp`](#ikatapp) | Read Only; When a KatApp is being rendered as a nested ([v-ka-app](#v-ka-app)) or modal ([v-ka-modal](#v-ka-modal)) application, the KatApp Framework will automatically assign this property to a reference of the KatApp application that is creating the nested or modal application.<br/><br/>This property is not acesed often; `hostApplication` is access when a Kaml View needs to call [`KatApp.notifyAsync`](#ikatappnotifyasync).
-`katAppNavigate` | `(id: string, props: IModalOptions, el: HTMLElement) => void \| undefined` | To allow navigation to occur from within a KatApp (via [v-ka-navigate](#v-ka-navigate)), a reference to a javascript function must be assigned to this property. The KatApp Framework will call this function (created by the Host Environment) when a navigation request has been issued.  It is up to the Host Environment's javascript to do the appropriate processing to initiate a successful navigation.
-`encryptCache` | `(data: object) => string \| Promise<string>` | RBL results are cached in browser storage.  This delegate allows the client to provide a JavaScript function that will encrypt the data before storing the results.  By default, the results are not cached.
-`decryptCache` | `(cipher: string) => object \| Promise<object>` | If the RBL results were encrypted before caching in browser storage, this delegate allows the client to provide a JavaScript function that will decrypt the data before returning the results.  By default, the results are not cached.
 
 <sup>1</sup> Not only can the manual results be a RBLe Framework calculation performed on the server, it can also be post processed and modified a bit before passing in to the KatApp or the manual results can be completely generated via server side code without using the RBLe Framework.  As long as the results match the `IManualTabDef` interface, it can be used.
 
@@ -3611,7 +3599,22 @@ Property | Type | Description
 ]
 ```
 
-<sup>2</sup> `relativePathTemplates` is an object in the format of the following:
+### IKatAppEndpointOptions
+
+Optional debugging options that can be used during the development of a KatApp's Kaml View or CalcEngine.
+
+Property | Type | Description
+---|---|---
+`calculation` | `string` | Url (usually an api endpoint in Host Environment) where RBLe Framework calculations should be posted to. A common endpoint that is used is `api/rble/sessionless-proxy`.
+`katDataStore` | `string \| undefined` | Url of where to download Kaml View and Template files from if they are not hosted in Host Environment.  If not provided, defaults to `https://btr.lifeatworkportal.com/services/camelot/datalocker/api/kat-apps/{name}/download`
+`kamlVerification` | `string` | Url (api endpoint in Host Environment) where Kaml views requested modal and nested KatApp applications are verified.  If not provided, defaults to `api/katapp/verify-katapp`.
+`manualResults` | `string` | Similiar to `manualResults`, if provided, this endpoint could be called to retrieve a `manualResults` object from the Host Environment that is of type [`Array<IManualTabDef>`](#imanualtabdef).  Used to leverage browser caching.
+`resourceStrings` | `string` | Similiar to `resourceStrings`, if provided, this endpoint could be called to retrieve the `resourceStrings` object from the Host Environment that is of type [`IResourceStrings`](#iresourcestrings).  Used to leverage browser caching.
+`anchoredQueryStrings` | `string?` | Optional query string that should be merged with every api call.  If not provided, it will use the query string (if any) that is present on the `calculationUrl`.
+`baseUrl` | `string?` | Optional string to indicate the base url to use before calling api endpoints.  It will be prepended before the `api/`.
+`relativePathTemplates`<sup>1</sup> | `IStringIndexer<string>` | If the Host Environment hosts all its own Kaml Views and Kaml Template files, instead of the KAT CMS, all the relative paths to existing Kaml Template files can be provided, instructing KatApp Framework to request it via relative path.
+
+<sup>1</sup> `relativePathTemplates` is an object in the format of the following:
 
 ```javascript
 // The 'Rel:' prefix is required and informs KatApp Framework that is is a relative path.
@@ -3622,7 +3625,33 @@ Property | Type | Description
 }									
 ```
 
-## IKatAppDebugOptions
+### IKatAppDelegateOptions
+
+Optional delegate options that can be used to instruct how the KatApp framework can call into delegate/callback methods found in the Host Environment.
+
+Property | Type | Description
+---|---|---
+`encryptCache` | `(data: object) => string \| Promise<string>` | RBL results are cached in browser storage.  This delegate allows the client to provide a JavaScript function that will encrypt the data before storing the results.  By default, the results are not cached.
+`decryptCache` | `(cipher: string) => object \| Promise<object>` | If the RBL results were encrypted before caching in browser storage, this delegate allows the client to provide a JavaScript function that will decrypt the data before returning the results.  By default, the results are not cached.
+`getSessionKey` | `(key: string) => string` | Generates a session key specific to KatApp framework when storing information in browser `sessionStorage`.
+`getSessionItem` | `<T = string>(key: string, oneTimeUse?: boolean) => T \| undefined` | Retrieves a session item from the browser `sessionStorage` given the requested `key`.  The `oneTimeUse` parameter indicates if the item should be removed from storage after it is retrieved.  The default value is `false`.
+`setSessionItem` | `(key: string, value: any) => void` | Sets a session item in the browser `sessionStorage` given the requested `key` and `value`.
+``removeSessionItem` | `(key: string) => void` | Removes a session item from the browser `sessionStorage` given the requested `key`.
+`katAppNavigate` | `(id: string, props: IModalOptions, el: HTMLElement) => void \| undefined` | To allow navigation to occur from within a KatApp (via [v-ka-navigate](#v-ka-navigate)), a reference to a javascript function must be assigned to this property. The KatApp Framework will call this function (created by the Host Environment) when a navigation request has been issued.  It is up to the Host Environment's javascript to do the appropriate processing to initiate a successful navigation.
+
+### IKatAppIntlOptions
+
+Optional settings used when formatting numbers and dates in the KatApp Framework.
+
+Property | Type | Description
+---|---|---
+`currentCulture` | `string` | The current culture as it is known in the Host Environment.  This enables culture specific number and date formatting and is in the format of `languagecode2-country/regioncode2`.  The default value is `en-US`.<br/><br/>This value is passed into the RBLe Framework calculations via the `iCurrentCulture` input.  This controls default number and date formatting.
+`currentUICulture` | `string` | The current culture as it is known in the Host Environment.  This enables culture specific number and date formatting and is in the format of `languagecode2-country/regioncode2`.  The default value is `en-US`.<br/><br/>This value is passed into the RBLe Framework calculations via the `iCurrentUICulture` input.  This is primarily regarding the UI localization/translation part of the app.
+`currencyDecimalSeparator` | `string` | Based on the current `currentCulture` value, this is the currency decimal separator.  The default value is `.`.
+`currencyCode` | `string` | Based on the current `currentCulture` value, this is the currency code.  The default value is `USD`.
+
+
+### IKatAppDebugOptions
 
 Optional debugging options that can be used during the development of a KatApp's Kaml View or CalcEngine.
 
