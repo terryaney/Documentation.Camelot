@@ -121,7 +121,7 @@ Inside each Kaml View file is a required `<rbl-config>` element; This should be 
 </rbl-config>
 ```
 
-When multiple CalcEngines or result tabs are used, additional information can be required to specify the appropriate results.  See the [`rbl.source()`](#istaterblsource) method for more information on how the appropriate CalcEngine/Tab name combination is determined specifying non-default CalcEngine results and how they are used in the [`rbl.exists()`](#istaterblexists), [`rbl.boolean()`](#istaterblboolean), [`rbl.value()`](#istaterblvalue) and [`rbl.number()`](#istaterblnumber) methods and the [v-ka-value](#v-ka-value), [v-ka-table](#v-ka-table), and [v-ka-highchart](#v-ka-highchart) directives.
+When multiple CalcEngines or result tabs are used, additional information can be required to specify the appropriate results.  See the [`rbl.source()`](#istaterblsource) method for more information on how the appropriate CalcEngine/Tab name combination is determined specifying non-default CalcEngine results and how they are used in the [`rbl.exists()`](#istaterblexists), [`rbl.boolean()`](#istaterblboolean), [`rbl.value()`](#istaterblvalue) and [`rbl.number()`](#istaterblnumber) methods and the [v-ka-value](#v-ka-value), [v-ka-table](#v-ka-table), [v-ka-chart](#v-ka-chart), and [v-ka-highchart](#v-ka-highchart) directives.
 
 **Important** - Whenever multiple CalcEngines are used, you must provide a `key` attribute; minimally on CalcEngines 2...N, but ideally on all of them.  Note that the first CalcEngine will be assigned a key value of `default` if no `key` is provided.
 
@@ -431,7 +431,7 @@ rbl: {
 }
 ```
 
-<sup>2</sup> Given the following configuration for multiple CalcEngines and tabs, the `rbl.options` object can be used in the following scenarios.  Note, that when `options.calcEngine` or `options.tab` are set, all KatApp directives (`v-ka-value`, `v-ka-template`, `v-ka-table`, `v-ka-highchart`, etc.) that access RBLe Results will also obey the settings.
+<sup>2</sup> Given the following configuration for multiple CalcEngines and tabs, the `rbl.options` object can be used in the following scenarios.  Note, that when `options.calcEngine` or `options.tab` are set, all KatApp directives (`v-ka-value`, `v-ka-template`, `v-ka-table`, `v-ka-chart`, `v-ka-highchart`, etc.) that access RBLe Results will also obey the settings.
 
 ```html
 <rbl-config templates="Standard_Templates,LAW:Law_Templates">
@@ -1603,6 +1603,7 @@ Similiar to common Vue directives, the KatApp Framework provides custom directiv
 - [v-ka-modal](#v-ka-modal) - Configure a `HTMLElement` to open up a modal dialog (containing fixed markup or seperate Kaml View) on click.
 - [v-ka-app](#v-ka-app) - Nest an instance of a seperate Kaml View within the current Kaml View (the KatApps will be isolated from each other).
 - [v-ka-table](#v-ka-table) - Render HTML tables automatically from the calculation results based on `text*` and `value*` columns.
+- [v-ka-chart](#v-ka-chart) - Render SVG chart automatically from the calculation results.
 - [v-ka-highchart](#v-ka-highchart) - Render Highcharts chart automatically from the calculation results.
 - [v-ka-attributes](#v-ka-attributes) - Accepts a key/value space delimitted `string` of attributes and applies them to the current `HTMLElement`.
 - [v-ka-needs-calc](#v-ka-needs-calc) - Flag UI submission link/button as requiring a RBLe Framework calculation to complete before user can submit the form.
@@ -2877,6 +2878,137 @@ When using bootstrap widths, the `width` value is applied to the `col` element i
 ### v-ka-table Row Processing
 
 In addition to the header row, spanning, and column width processing described above, the final step is to render a HTML table rows and cells.  For each row returned in the specified table source a `tr` element is created.  Then for each column in that row whose name starts with `text` or `value`, a `td` or `th` element is created and the value along with the appropriate css classes described in [v-ka-table Result Table Columns](v-ka-table-Result-Table-Columns).
+
+## v-ka-chart
+
+The `v-ka-chart` directive is responsible for creating HTML/javascript based chart objects (leveraging SVG creation on browser canvas) from the calculation results.
+
+- [v-ka-chart Model](#v-ka-chart-model) - Discusses the properties that can be passed in to configure the `v-ka-chart` directive.
+- [v-ka-chart Table Layouts](#v-ka-chart-table-layouts) - Discusses the tables in the RBLe CalcEngine used to render a chart.
+- [v-ka-chart Options](#v-ka-chart-configuration) - Discusses configuration options supported by the KatApp framework.
+
+### v-ka-chart Model
+
+The `IKaChartModel` represents the model type containing the properties that configure how a `v-ka-chart` will render.
+
+The `v-ka-chart` directive *does* have a `string` shorthand syntax that allows for more terse markup.  If the chart to be rendered only needs to provide a `data` and, optionally, an `options` name to the directive, the following can be used.
+
+```html
+<!-- The following v-ka-chart examples are equivalent -->
+<div v-ka-chart="PayChart"></div>
+<div v-ka-chart="{ data: 'PayChart' }"></div>
+
+<!-- The following v-ka-chart examples are equivalent -->
+<div v-ka-highchart="PayChart.PieOptions"></div>
+<div v-ka-highchart="{ data: 'PayChart', options: 'PieOptions' }"></div>
+```
+
+Property | Type | Description
+---|---|---
+`data` | `string` | The *partial* name of the RBLe Framework result table providing the 'data' to the chart.  This value will be translated into `Highcharts-{model.data}-Data` when retrieving results from the calculation.
+`mode` | `('chart' | 'legend')?` | What the directive should render.  By default, it renders a SVG chart *and* html legend (unless CalcEngine options turns off).  If the default rendering and positioning does not work, `mode` can be used to render only what is needed.  If provided, the `legend.show` option is ignored.
+`from` | `number?` | If provided, the chart will be sliced to only show the range of categories.  If not provided, all categories will be shown.  This is useful when lots of categories are available and client will render multiple charts with different ranges to display 'all' data (or to change the range of data shown without the need of a re-calculation).  **Note**: `from` and `to` must be provided together.
+`to` | `number?` | If provided, the chart will be sliced to only show the range of categories.  If not provided, all categories will be shown.  This is useful when lots of categories are available and client will render multiple charts with different ranges to display 'all' data (or to change the range of data shown without the need of a re-calculation). **Note**: `from` and `to` must be provided together.
+`legendItemSelector` | `string?` | If provided, rendered legend needs to have `.ka-chart-legend-{name.toLower()}` class.  Then each item needs to have `ka-chart-highlight-key="{series.name}"` attribute.  Each 'text' element containing info that should be opaque needs to be provided via selector (i.e. `div.legend-hover`).
+`maxHeight` | `number?` | If provided, the charts height will be restricted to the specified number of px.
+`breakpoints` | `object` | If any breakpoints are provided, the primary chart will be wrapped with appropriate bootstrap classes to make it render, then based on provided breakpoints, rendering will be done appropriately based on bootstrap classes.  On the breakpoints object, `xs`, `sm`, `md`, `lg`, and `xl` are supported.  Each of these properties are optional and are of type [`IKaChartModelBreakpoint`](#v-ka-chart-breakpoint-model).  
+`ce` | `string` | If the RBLe Framework results to process is not part of the default Kaml View CalcEngine, a CalcEngine key can provided.
+`tab` | `string` | If the RBLe Framework results to process is not part of the default result tab (`RBLResult`), a tab name can provided.
+
+### v-ka-chart Breakpoint Model
+
+The `IKaChartModelBreakpoint` represents the model type containing the properties that configure how a breakpoint chart will render.
+
+Property | Type | Description
+---|---|---
+`maxHeight` | `number?` | If provided, the charts height will be restricted to the specified number of px in given breakpoint.  Default is `model.maxHeight`.
+`categories` | `number?` | The number of categories to show per chart (multiple charts will be rendered to display all categories with equal scaling).  Default is all categories.
+`fontMultiplier` | `number?` | If provided, the multiplier to use on all chart fonts.  Default is CalcEnging option `.fontMultiplier` ?? `1.0`.  This is useful when there is a wide aspect ratio for the chart and fonts become too small to read in small breakpoints.
+
+
+### v-ka-chart Table Layouts
+
+Primarily, the tables used to produce SVG charts in a Kaml view are self contained and have both configuration options and data provided in the same table.  There are capabilities to provide a set of [shared options](#v-ka-chart-option-tables) to be used by more than one chart if necessary.
+
+#### v-ka-chart Table
+
+Provides the data and configuration to build the chart.  Chart tables have `id`, `value`, and `dataN` columns.
+
+Column | Description
+---|---
+`id` | Identifies the purpose of the row.<br/><br/>`type` - (required) Indicates that the `value` column will contain the chart type to render.<br/><br/>`options` - (optional) If shared options are available, provide the table name here.<br/><br/>`category` - (required) Identifies the row as 'data' and typically represents an entry on xAxis when applicable.  Exceptions to this are when it made more sense to have multiple `data*` columns for each piece of data so that they could be configured with corresponding configuration rows (`text`, `color`, etc.).  For example, `pie`, `donut`, and `column` type charts wouldn't normally have multiple `dataN` columns but it was easier to control configuration.<br/><br/>`text`, `color`, `shape` - (required) Core setting id's.  For each series/data element, provide label, color, and shape (when applicable).<br/><br/>All other IDs - Specify optional configuration settings to use during chart creation.  See [v-ka-chart Configuration](#v-ka-chart-configuration) for more information on supported settings.
+`value` | Provide value for applicable rows.  For configuration settings, it contains the value to use.  For `category` rows, it is the label of the xAxis item.  Any other scenarios do not use this column.
+`dataN` | Typically aligns with 'series', but for charts with 'single series' of data, to make it easier to assign configuration values, in those cases, each `dataN` column is a 'single value' to be plotted.  At time of writing, `pie`, `donut` and `column` are examples of these types of 'single series' charts that use multiple `dataN` columns.
+
+#### v-ka-chart Option Tables
+
+The tables used to produce shared chart options are simply 'key/value pair' tables.  If present, `chartOptions` is the 'global' options used on all charts.  Additionally, a CalcEngine can specify an option table to use via the `options` setting provided in the chart table.
+
+The precedence of chart options is discovered in following order:
+
+1. Value provided in the [data table](#v-ka-chart-table).
+1. Value provided in the options table specified via `options` setting (if provided).
+1. Value provided in the global `chartOptions` table (if provided).
+
+Column | Description
+---|---
+id | The name of the option.  Can be a `period` delimitted key that matches the object hierarchy (i.e. `dataLabels.format`) or the property name of the object when the value provides a complete json string representing the object.
+value | The value of the option.  See [v-ka-chart Configuration](#v-ka-chart-configuration) for supported settings.
+
+### v-ka-chart Configuration
+
+The following options are supported by the KatApp framework.  Configuration values can be specified with an `id` that has a `.` delimitted key that matches the object hierarchy (i.e. `dataLabels.format`) or a complete json string representing the object.  Note that both the full object json string can be provided and then any other properties specifically provided via delimited `.` will complete/override the configuration for the object.
+
+As an example, if the following configuration rows were provided (order of rows in CalcEngine do not affect processing).
+
+id | value
+---|---
+dataLabels | `{ "show": true, "format": "c0" }`
+dataLabels.format | `c2`
+
+Processing would be:
+1. The `dataLabels` object would be created with `show` set to `true` and `format` set to `c0`.
+2. The `dataLabels.format` would be set to `c2` and override the previous value of `c0`.
+
+Below, all supported options (fully `.` delimited) are listed.
+
+id | Type | Description
+---|---|---
+`type` | `string` | `value` will contain the type of chart to render.  Currently supported types are `column`, `columnStacked`, `donut` and `sharkfin`.<br/><br/>**`dataN` Specific Types** - For `columnStacked` charts, a series can be of two additional types specific to the rendering of this chart.<br/>1. `line` makes the series render as a line as is *not* included in the stacking (or totalling of a stack).<br/>2. `tooltip` makes the stack transparent (invisible) and its value is *only* included in the tooltip (excluded from the legend as well).
+`options` | `string` | If provided, `value` will contain the name of a table containing shared options to be used for this chart.  This is useful when multiple charts are rendered and they share the same options (i.e. colors, fonts, etc.).
+`text`<sup>1</sup> | `string` | Each `dataN` column will contain the label to use for this data entity.
+`color`<sup>1, 5</sup> | `string` | Each `dataN` column will contain the color to use for this data entity.  Colors should be specified in hex format.
+`shape`<sup>1</sup> | `string` | `value` will contain the default shape for every `dataN` column (`square` by default) to use for this data entity in tooltips (if applicable) and generated legend (if applicable).  To change individual shapes, each `dataN` column can contain the shape.  Currently supported shapes are `circle` and `square`.
+`aspectRatio` | `string` | `value` contains aspect ratio of the chart.  Default is `1:1` (square).  Changing the aspect ratio of the chart affects font rendering sizes and may require the use of `font.multiplier`.  The aspect ratio is specified as a string in the format of `width:height` (i.e. `16:9`, `4:3`, etc.).  The aspect ratio is used to determine the width and height of the SVG `viewBox`.<br/><br/>For wide aspect ratios of column charts that have lots of columns/categories rendered making the chart render 'breakpoint charts' the entire json string can be provided to give aspect ratios for each breakpoint.  For example, `{ "value": "2.5:1", "xs": "1.38:1" }` would use `value` property for all renderings other than the `xs` breakpoint which would use `1.38:1`.
+`dataLabels.show` | `boolean` | `value` indicates whether or not to show data labels on column charts.  Default is `false`.
+`dataLabels.format`<sup>2</sup> | `string` | `value` specifies format to use for rendering of any formatted numbers (i.e. data labels, `aria-label` attributes, donut label, etc.).  Default is `format`
+`donut.labelFormatter`<sup>3</sup> | `string?` | `value` contains a string format to use as the label with substitution tokens that will be replaced when rendered.
+`font.multiplier` | `number` | `value` contains the multiplier to use on all chart fonts.  Default is `1.0`.  This is useful when there is a wide aspect ratio for the chart and fonts become too small to read.
+`format`<sup>2</sup> | `string` | `value` contains the default format to use for all unspecified format string configurations (i.e. `dataLabels.format`).  Default is `c0`.
+`highlight.series.hoverItem` | `boolean` | `value` indicates whether or not to highlight the series when hovering over the series.  Default is `true` when `type != 'column' && type != 'donut'`.
+`legend.show` | `boolean` | `value` indicates whether or not to show the legend.  Default is `false`.
+`pie.startAngle` | `number` | `value` contains the starting angle of the pie or donut chart.  Default is `0`.
+`pie.endAngle` | `number` | `value` contains the ending angle of the pie or donut chart.  Default is `360`.
+`tip.show` | `boolean` | `value` indicates whether or not to show tooltips.  Default is `true`.
+`tip.headerFormatter`<sup>4</sup> | `string?` | `value` contains a string format to use as the header with substitution tokens that will be replaced when rendered.
+`tip.includeShape` | `boolean` | `value` indicates whether or not to include the shape in the tooltip.  Default is `true`.
+`tip.includeTotal` | `boolean` | `value` indicates whether or not to include the total in the tooltip.  Default is `true` when `type != 'column' && type != 'donut'` and `dataLabels.show = false`.
+`sharkfin` | `json` | When `type` is `sharkfin`, the `sharkfin` property is shorthand configuration to generate appropriate `plotBand` and `plotLine` configuration for the chart.  The `sharkfin` property is a json string that contains the following properties:<br/><br/>`color` - The color of the plot band to create.<br/>`retirementAge` - The value used for the plot line and the `to` value of the plot band.
+`xAxis.label` | `string?` | `value` contains the label to use for the entire xAxis.
+`xAxis.plotBand` | `json` | `value` contains a json string representing the plot band configuration to use to generate a xAxis plot band.  There can be more than one `xAxis.plotBand` specified when multiple bands are needed.<br/><br/>Plot bands have the following properties supported.  Note that the `from` and `to` properties are in `0.5` increments with `0` being the center of the first column and incrementing by `1` for the center of each column thereafter.  To make a band from the left edge of chart all the way through the first column, `from` would be `-0.5` and `to` would be `0.5`.<br/><br/>	`label.text` - The text to show on the plot band.<br/>`label.textXs` - The text to show on the plot band for xs breakpoint.<br/>`color` - The color of the plot band.<br/>`from` - The starting value of the plot band.<br/>`to` - The ending value of the plot band.
+`xAxis.plotLine` | `json` | `value` contains a json string representing the plot line configuration to use to generate a xAxis plot line.  There can be more than one `xAxis.plotLine` specified when multiple lines are needed.  See the footnote for supported properties.<br/><br/>Plot lines have the following properties supported.  Note that the `value` property is in `0.5` increments with `0` being the center of the first column and incrementing by `1` for the center of each column thereafter.<br/><br/>`label.text` - The text to show on the plot line.<br/>`label.textXs` - The text to show on the plot line for xs breakpoint.<br/>`color` - The color of the plot line.<br/>`value` - The location/value of the plot line.
+`yAxis.label` | `string?` | `value` contains the label to use for the entire yAxis.
+`yAxis.tickCount` | `string?` | `value` contains the number of ticks to render on the yAxis.  The default is `5` ticks.
+
+<sup>1</sup> Usually each `dataN` column represents a series, but can be single value for 'single series charts' as well.
+
+<sup>2</sup> See [Standard number format strings](https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings#standard-format-specifiers) and [Custom number format strings](https://learn.microsoft.com/en-us/dotnet/standard/base-types/custom-numeric-format-strings) for possible format values.  These format strings are processed into settings that can be used by the [Intl.NumberFormat](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat/NumberFormat#options) object.
+
+<sup>3</sup> The available tokens for `donut.labelFormatter` are `{total}` and all the `{dataN}` columns.  Note, each value will have been formatted with `dataLabels.format`.
+
+<sup>4</sup> Currently, the only support token for `tip.headerFormatter` is `{x}` which will be replaced with the xAxis value (i.e. category).  This is useful when the xAxis value is an age, but the header should be something like `Savings at Age {x}`.
+
+<sup>5</sup> If `color` is provided in the global `chartOptions` table, `value` will contain a `,` delimitted list of colors to use for the chart if not specified in the standard options.  The number of colors provided must be equal to or greater than the number of `dataN` columns to render.
 
 ## v-ka-highchart
 
