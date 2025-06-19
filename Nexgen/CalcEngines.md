@@ -156,7 +156,7 @@ When the API is a _GET_ method, the json data returned from the API is massaged 
 
 #### API DataSource CalcEngine Tables
 
-There are two tables that describe the mapping rules when converting Nexgen API responses into BTR xDS Format: `apiDataSource` and `apiDataSourceMapping`.  `apiDataSource` is the 'parent' table of `apiDataSourceMapping`.  That is, endpoints can exist in `apiDataSource` without any mappings, however `apiDataSourceMapping` rows are *always* associated with an existing `apiDataSource` row.  `apiDataSourceMapping` rows are primarily used to describe how to map to historical/transactional data.  The table schemas are described below.  See [Supported Mapping Features](#Supported-Mapping-Features) for information on how different settings provide specific control over how data is mapped to xDS format.
+There are two tables that describe the mapping rules when converting Nexgen API responses into BTR xDS Format: `apiDataSource`, `apiDataSourceMapping`, and `apiDataSourceInputs` (if an API is a `POST` and needs inputs to run at login).  `apiDataSource` is the 'parent' table of `apiDataSourceMapping` and `apiDataSourceInputs`.  That is, endpoints can exist in `apiDataSource` without any mappings or inputs, however not the other way around.  `apiDataSourceMapping` rows are primarily used to describe how to map to historical/transactional data and `apiDataSourceInputs` list inputs to add before calling the Nexgen API.  The table schemas are described below.  See [Supported Mapping Features](#Supported-Mapping-Features) for information on how different settings provide specific control over how data is mapped to xDS format.
 
 ##### apiDataSource Layout
 
@@ -165,7 +165,7 @@ Column | Description
 id | The name of the API which is then referenced in the `apiDataSourceMapping` table, `requires` column, and in [Command Processing](#Command-Processing).  The name should start with a lower case domain prefix (i.e. `hw`, `db`, `com`) which generally matches with the controller name in the API.
 endpoint | The endpoint url (excluding the site url).
 runAtLogin | A value indicating whether or not the API should be ran at login (as a _GET_ method).  _Blank_ or `1` will run it, returning `0` indicates that the API should **not** be run.
-ignoreErrors | A value indicating whether or not `-1` errors from the API should be ignored.  This is helpful if the API itself makes external calls that are not always stable.  Returning `1` indicates that the API errors **can** be ignored.
+ignoreErrors | A value indicating whether or not errors from the API should be ignored.  This is helpful if the API itself makes external calls that are not always stable.  Returning `1` indicates that the API errors **can** be ignored.
 eligibility | Upon login, if an API should only be ran based on data that is returned from other API(s), an _XPath Expression_ can be provided to run against xDS Data (i.e. `xDataDef/HistoryData/HistoryItem[@hisType='dbCalculationID' and @hisIndex='ACCRUED']` will only allow API to process if a row exists for the `ACCRUED` index).  If the expression returns a node, then the API can be ran, otherwise it'll be skipped.  Note, after login, an API no longer checks eligibility and it is responsibility of the CalcEngine to only call APIs correctly.
 requires | When `eligiblity` is specified, a comma delimmited list of ids are required to indicate which APIs contain the required data to use during the `eligibility` expression evaluation.  When `id` values are provided in the `requires` column, the specified apiDataSource rows will run until completion before the dependent row starts and evaluates `eligibility`.
 mergeMode | Control how historical/transaction data is merged into the current xDS data model.  The default is `Replace` which will _delete all existing history rows_ before adding rows from API results.  Using `Merge` will leave existing history, and _only delete history rows with matching index values_ before adding the rows from API results.  Note that [temporary queries](#Temp-Query-Processing) are always treated as `Replace`.
@@ -201,6 +201,17 @@ dataSource | The `id` of the `apiDataSource` used to relate mappings to an endpo
 apiTable | The name of the table (array of objects) returned in json responses.
 xdsTable | Optional.  If provided, specifies the name of the table name that should be used in xDS profile.  If not provided, the value in `apiTable` is used.
 indexField | Specifies how to generate the unique index for each history row.
+
+##### apiDataSourceInputs Layout
+
+Column | Description
+---|---
+dataSource | The `id` of the `apiDataSource` used to relate mappings to an endpoint.
+key | The name of the input parameter to send to the API.
+value | Can be a static value or a string representation of JSON object (if `value` starts with `json:`).  Note that `{legalIdentifier}` is always replaced with the current user's xDS AuthID.
+parse | (Optional) A `1` or `0` indicating whether or not the site should attempt to parse the value into an `int`, `double` or `boolean`.  The default is `0` meaning the value will be treated as a `string` and enclosed in quotes.
+
+**Note**: When inputs are provided, the API is always called as a `POST` method.
 
 #### Custom API Reponse Processing
 
@@ -1947,10 +1958,11 @@ Column | Description
 id|The name of the application setting.
 DEFAULT|The default value to use for the application setting.
 LOCAL.DEV|(Optional) Override the `DEFAULT` value when site is running in a local devlopment debugger environment.
-EW1.DEV|(Optional) Override the `DEFAULT` value when site is running in the EW1.DEV environment.
-EW1.QA|(Optional) Override the `DEFAULT` value when site is running in the EW1.QA environment.
-EW1.UAT|(Optional) Override the `DEFAULT` value when site is running in the EW1.UAT environment.
-EW1.PROD|(Optional) Override the `DEFAULT` value when site is running in the EW1.PROD environment.
+EW.QA|(Optional) Override the `DEFAULT` value when site is running in the EW.QA environment.
+EW.PROD|(Optional) Override the `DEFAULT` value when site is running in the EW.PROD environment.
+NG.QA|(Optional) Override the `DEFAULT` value when site is running in the NG.QA environment.
+NG.UAT|(Optional) Override the `DEFAULT` value when site is running in the NG.UAT environment.
+NG.PROD|(Optional) Override the `DEFAULT` value when site is running in the NG.PROD environment.
 
 ### appAttributeMapping Table
 
@@ -1964,9 +1976,9 @@ persist|Whether or not to persist the value to the xDS data store; set the value
 
 ### userEligibility Table
 
-All user eligiblity logic in the `RBLUser` tab is controlled by the `userEligibity` table.  Each result table returned from this tab that has eligibility requirements will have a `eligibilityAll` and `eligibilityPlusAny` column availble to provide a comma delimitted list of eligibilites to evaluate.  Each eligibility specified in these columns will have a `value` of `1` if the current user has eligibility/access to the current resource.
+All user eligiblity logic in the `RBLUser` tab is controlled by the `userEligibity` table.  Each result table returned from this tab that has eligibility requirements will have a `eligibilityAll` and `eligibilityPlusAny` column availble to provide a comma delimitted list of eligibilites to evaluate.  Each eligibility specified in these columns will have a _truthy_ `value` if the current user has eligibility/access to the current resource.
 
-The `userEligibility` table in the 'global' BRD has the appropriate default value, but the actual value by finding the eligibility key inside the `<userEligibility>` input tab with a different value.  See [BRD Calculation Flow](#BRD-Calculation-Flow) for information on how eligibilites are specified between the combination of 'global' and 'user' BRDs.
+The `userEligibility` table in the 'global' BRD can have default value, while the client BRDs can provide override and additional eligibilities during 'Client Override Calculation' that will ultimately end up in the `<userEligibility>` table during global and client BRD calculations.  See [BRD Calculation Flow](#BRD-Calculation-Flow) for information on how eligibilites are specified between the combination of 'global' and 'user' BRDs.
 
 ### manualResults Table
 
@@ -2030,43 +2042,53 @@ As described in the [Benefit Requirements Document](#Benefit-Requirements-Docume
 
 There are two workflows to understand about BRD Calculations: 'Site settings' and 'User settings'.  The details of each BRD calculation type are below.
 
-Site Settings
-1. Returns settings that are client specific vs user specific (i.e. site key, page parameters, emergency client wide banners, client IDs for Nexgen APIs etc.)
-1. Calculated when the web site starts or when BRDs are updated.
-1. Processes `RBLSite` tab.  No formulas in this tab can refer to user data.
-1. All web site headers that start with `HTTP_NG_ATTR_` are passed in as inputs.
+**Site Settings**
 
-User Settings
+1. Returns settings that are site specific vs user specific (i.e. site key, page parameters, emergency site wide banners, IDs for external APIs etc.)
+1. Calculated when the web site starts, cached settings expire, or when BRDs are updated.
+1. Input Data
+	1. All cookies that start with `IAM_` are passed with input name being the same as the cookie name.
+	1. All web site headers that start with `HTTP_NG_ATTR_`, `SM_` or `IAM_` are passed with input name being the same as the header names (if matches name of cookies that start with `IAM_`, the header will be used instead of the cookie).
+	1. All page parameters are passed with input name being the the format of `PageParameter.<parameterName>`.
+1. Processes the `RBLEligibility` tab during the 'override' calculation.
+1. Processes `RBLSite` tab.  **No formulas in this tab can refer to participant or authenticated user data.**
+
+**User Settings**
+
 1. Returns settings that are user specific vs client specific (i.e. views, messaging banners, sharkfin inputs, channel page layout info, resource links for users, etc.)
 1. Calculated when a user logs in or when BRDs are updated while a user is logged in.
-1. Processes `RBLSite` and `RBLUser` tabs.  Only the `RBLUser` tab can have formulas that refer to user data.
+1. Input Data
+	1. All cookies that start with `IAM_` are passed with input name being the same as the cookie name.
+	1. All web site headers that start with `HTTP_NG_ATTR_`, `SM_` or `IAM_` are passed with input name being the same as the header names (if matches name of cookies that start with `IAM_`, the header will be used instead of the cookie).
+	1. All page parameters are passed with input name being the the format of `PageParameter.<parameterName>`.
 1. Processes the `RBLEligibility` tab during the 'override' calculation.
-1. All web site headers that start with `HTTP_NG_ATTR_` are passed in as inputs.
+1. Processes `RBLSite` and `RBLUser` tabs.  **Only the `RBLUser` tab can have formulas that refer to user data.**
+1. If the resulting `RBLSite` (Site Settings) has a new CalcEngine version than what is cached (i.e. this is the first calculation since a newly uploaded/approved global or client BRD), the new Site Settings will replace the cached settings.
 
 ### BRD Calculation Flow
 
-To understand the calculation flow of the global and client BRDs, you have to understand the purpose of the [userEligibility Table](#userEligibility-Table).  Below is the flow that occurs when BRD calculations are done.
+To understand the calculation flow of the global and client BRDs, please review the purpose of the [userEligibility Table](#userEligibility-Table) and how it controls user access to resources returned by the BRD calculations.  Below is the flow that occurs when BRD calculations occur (calculation order, submission data preparation, result merging, etc.).
 
 1. Prepare 'submit data' to pass to calculations.
     1. If user is *not* logged in, simply an empty xDS model.
-    1. If user *is* logged in, use current xDS model (this will have API response data merged into it)
-1. If user is logged in, run the 'Client Override' calculation.
-    1. Uses the client BRD and only processes the `RBLEligibility` tab.
-    1. Allows client BRD to pass in `userEligibility` overrides.
+    1. If user *is* logged in, use current xDS model (this will have all API response data merged into it that were not dependent on the actual BRD calculation via the `requires` column in the `apiDataSource` table).
+1. Run the 'Client Override' calculation.
+    1. Uses the client BRD and only processes the `RBLEligibility` tab which is expected to return a `userEligibility` table.
     1. Update original 'submit data' to be used in global BRD calculation.
-        1. Every table returned from `RBLEligibility` tab is converted into an xDS History table and can be accessed in their input tabs with the `<tableName>` syntax.
+        1. Every table returned from `RBLEligibility` tab is converted into an xDS History table and can be accessed on input tabs via the `<tableName>` syntax.
         1. `index` of each row is created with first matching element: `id`, `index`, simple auto counter.
         1. Every column returned in each table will be availble.
-        1. Matching history rows (by history type and `index`) will be completely replaced.
+        1. Matching rows (by history type and `index`) will be completely replaced (no merging is supported).
 1. Run the global BRD calculation.
-    1. Processes the `RBLSite` and `RBLUser` tabs.
-    1. Update original 'submit data' to be used in client BRD calculation.
-        1. Every table returned from `RBLUser` tab in global results is converted into an xDS History table in manner described above.
-        1. Every table returned from `RBLEligibility` tab in the 'Client Override' calculation is converted into an xDS History table in manner described above.
+    1. Processes the `RBLSite` tab and optionally, the `RBLUser` tab if a user is logging in.
+    1. Update original 'submit data' to be used in client BRD calculation by merging global results, then **again, re-merging** the 'Client Override' results.
+        1. Global Calculation Results: Every table returned from `RBLUser` tab is converted into an xDS History table in manner described above (replacing matching keys).
+        1. Client Override Results: Every table returned from `RBLEligibility` tab in the 'Client Override' calculation re-merged (last) taking precedence over any matching rows from original history or Global Calculation results.
 1. Run the 'Client BRD' calculation.
-1. [Merge](#BRD-Results-Merge-Flow) Global and and Client calculation results.
+    1. Processes the `RBLSite` tab and optionally, the `RBLUser` tab if a user is logging in.
+1. [Merge](#BRD-Results-Merge-Flow) Global and and Client calculation results into a single source of 'settings'.
 1. Build [AppSettings object](#AppSettings-Object) used in site.
-1. Build [UserSettings object](#UserSettings-Object) used in site for current user.
+1. Build [UserSettings object](#UserSettings-Object) used in site for current user (if user is logging in).
 1. Build [ManualResult caches](#ManualResult-Caches) used to pass to KatApps.
 
 ### BRD Results Merge Flow
