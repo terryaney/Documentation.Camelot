@@ -201,7 +201,7 @@ dataSource | The `id` of the `apiDataSource` used to relate mappings to an endpo
 apiTable | The name of the table (array of objects) returned in json responses.
 xdsTable | Optional.  If provided, specifies the name of the table name that should be used in xDS profile.  If not provided, the value in `apiTable` is used.
 indexField | Specifies how to generate the unique index for each history row.
-mappingFields | Optional. Controls how field names are mapped **when calling Nexgen APIs** before xDS mapping processing.  This is used in BA7 implementations to try and match field names between BA7 and Nexgen APIs.  The value a JSON object string with property names representing original field names and property values representing the desired field names.  For example, a value of `{"addr1":"address1","zip":"postalCode"}` would rename all `addr1` fields to `address1` and all `zip` fields to `postalCode` before any xDS mapping processing occurs.
+fieldMapping | Optional. Controls how field names are mapped **when calling Nexgen APIs** before xDS mapping processing.  This is used in BA7 implementations to try and match field names between BA7 and Nexgen APIs.  The value a JSON object string with property names representing original field names and property values representing the desired field names.  For example, a value of `{"addr1":"address1","zip":"postalCode"}` would rename all `addr1` fields to `address1` and all `zip` fields to `postalCode` before any xDS mapping processing occurs.
 filterExpression | Optional.  Regular expression to specify field name patterns to include in mapping **when querying KAT xDS Api**.  If provided, only fields that match the expression will be mapped.
 
 ##### apiDataSourceInputs Layout
