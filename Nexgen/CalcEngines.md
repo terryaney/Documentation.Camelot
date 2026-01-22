@@ -203,7 +203,7 @@ xdsTable | Optional.  If provided, specifies the name of the table name that sho
 indexField | Specifies how to generate the unique index for each history row.
 manualFields | Optional. Inject custom values into each resopnse object before being processed.  Value is simply a comma delimitted list of `key1=value1,key2=value2` pairs or JSON object string `{ "key1": "value1", "key2": "value2" }`.  [See sample usage](#manual-fields)
 fieldMapping | Optional. Controls how field names are mapped **when calling Nexgen APIs** before xDS mapping processing.  This is used in BA7 implementations to try and match field names between BA7 and Nexgen APIs.  The value is simply a comma delimitted list of `addr1=address1,zip=postalCode` or a JSON object string `{"addr1":"address1","zip":"postalCode"}`.  Renaming occurs before any xDS mapping processing occurs and this sample would rename all `addr1` fields to `address1` and all `zip` fields to `postalCode` .  [See sample usage](#field-mapping)
-filterExpression | Optional.  Regular expression to specify field name patterns to include in mapping **when querying KAT xDS Api**.  If provided, only fields that match the expression will be mapped.
+filterExpression | Optional.  Regular expression for field name patterns that must succeed to allow a field. Only matching fields that match the expression are mapped.
 
 **`filterExpression` Examples**
 Expression | Description
