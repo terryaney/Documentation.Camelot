@@ -201,7 +201,8 @@ dataSource | The `id` of the `apiDataSource` used to relate mappings to an endpo
 apiTable | The name of the table (array of objects) returned in json responses.
 xdsTable | Optional.  If provided, specifies the name of the table name that should be used in xDS profile.  If not provided, the value in `apiTable` is used.
 indexField | Specifies how to generate the unique index for each history row.
-fieldMapping | Optional. Controls how field names are mapped **when calling Nexgen APIs** before xDS mapping processing.  This is used in BA7 implementations to try and match field names between BA7 and Nexgen APIs.  The value a JSON object string with property names representing original field names and property values representing the desired field names.  For example, a value of `{"addr1":"address1","zip":"postalCode"}` would rename all `addr1` fields to `address1` and all `zip` fields to `postalCode` before any xDS mapping processing occurs.
+manualFields | Optional. Inject custom values into each resopnse object before being processed.  Value is simply a comma delimitted list of `key1=value1,key2=value2` pairs or JSON object string `{ "key1": "value1", "key2": "value2" }`.  [Sample](#manual-fields)
+fieldMapping | Optional. Controls how field names are mapped **when calling Nexgen APIs** before xDS mapping processing.  This is used in BA7 implementations to try and match field names between BA7 and Nexgen APIs.  The value is simply a comma delimitted list of `addr1=address1,zip=postalCode` or a JSON object string `{"addr1":"address1","zip":"postalCode"}`.  Renaming occurs before any xDS mapping processing occurs and this sample would rename all `addr1` fields to `address1` and all `zip` fields to `postalCode` .  [Sample](#field-mapping)
 filterExpression | Optional.  Regular expression to specify field name patterns to include in mapping **when querying KAT xDS Api**.  If provided, only fields that match the expression will be mapped.
 
 ##### apiDataSourceInputs Layout
@@ -1487,8 +1488,8 @@ When the history row is being generated, the field specified in `indexField` wil
 
 Just like [Default Profile Mapping](#Default-Profile-Mapping), every property that is *not* a direct descendant of an array (`[]`), regardless of hierarchy depth, by default, is flattened out and injected into the history row.
 
-dataSource|apiTable|xdsTable|indexField|manualFields
----|---|---|---|---
+dataSource|apiTable|xdsTable|indexField|manualFields|fieldMapping
+---|---|---|---|---|---
 sampleAPI|electedCoverages|coverages|benefitType
 
 **Note:** Given the sample reponse, the BRD would most likely contain namespace mapping information for the `electedCoverages.pending` container.  With no mapping information supplied, given identical names, the last properties processed (top to bottom) will take precedence and resulting in the Xml below.
@@ -1556,8 +1557,8 @@ When a field containing a number is used for the index via `indexField` it may b
 
 Note: Formatting is also supported while [Concatenating Index Fields](#Concatenating-Index-Fields).  To accomplish this, simply place the `:format` after any desired field segments.
 
-dataSource|apiTable|xdsTable|indexField|manualFields
----|---|---|---|---
+dataSource|apiTable|xdsTable|indexField|manualFields|fieldMapping
+---|---|---|---|---|---
 sampleAPI|beneficiaries|beneficiary|ssn:000000000
 
 ```xml
@@ -1583,8 +1584,8 @@ Additionally, each field that built an 'ancestor index' will be injected into th
 
 **Note:** When index includes a prefix of ancestor index(es), the field specified in the `indexField` for each child mapping **is not** excluded in the resulting history row as happens during normal index processing.
 
-dataSource|apiTable|xdsTable|indexField|manualFields
----|---|---|---|---
+dataSource|apiTable|xdsTable|indexField|manualFields|fieldMapping
+---|---|---|---|---|---
 sampleAPI|beneficiaries|beneficiary|ssn:000000000
 sampleAPI|addresses|beneficiaryAddress|addressType
 
@@ -1649,8 +1650,8 @@ When a simple array is processed, for each value in the array, a history row wil
 
 [Index Formatting](#Index-Formatting) is supported as well via `[array:format]` is supported as well if the `index` should have a format applied during processing.
 
-dataSource|apiTable|xdsTable|indexField|manualFields
----|---|---|---|---
+dataSource|apiTable|xdsTable|indexField|manualFields|fieldMapping
+---|---|---|---|---|---
 sampleAPI|paymentDate|paymentDate|[array:00]
 
 ```xml
@@ -1681,8 +1682,8 @@ Fields within a container can be namespaced with a prefix or a suffix to ensure 
 1. Array properties can *not* indicate namespacing.  They can only be mapped to a xDS history type.
 1. When namespacing a container that is part of an array object, the `apiTable` should include the array property name (i.e. `arrayProperty.containerName`).
 
-dataSource|apiTable|xdsTable|indexField|manualFields
----|---|---|---|---
+dataSource|apiTable|xdsTable|indexField|manualFields|fieldMapping
+---|---|---|---|---|---
 sampleAPI|profile||eeData*
 sampleAPI|profile.person.prevEmployment||eeDataPrev*
 sampleAPI|electedCoverages|coverages|benefitType
@@ -1740,8 +1741,8 @@ There are times when suitable fields to create a unique index are not available,
 
 When using `{id}`, by default there is no format applied to the number, however [Index Formatting](#Index-Formatting) is encouraged to ensure proper sorting.  To support _Index Formatting_, `{id:format}` is supported.
 
-dataSource|apiTable|xdsTable|indexField|manualFields
----|---|---|---|---
+dataSource|apiTable|xdsTable|indexField|manualFields|fieldMapping
+---|---|---|---|---|---
 sampleAPI|electedCoverages|coverages|{id:000}
 
 ```xml
@@ -1803,8 +1804,8 @@ As described in the [Default Profile Mapping](#Default-Profile-Mapping) and [Def
 
 To map 'root' response containers to history rows, the following mapping could be provided (remember the full path into JSON object is required).
 
-dataSource|apiTable|xdsTable|indexField|manualFields
----|---|---|---|---
+dataSource|apiTable|xdsTable|indexField|manualFields|fieldMapping
+---|---|---|---|---|---
 sampleAPI|profile|demographic|{id}
 sampleAPI|profile.person.employment|employment|{id}
 
@@ -1836,8 +1837,8 @@ sampleAPI|profile.person.employment|employment|{id}
 
 Mapping array properties (`[]`) to history tables is straight forward.  Instead of allowing the default flattening or namespacing a container, a container that is part of a history row can map to a different history table as well.
 
-dataSource|apiTable|xdsTable|indexField|manualFields
----|---|---|---|---
+dataSource|apiTable|xdsTable|indexField|manualFields|fieldMapping
+---|---|---|---|---|---
 sampleAPI|electedCoverages|coverages|benefitType
 sampleAPI|electedCoverages.pending|pendingCoverages|{id}
 
@@ -1884,8 +1885,8 @@ There are times when an array row from an API response can not be uniquely ident
 **Note:** When multiple fields form an index, their raw properties **are not** excluded in the resulting history row as happens when only one field is provided.
 
 
-dataSource|apiTable|xdsTable|indexField|manualFields
----|---|---|---|---
+dataSource|apiTable|xdsTable|indexField|manualFields|fieldMapping
+---|---|---|---|---|---
 sampleAPI|designations|beneficiaryDesignation|benefitType.planID
 
 ```xml
@@ -1928,8 +1929,8 @@ If the responses from both APIs do not have a guaranteed way to make a unique in
 
 The `manualFields` property is simply a comma delimitted list of `key=value` pairs.  Additionally, the `value` part of this assignment can use the `{id}` feature to generating an incrementing counting an injected field.
 
-dataSource|apiTable|xdsTable|indexField|manualFields
----|---|---|---|---
+dataSource|apiTable|xdsTable|indexField|manualFields|fieldMapping
+---|---|---|---|---|---
 sampleAPI|profile|dbCalcDetailsInfo|category.scenario|category=CURRENT,scenario={id:000}
 
 ```xml
@@ -1948,6 +1949,38 @@ sampleAPI|profile|dbCalcDetailsInfo|category.scenario|category=CURRENT,scenario=
             <hireDate>1967-10-17</hireDate> <!-- Flattened from employement, overwritten by prevEmployment -->
         </HistoryItem>
     </HistoryData>
+</xDataDef>
+```
+
+##### Field Mapping
+
+If you need to change a field name before xDS mapping process has begun, you can use the `fieldMapping` property.  Originally this was required to convert BA7 api results to match 'equivalent' Nexgen api results.
+
+dataSource|apiTable|xdsTable|indexField|manualFields|fieldMapping
+---|---|---|---|---|---
+sampleAPI|profile||||{ "first": "nameFirst", "last": "nameLast" }
+
+Given a response of (for brevity, only the relevant part is shown):
+
+```json
+{
+    "response": {
+        "id": "123",
+		"first": "TEST",
+		"last": "SAMPLE"
+    }
+}
+```
+
+Mapping result would be:
+
+```xml
+<xDataDef>
+	<Profile>
+		<id>123</id>
+		<nameFirst>TEST</nameFirst>
+		<nameLast>SAMPLE</nameLast>
+	</Profile>
 </xDataDef>
 ```
 
