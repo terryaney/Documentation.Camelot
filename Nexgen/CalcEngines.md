@@ -201,9 +201,17 @@ dataSource | The `id` of the `apiDataSource` used to relate mappings to an endpo
 apiTable | The name of the table (array of objects) returned in json responses.
 xdsTable | Optional.  If provided, specifies the name of the table name that should be used in xDS profile.  If not provided, the value in `apiTable` is used.
 indexField | Specifies how to generate the unique index for each history row.
-manualFields | Optional. Inject custom values into each resopnse object before being processed.  Value is simply a comma delimitted list of `key1=value1,key2=value2` pairs or JSON object string `{ "key1": "value1", "key2": "value2" }`.  [Sample](#manual-fields)
-fieldMapping | Optional. Controls how field names are mapped **when calling Nexgen APIs** before xDS mapping processing.  This is used in BA7 implementations to try and match field names between BA7 and Nexgen APIs.  The value is simply a comma delimitted list of `addr1=address1,zip=postalCode` or a JSON object string `{"addr1":"address1","zip":"postalCode"}`.  Renaming occurs before any xDS mapping processing occurs and this sample would rename all `addr1` fields to `address1` and all `zip` fields to `postalCode` .  [Sample](#field-mapping)
+manualFields | Optional. Inject custom values into each resopnse object before being processed.  Value is simply a comma delimitted list of `key1=value1,key2=value2` pairs or JSON object string `{ "key1": "value1", "key2": "value2" }`.  [See sample usage](#manual-fields)
+fieldMapping | Optional. Controls how field names are mapped **when calling Nexgen APIs** before xDS mapping processing.  This is used in BA7 implementations to try and match field names between BA7 and Nexgen APIs.  The value is simply a comma delimitted list of `addr1=address1,zip=postalCode` or a JSON object string `{"addr1":"address1","zip":"postalCode"}`.  Renaming occurs before any xDS mapping processing occurs and this sample would rename all `addr1` fields to `address1` and all `zip` fields to `postalCode` .  [See sample usage](#field-mapping)
 filterExpression | Optional.  Regular expression to specify field name patterns to include in mapping **when querying KAT xDS Api**.  If provided, only fields that match the expression will be mapped.
+
+**`filterExpression` Examples**
+Expression | Description
+---|---
+`^(name-first\|name-last)$` | Only include `name-first` and `name-last` fields.
+`^(city\|address-.+\|.+-code)$` | Only include `city`, fields that starts with `address-` and fields that ends with `-code`.
+`^(?!id$\|address3$\|ignore-fld$).*$` | All fields except the `id`, `address3` and `ignore-fld` fields.
+`^(?!hw-\|db-).*$` | All fields except fields that start with `hw-` or `db-`.
 
 ##### apiDataSourceInputs Layout
 
