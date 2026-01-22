@@ -28,6 +28,9 @@
                     - [Mapping History Container To New History Type](#Mapping-History-Container-To-New-History-Type)
                 - [Concatenating Index Fields](#Concatenating-Index-Fields)
                 - [Manual Fields](#Manual-Fields)
+                - [Field Mapping](#Field-Mapping)
+                - [Multiple Destinations](#Multiple-Destinations)
+                - [Field Filter Expressions](#Field-Filter-Expressions)
         - [appSettings Table](#appSettings-Table)
         - [appAttributeMapping Table](#appAttributeMapping-Table)
         - [userEligibility Table](#userEligibility-Table)
@@ -203,15 +206,7 @@ xdsTable | Optional.  If provided, specifies the name of the table name that sho
 indexField | Specifies how to generate the unique index for each history row.
 manualFields | Optional. Inject custom values into each resopnse object before being processed.  Value is simply a comma delimitted list of `key1=value1,key2=value2` pairs or JSON object string `{ "key1": "value1", "key2": "value2" }`.  [See sample usage](#manual-fields)
 fieldMapping | Optional. Controls how field names are mapped **when calling Nexgen APIs** before xDS mapping processing.  This is used in BA7 implementations to try and match field names between BA7 and Nexgen APIs.  The value is simply a comma delimitted list of `addr1=address1,zip=postalCode` or a JSON object string `{"addr1":"address1","zip":"postalCode"}`.  Renaming occurs before any xDS mapping processing occurs and this sample would rename all `addr1` fields to `address1` and all `zip` fields to `postalCode` .  [See sample usage](#field-mapping)
-filterExpression | Optional.  Regular expression for field name patterns that must succeed to allow a field. Only matching fields that match the expression are mapped.
-
-**`filterExpression` Examples**
-Expression | Description
----|---
-`^(name-first\|name-last)$` | Only include `name-first` and `name-last` fields.
-`^(city\|address-.+\|.+-code)$` | Only include `city`, fields that starts with `address-` and fields that ends with `-code`.
-`^(?!id$\|address3$\|ignore-fld$).*$` | All fields except the `id`, `address3` and `ignore-fld` fields.
-`^(?!hw-\|db-).*$` | All fields except fields that start with `hw-` or `db-`.
+filterExpression | Optional.  Regular expression for field name patterns that must succeed to allow a field. Only matching fields that match the expression are mapped. [See sample usage](#field-filter-expressions)
 
 ##### apiDataSourceInputs Layout
 
@@ -1989,6 +1984,118 @@ Mapping result would be:
 		<nameFirst>TEST</nameFirst>
 		<nameLast>SAMPLE</nameLast>
 	</Profile>
+</xDataDef>
+```
+
+##### Multiple Destinations
+
+There are times when a single API response container needs to map to multiple xDS history tables. For example, a `profile.person.employment` container might contain fields that should be split across separate history types like `employmentCategory`, `employmentStatus`, and `employmentPay`.
+
+The "multiple destinations" feature allows this by using a `+` prefix notation on the `apiTable` column. The same source container can be mapped multiple times by prefixing subsequent mappings with increasing numbers of `+` characters:
+
+1. First mapping: `profile.person.employment` (no prefix) - processed first
+2. Second mapping: `+profile.person.employment` (one `+`) - processed second
+3. Third mapping: `++profile.person.employment` (two `+`) - processed third
+
+The `+` prefixes are stripped during processing, allowing the same API container to be reused for each mapping.  Essentially the workflow is:
+
+1. Process all mappings without `+` prefixes first.
+2. Then process mappings with one `+` prefix.
+3. Then process mappings with two `+` prefixes.
+4. And so on...so if you needed to group some mappings together, if mapping a parent history and child container to new history rows), you would use the same number of `+` prefixes.  See [Mapping History Container To New History Type](#mapping-history-container-to-new-history-type) for an example of this.
+
+dataSource|apiTable|xdsTable|indexField|filterExpression
+---|---|---|---|---
+comEmployeeData|profile.person.employment|employmentCategory|{id}|^emplCategory
+comEmployeeData|+profile.person.employment|employmentStatus|{id}|^emplStatus
+comEmployeeData|++profile.person.employment|employmentPay|{id}|^pay
+
+Given an API response containing employment data with category, status, and pay fields, the mapping would produce three separate history types:
+
+```xml
+<xDataDef>
+    <HistoryData>
+        <HistoryItem hisType="employmentCategory" hisIndex="1">
+            <index>1</index>
+            <emplCategoryCode>F</emplCategoryCode>
+            <emplCategory>FULL_TIME</emplCategory>
+        </HistoryItem>
+        <HistoryItem hisType="employmentStatus" hisIndex="1">
+            <index>1</index>
+            <emplStatusCode>A</emplStatusCode>
+            <emplStatus>ACTIVE</emplStatus>
+            <emplStatusDate>2010-01-19</emplStatusDate>
+        </HistoryItem>
+        <HistoryItem hisType="employmentPay" hisIndex="1">
+            <index>1</index>
+            <payFreq>BIWEEKLY</payFreq>
+            <payRate>0.0</payRate>
+            <payCode>A</payCode>
+        </HistoryItem>
+    </HistoryData>
+</xDataDef>
+```
+
+**Note**: When using multiple destinations, you will typically want to combine this feature with `filterExpression` to control which fields from the source container go to each destination history type.
+
+##### Field Filter Expressions
+
+The `filterExpression` column allows filtering which fields from the API response are included in the xDS mapping. Only fields whose names match the regular expression pattern will be mapped.
+
+This is particularly useful when:
+
+1. Splitting a single API container across multiple xDS history types (see [Multiple Destinations](#Multiple-Destinations))
+2. Excluding unwanted fields from the mapping
+3. Selecting specific fields without explicitly listing each one
+
+dataSource|apiTable|xdsTable|indexField|filterExpression
+---|---|---|---|---
+comAddresses|response.addresses|addresses|addressType|^(address1\|city\|state\|postalCode)$
+
+**Common Filter Expression Patterns**
+
+Expression | Description
+---|---
+`^(name-first\|name-last)$` | Only include `name-first` and `name-last` fields.
+`^(city\|address-.+\|.+-code)$` | Only include `city`, fields that starts with `address-` and fields that ends with `-code`.
+`^(?!id$\|address3$\|ignore-fld$).*$` | All fields except the `id`, `address3` and `ignore-fld` fields.
+`^(?!hw-\|db-).*$` | All fields except fields that start with `hw-` or `db-`.
+
+Given an API response with many address fields:
+
+```json
+{
+    "response": {
+        "addresses": [
+            {
+                "addressType": "HOME",
+                "address1": "123 Main St",
+                "address2": "",
+                "city": "New York",
+                "state": "NY",
+                "postalCode": "10001",
+                "country": "US",
+                "isPrimary": true,
+                "lastUpdated": "2024-01-15"
+            }
+        ]
+    }
+}
+```
+
+With `filterExpression` of `^(address1|city|state|postalCode)$`, the mapping would only include:
+
+```xml
+<xDataDef>
+    <HistoryData>
+        <HistoryItem hisType="addresses" hisIndex="HOME">
+            <index>HOME</index>
+            <address1>123 Main St</address1>
+            <city>New York</city>
+            <state>NY</state>
+            <postalCode>10001</postalCode>
+        </HistoryItem>
+    </HistoryData>
 </xDataDef>
 ```
 
