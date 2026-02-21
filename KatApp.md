@@ -404,6 +404,7 @@ Helper object used to access RBLe Framework Calculation results.
 
 Property | Type | Description
 `results`<sup>1</sup> | `IStringIndexer<IStringIndexer<Array<ITabDefRow>>>` | JSON object containing results of all assocatied CalcEngines.  Typically not used by Kaml developers.  Instead, use other methods of `IStateRbl` to grab results.  The `string` key to results is the concatenation of `CalcEngineKey.TabName`.
+`expressions` | [`IStateRblExpressions`](#istaterblexpressions) | Provides access to evaluated values from `rbl-expression` rows returned by CalcEngine results.  Return evaluated values from `rbl-expression` rows using `value`, `number`, and `boolean` accessors or direct access via expression `id`.
 
 <sup>1</sup> The `results` object can be visualized as below (See [RBLe Framework Result Processing in KatApp State](#rble-framework-result-processing-in-katapp-state) to understand how RBLe Framework result managed in KatApp state to ensure proper `reactivity` after each calculation):
 
@@ -683,6 +684,49 @@ application.on("resultsProcessing.ka", (event, results, inputs) => {
 ```
 
 The *first* CalcEngine key and its *first* result tab defined in the [`<rbl-config>`](#configuring-calcengines-and-template-files) element in the Kaml View will be used when pushing results if calcEngine and/or tab are not provided.
+
+#### IStateRbl.expressions
+
+**`expressions.value(id: string) => string | undefined`**  
+**`expressions.number(id: string) => number`**  
+**`expressions.boolean(id: string, valueWhenMissing?: boolean) => boolean`**
+
+Provides evaluated results of JavaScript expression strings returned by the CalcEngine in the special `rbl-expression` result table.
+
+The `rbl-expression` table requires an `id` column and a `value` column. The `value` column contains a JavaScript expression evaluated against the current KatApp `state` object. All expressions are compiled once per calculation run into a single object, not re-compiled on each accessor call.
+In addition to direct access to the [IState](#istate) properties and methods, expressions have access to the other expression results via `this`.  So if there are multiple rows in the `rbl-expression` table, they can reference each other as long as there are no circular references.
+
+| Accessor | Returns |
+|---|---|
+| `value(id)` | The `string` result of the expression, or `undefined` if no row with that `id` exists or the expression throws. |
+| `number(id)` | The result parsed as a number; returns `0` if missing or not parseable. |
+| `boolean(id, valueWhenMissing?)` | The result parsed using the same truthy rules as `rbl.boolean()`. Returns `valueWhenMissing ?? true` when the `id` is not found. |
+
+Expressions have implicit access to all `state` properties (`inputs`, `rbl`, `model`, etc.) without qualification. Expressions can reference each other using `this.expressionId`.
+
+Each CalcEngine `rbl-expression` table is stateless across calculations — rows are **not** merged with results from previous runs. If any `rbl-expression` rows are returned in a given calculation, the entire expression object is rebuilt from scratch using only those rows. Therefore, a CalcEngine must return every expression row the application needs on every calculation run that returns any `rbl-expression` rows. Rows returned across multiple CalcEngines or result tabs within a single run are combined into one expressions object (last writer wins on duplicate `id` values).
+
+**CalcEngine table:**
+
+| id | value |
+|---|---|
+| `isFutureDate` | `new Date(inputs.iEffectiveDate) > new Date()` |
+| `adjustedSalary` | `rbl.number('salary') * 1.03` |
+| `isEligible` | `this.isFutureDate && inputs.iStatus != 'retired'` |
+
+**Usage in KAML JavaScript:**
+```javascript
+const isFuture = application.state.rbl.expressions.boolean("isFutureDate");
+const salary   = application.state.rbl.expressions.number("adjustedSalary");
+```
+
+**Usage in KAML markup:**
+```html
+<div v-if="rbl.expressions.boolean('isFutureDate')">Future date selected</div>
+<span v-text="rbl.expressions.value('adjustedSalary')"></span>
+```
+
+> **Note:** Expression strings are compiled using the `Function` constructor and have access to `state` properties via a `with(state)` scope inside each getter. Syntax errors in any expression string are caught individually; the affected `id` will return `undefined` / `0` / `true` from its accessors. Runtime errors are traced at `TraceVerbosity.None`.
 
 
 ## RBLe Framework Result Processing in KatApp State
