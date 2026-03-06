@@ -4235,6 +4235,7 @@ When a KatApp is being created via the [`KatApp.createAppAsync`](#katappcreateap
 1. All events in the [Calculation Lifecycle](#calculation-lifecycle) - if any CalcEngines are [configured to all iConfigureUI calculations](#configuring-calcengines-and-template-files)
 1. [rendered](#ikatapprendered)
 1. [nestedAppRendered](#ikatappnestedapprendered) - if application is a nested application
+1. [modalAppClosed](#ikatappmodalappclosed) - if application is a modal application
 
 #### Calculation Lifecycle
 
@@ -4276,6 +4277,7 @@ Name | Description
 ---|---
 [`initialized`](#ikatappinitialized) | Triggered after KatApp Framework has finished initialization.
 [`modalAppInitialized`](#ikatappmodalappinitialized) | Triggered on host application after a modal application has been initialized.
+[`modalAppClosed`](#ikatappmodalappclosed) | Triggered on modal application after a modal has been closed (irregaurdless of confirm or cancel).
 [`nestedAppInitialized`](#ikatappnestedappinitialized) | Triggered on host application after a nested application has been initialized.
 [`rendered`](#ikatapprendered) | Triggered after Kaml View has been made visible to the user.
 [`nestedAppRendered`](#ikatappnestedapprendered) | Triggered on host application after a nested application has been rendered.
@@ -4334,6 +4336,11 @@ if (response.confirmed) {
 
 2. It is triggered **on the modal application** after the modal application has been initialized and calculations and/or manualResults has been processed.  It allows for a modal application to cancel the display of the modal if needed.  This is accomplished by returning `false`.  No return or returning `true` allows the modal application to display normally.
 
+#### IKatApp.modalAppClosed
+
+**`modalAppClosed(modalApplication: IKatApp)`**
+
+This event is triggered when KatApp modal is confirmed or cancelled.  Allows for event to be handled in the modal application's event configuration regardless of confirm or cancel.  Useful for cleanup of events that might have been registered by the modal application on elements outside of the application scope (i.e. document elements).
 
 #### IKatApp.nestedAppInitialized
 
