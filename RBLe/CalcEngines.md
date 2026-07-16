@@ -1,4 +1,4 @@
-﻿# RBLe CalcEngines
+# RBLe CalcEngines
 
 The spreadsheets used to perform the complex actuarial calculations or business logic for KAT products should originally be converted to a RBLe CalcEngine (CE).
 
